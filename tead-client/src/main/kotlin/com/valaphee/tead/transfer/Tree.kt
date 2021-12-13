@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.valaphee.tead.explorer
+package com.valaphee.tead.transfer
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -51,9 +51,8 @@ import kotlin.coroutines.CoroutineContext
  * @author Kevin Ludwig
  */
 class Tree<T : Entry<T>>(
-    private val entry: Entry<T>,
     override val coroutineContext: CoroutineContext
-) : TreeTableView<Entry<T>>(entry.item), CoroutineScope {
+) : TreeTableView<Entry<T>>(), CoroutineScope {
     lateinit var job: Job
 
     init {
@@ -94,8 +93,6 @@ class Tree<T : Entry<T>>(
                 }
             }
         }
-
-        populate(root)
     }
 
     fun populate(item: TreeItem<Entry<T>>) {
@@ -106,10 +103,14 @@ class Tree<T : Entry<T>>(
         stopUpdates()
         job = launch {
             while (true) {
-                entry.update()
+                update()
                 delay(1000)
             }
         }
+    }
+
+    fun update() {
+        root.value.update()
     }
 
     fun stopUpdates() {
@@ -117,6 +118,6 @@ class Tree<T : Entry<T>>(
     }
 
     companion object {
-        private val manifest = jacksonObjectMapper().readValue<Manifest>(Tree::class.java.getResourceAsStream("/explorer/.manifest")!!)
+        private val manifest = jacksonObjectMapper().readValue<Manifest>(Tree::class.java.getResourceAsStream("/transfer/.manifest")!!)
     }
 }

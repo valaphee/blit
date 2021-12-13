@@ -22,23 +22,32 @@
  * SOFTWARE.
  */
 
-package com.valaphee.tead.explorer
+package com.valaphee.tead.transfer
 
-import javafx.scene.control.TreeItem
+import com.fasterxml.jackson.annotation.JsonIgnore
+import javafx.scene.image.Image
 
 /**
  * @author Kevin Ludwig
  */
-abstract class Entry<T : Entry<T>> : Comparable<Entry<T>> {
-    abstract val item: TreeItem<Entry<T>>
-    val self get() = this
+class Manifest(
+    val defaultFileIcon: FileIcon,
+    val fileIcons: List<FileIcon>,
+    val defaultFolderIcon: FolderIcon,
+    val folderIcons: List<FolderIcon>
+) {
+    class FileIcon(
+        val name: String,
+        val fileNames: List<String> = emptyList(),
+        val fileExtensions: List<String> = emptyList()
+    ) {
+        @get:JsonIgnore val image by lazy { Image(Manifest::class.java.getResourceAsStream("/transfer/$name.svg"), 16.0, 16.0, false, false) }
+    }
 
-    abstract val name: String
-    abstract val size: Long
-    abstract val directory: Boolean
-    abstract val children: List<T>
-
-    abstract fun update()
-
-    override fun compareTo(other: Entry<T>) = name.compareTo(other.name)
+    class FolderIcon(
+        val name: String,
+        val folderNames: List<String> = emptyList()
+    ) {
+        @get:JsonIgnore val image by lazy { Image(Manifest::class.java.getResourceAsStream("/transfer/$name.svg"), 16.0, 16.0, false, false) }
+    }
 }

@@ -22,48 +22,23 @@
  * SOFTWARE.
  */
 
-package com.valaphee.tead.explorer
+package com.valaphee.tead.transfer.sftp
 
-import javafx.beans.property.SimpleStringProperty
-import javafx.collections.FXCollections
-import javafx.scene.layout.Priority
-import javafx.scene.layout.VBox
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import tornadofx.Dimension
-import tornadofx.add
-import tornadofx.combobox
-import tornadofx.hbox
-import tornadofx.hgrow
-import tornadofx.onChange
-import tornadofx.style
-import tornadofx.textfield
-import java.io.File
+import com.valaphee.tead.transfer.Source
+import org.apache.sshd.sftp.client.SftpClient
+import org.apache.sshd.sftp.common.SftpException
 
 /**
  * @author Kevin Ludwig
  */
-class TreePane<T : Entry<T>>(
-    private val entry: Entry<T>,
-) : VBox() {
-    private val root = SimpleStringProperty(File("").absolutePath).onChange {
-        tree.root = entry.item
-
-        tree.populate(tree.root)
+class SftpSource(
+    private val sftpClient: SftpClient
+) : Source<SftpEntry> {
+    override fun isValid(path: String) = try {
+        sftpClient.stat(SftpEntry.Path(path, "").toString()).isDirectory
+    } catch (_: SftpException) {
+        false
     }
-    private val tree = Tree(entry, Dispatchers.IO + SupervisorJob()).also { it.startUpdates() }
 
-    init {
-        hgrow = Priority.ALWAYS
-
-        hbox {
-            combobox<String> { items = FXCollections.observableArrayList("Local", "root@127.0.0.1") }
-            textfield(root) {
-                hgrow = Priority.ALWAYS
-
-                style(append = true) { prefHeight = Dimension(27.0, Dimension.LinearUnits.px) }
-            }
-        }
-        add(tree)
-    }
+    override fun get(path: String) = SftpEntry(sftpClient, SftpEntry.Path(path, ""))
 }

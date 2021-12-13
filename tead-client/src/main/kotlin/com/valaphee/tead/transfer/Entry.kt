@@ -22,21 +22,23 @@
  * SOFTWARE.
  */
 
-package com.valaphee.tead
+package com.valaphee.tead.transfer
 
-import com.valaphee.tead.transfer.TransferView
-import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory
-import javafx.scene.image.Image
-import tornadofx.App
-import tornadofx.launch
+import javafx.scene.control.TreeItem
 
 /**
  * @author Kevin Ludwig
  */
-class Main : App(Image(Main::class.java.getResourceAsStream("/app.png")), TransferView::class)
+abstract class Entry<T : Entry<T>> : Comparable<Entry<T>> {
+    abstract val item: TreeItem<Entry<T>>
+    val self get() = this
 
-fun main(arguments: Array<String>) {
-    SvgImageLoaderFactory.install()
+    abstract val name: String
+    abstract val size: Long
+    abstract val directory: Boolean
+    abstract val children: List<T>
 
-    launch<Main>(arguments)
+    abstract fun update()
+
+    override fun compareTo(other: Entry<T>) = name.compareTo(other.name)
 }

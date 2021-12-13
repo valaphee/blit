@@ -22,32 +22,32 @@
  * SOFTWARE.
  */
 
-package com.valaphee.tead.explorer
+package com.valaphee.tead.transfer
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import javafx.scene.image.Image
+import com.valaphee.tead.transfer.local.LocalSource
+import com.valaphee.tead.transfer.sftp.SftpSource
+import jfxtras.styles.jmetro.JMetro
+import jfxtras.styles.jmetro.JMetroStyleClass
+import jfxtras.styles.jmetro.Style
+import org.apache.sshd.client.SshClient
+import org.apache.sshd.sftp.client.impl.DefaultSftpClientFactory
+import tornadofx.View
+import tornadofx.splitpane
 
 /**
  * @author Kevin Ludwig
  */
-class Manifest(
-    val defaultFileIcon: FileIcon,
-    val fileIcons: List<FileIcon>,
-    val defaultFolderIcon: FolderIcon,
-    val folderIcons: List<FolderIcon>
-) {
-    class FileIcon(
-        val name: String,
-        val fileNames: List<String> = emptyList(),
-        val fileExtensions: List<String> = emptyList()
-    ) {
-        @get:JsonIgnore val image by lazy { Image(Manifest::class.java.getResourceAsStream("/explorer/$name.svg"), 20.0, 20.0, false, false) }
-    }
+class TransferView : View("Transfer") {
+    override val root = splitpane {
+        JMetro(this, Style.DARK)
+        styleClass.add(JMetroStyleClass.BACKGROUND)
 
-    class FolderIcon(
-        val name: String,
-        val folderNames: List<String> = emptyList()
-    ) {
-        @get:JsonIgnore val image by lazy { Image(Manifest::class.java.getResourceAsStream("/explorer/$name.svg"), 20.0, 20.0, false, false) }
+        add(TransferPane(LocalSource()))
+        val ssh = SshClient.setUpDefaultClient()
+        ssh.start()
+        val sshSession = ssh.connect("*", "*", 22).verify(30000).session
+        sshSession.addPasswordIdentity("*")
+        sshSession.auth().verify(30000)
+        add(TransferPane(SftpSource(DefaultSftpClientFactory.INSTANCE.createSftpClient(sshSession))))
     }
 }

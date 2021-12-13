@@ -22,21 +22,13 @@
  * SOFTWARE.
  */
 
-package com.valaphee.tead
-
-import com.valaphee.tead.transfer.TransferView
-import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory
-import javafx.scene.image.Image
-import tornadofx.App
-import tornadofx.launch
+package com.valaphee.tead.transfer
 
 /**
  * @author Kevin Ludwig
  */
-class Main : App(Image(Main::class.java.getResourceAsStream("/app.png")), TransferView::class)
+interface Source<T : Entry<T>> {
+    fun isValid(path: String): Boolean
 
-fun main(arguments: Array<String>) {
-    SvgImageLoaderFactory.install()
-
-    launch<Main>(arguments)
+    operator fun get(path: String): T
 }

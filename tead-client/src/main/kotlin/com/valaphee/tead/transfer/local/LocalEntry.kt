@@ -22,8 +22,9 @@
  * SOFTWARE.
  */
 
-package com.valaphee.tead.explorer
+package com.valaphee.tead.transfer.local
 
+import com.valaphee.tead.transfer.Entry
 import javafx.scene.control.TreeItem
 import java.io.File
 import java.nio.file.FileSystems
@@ -34,7 +35,7 @@ import kotlin.io.path.name
 /**
  * @author Kevin Ludwig
  */
-class LocalEntry(
+open class LocalEntry(
     internal val path: File
 ) : Entry<LocalEntry>() {
     override val item = TreeItem<Entry<LocalEntry>>(this)
@@ -42,8 +43,10 @@ class LocalEntry(
     override val name: String get() = path.name
     override val size = path.length()
     override val directory = path.isDirectory
-    override var children = path.listFiles()?.map { LocalEntry(it) } ?: emptyList()
-        private set
+
+    override val children get() = _children ?: (path.listFiles()?.map { LocalEntry(it) } ?: emptyList()).also { _children = it }
+    private var _children: List<LocalEntry>? = null
+
     private val watchKey = if (path.isDirectory) path.toPath().register(watcherService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE) else null
 
     override fun update() {
@@ -66,9 +69,11 @@ class LocalEntry(
             }
         }
 
-        children = path.listFiles()?.map { LocalEntry(it) } ?: emptyList()
+        _children = path.listFiles()?.map { LocalEntry(it) } ?: emptyList()
         children.forEach { it.update() }
     }
+
+    override fun toString() = path.toString()
 
     companion object {
         private val watcherService = FileSystems.getDefault().newWatchService()

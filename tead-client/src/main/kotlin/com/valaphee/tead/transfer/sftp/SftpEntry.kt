@@ -22,43 +22,43 @@
  * SOFTWARE.
  */
 
-package com.valaphee.tead.explorer
+package com.valaphee.tead.transfer.sftp
 
+import com.valaphee.tead.transfer.Entry
 import javafx.scene.control.TreeItem
 import org.apache.sshd.sftp.client.SftpClient
 
 /**
  * @author Kevin Ludwig
  */
-class SshEntry(
+class SftpEntry(
     private val sftpClient: SftpClient,
-    private val sshPath: SshPath,
-    private val attributes: SftpClient.Attributes = sftpClient.stat(sshPath.toString())
-) : Entry<SshEntry>() {
-    override val item = TreeItem<Entry<SshEntry>>(this)
+    private val path: Path,
+    private val attributes: SftpClient.Attributes = sftpClient.stat(path.toString())
+) : Entry<SftpEntry>() {
+    override val item = TreeItem<Entry<SftpEntry>>(this)
 
-    override val name get() = sshPath.name
+    override val name get() = path.name
     override val size get() = attributes.size
     override val directory get() = attributes.isDirectory
-    override val children by lazy {
-        if (directory) try {
-            println(sshPath.toString())
-            sftpClient.readDir(sshPath.toString()).mapNotNull {
-                val name = it.filename
-                if (name != "." && name != "..") SshEntry(sftpClient, sshPath.subPath(name), it.attributes) else null
-            }
-        } catch (_: RuntimeException) {
-            emptyList()
-        } else emptyList()
-    }
+
+    override val children get() = _children ?: (if (directory) try {
+        sftpClient.readDir(path.toString()).mapNotNull {
+            val name = it.filename
+            if (name != "." && name != "..") SftpEntry(sftpClient, path.subPath(name), it.attributes) else null
+        }
+    } catch (_: RuntimeException) {
+        emptyList()
+    } else emptyList()).also { _children = it }
+    private var _children: List<SftpEntry>? = null
 
     override fun update() {
-        /*if (!item.isExpanded) return
+        if (!item.isExpanded) return
 
-        children = if (directory) try {
-            sftpClient.readDir(sshPath.toString()).mapNotNull {
+        _children = if (directory) try {
+            sftpClient.readDir(path.toString()).mapNotNull {
                 val name = it.filename
-                if (name != "." && name != "..") SshEntry(sftpClient, sshPath.subPath(name), it.attributes) else null
+                if (name != "." && name != "..") SftpEntry(sftpClient, path.subPath(name), it.attributes) else null
             }
         } catch (_: RuntimeException) {
             emptyList()
@@ -67,14 +67,16 @@ class SshEntry(
         children.forEach {
             item.children += it.item
             it.update()
-        }*/
+        }
     }
 
-    class SshPath(
+    override fun toString() = path.toString()
+
+    class Path(
         private val cd: String,
         val name: String
     ) {
-        fun subPath(name: String) = SshPath(toString(), name)
+        fun subPath(name: String) = Path(toString(), name)
 
         override fun toString() = if (name.isEmpty()) cd else if (cd.endsWith("/")) "$cd$name" else "$cd/$name"
     }

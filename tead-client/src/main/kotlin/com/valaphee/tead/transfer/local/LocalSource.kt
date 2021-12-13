@@ -22,31 +22,16 @@
  * SOFTWARE.
  */
 
-package com.valaphee.tead.explorer
+package com.valaphee.tead.transfer.local
 
-import jfxtras.styles.jmetro.JMetro
-import jfxtras.styles.jmetro.JMetroStyleClass
-import jfxtras.styles.jmetro.Style
-import org.apache.sshd.client.SshClient
-import org.apache.sshd.sftp.client.impl.DefaultSftpClientFactory
-import tornadofx.View
-import tornadofx.splitpane
+import com.valaphee.tead.transfer.Source
 import java.io.File
 
 /**
  * @author Kevin Ludwig
  */
-class Explorer : View("Explorer") {
-    override val root = splitpane {
-        JMetro(this, Style.DARK)
-        styleClass.add(JMetroStyleClass.BACKGROUND)
+class LocalSource : Source<LocalEntry> {
+    override fun isValid(path: String) = File(path).isDirectory
 
-        add(TreePane(LocalEntry(File("."))))
-        val ssh = SshClient.setUpDefaultClient()
-        ssh.start()
-        val sshSession = ssh.connect("test", "162.55.41.109", 22).verify(30000).session
-        sshSession.addPasswordIdentity("b3BlbnNzaC1rZXkt")
-        sshSession.auth().verify(30000)
-        add(TreePane(SshEntry(DefaultSftpClientFactory.INSTANCE.createSftpClient(sshSession), SshEntry.SshPath("/", ""))))
-    }
+    override fun get(path: String) = LocalEntry(File(path))
 }
