@@ -40,10 +40,10 @@ class LocalEntry(
     override val item = TreeItem<Entry<LocalEntry>>(this)
 
     override val name: String get() = path.name
-    override val size get() = path.length()
-    override val directory get() = path.isDirectory
-    override val children get() = path.listFiles()?.map { LocalEntry(it) } ?: emptyList()
-
+    override val size = path.length()
+    override val directory = path.isDirectory
+    override var children = path.listFiles()?.map { LocalEntry(it) } ?: emptyList()
+        private set
     private val watchKey = if (path.isDirectory) path.toPath().register(watcherService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE) else null
 
     override fun update() {
@@ -66,8 +66,10 @@ class LocalEntry(
             }
         }
 
+        children = path.listFiles()?.map { LocalEntry(it) } ?: emptyList()
         children.forEach { it.update() }
     }
+
     companion object {
         private val watcherService = FileSystems.getDefault().newWatchService()
     }

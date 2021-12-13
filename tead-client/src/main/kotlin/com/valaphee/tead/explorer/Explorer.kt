@@ -24,25 +24,13 @@
 
 package com.valaphee.tead.explorer
 
-import javafx.beans.property.SimpleStringProperty
-import javafx.collections.FXCollections
-import javafx.scene.layout.Priority
-import javafx.scene.layout.VBox
 import jfxtras.styles.jmetro.JMetro
 import jfxtras.styles.jmetro.JMetroStyleClass
 import jfxtras.styles.jmetro.Style
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import tornadofx.Dimension
+import org.apache.sshd.client.SshClient
+import org.apache.sshd.sftp.client.impl.DefaultSftpClientFactory
 import tornadofx.View
-import tornadofx.add
-import tornadofx.combobox
-import tornadofx.hbox
-import tornadofx.hgrow
-import tornadofx.onChange
 import tornadofx.splitpane
-import tornadofx.style
-import tornadofx.textfield
 import java.io.File
 
 /**
@@ -53,29 +41,12 @@ class Explorer : View("Explorer") {
         JMetro(this, Style.DARK)
         styleClass.add(JMetroStyleClass.BACKGROUND)
 
-        add(Pane())
-        add(Pane())
-    }
-
-    class Pane : VBox() {
-        private val root = SimpleStringProperty(File("").absolutePath).onChange {
-            tree.root = LocalEntry(File(it!!)).item
-            tree.populate(tree.root)
-        }
-        private val tree = Tree(LocalEntry(File(".")), Dispatchers.IO + SupervisorJob())
-
-        init {
-            hgrow = Priority.ALWAYS
-
-            hbox {
-                combobox<String> { items = FXCollections.observableArrayList("Local", "root@127.0.0.1") }
-                textfield(root) {
-                    hgrow = Priority.ALWAYS
-
-                    style(append = true) { prefHeight = Dimension(27.0, Dimension.LinearUnits.px) }
-                }
-            }
-            add(tree)
-        }
+        add(TreePane(LocalEntry(File("."))))
+        val ssh = SshClient.setUpDefaultClient()
+        ssh.start()
+        val sshSession = ssh.connect("test", "162.55.41.109", 22).verify(30000).session
+        sshSession.addPasswordIdentity("b3BlbnNzaC1rZXkt")
+        sshSession.auth().verify(30000)
+        add(TreePane(SshEntry(DefaultSftpClientFactory.INSTANCE.createSftpClient(sshSession), SshEntry.SshPath("/", ""))))
     }
 }

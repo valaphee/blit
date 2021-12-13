@@ -80,7 +80,7 @@ class Tree<T : Entry<T>>(
         selectionModel.selectedItemProperty().onChange {
             it?.let {
                 contextMenu = ContextMenu().apply {
-                    if ((it.value as LocalEntry).path.isDirectory) {
+                    if (it.value.directory) {
                         item("Open")
                     } else {
                         item("Open")
@@ -98,8 +98,8 @@ class Tree<T : Entry<T>>(
         populate(root)
     }
 
-    fun populate(item: TreeItem<Entry<T>>){
-        populateTree(item, { entry -> TreeItem(entry).apply { expandedProperty().onChange { if (it) populate(this) } } }) { if (it.isExpanded || it.parent.isExpanded) it.value.children else emptyList() }
+    fun populate(item: TreeItem<Entry<T>>) {
+        launch { populateTree(item, { entry -> TreeItem(entry).apply { expandedProperty().onChange { if (it) populate(this) } } }) { if (it.isExpanded || it.parent.isExpanded) it.value.children else emptyList() } }
     }
 
     fun startUpdates() {

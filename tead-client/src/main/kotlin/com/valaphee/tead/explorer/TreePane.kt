@@ -24,30 +24,46 @@
 
 package com.valaphee.tead.explorer
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import javafx.scene.image.Image
+import javafx.beans.property.SimpleStringProperty
+import javafx.collections.FXCollections
+import javafx.scene.layout.Priority
+import javafx.scene.layout.VBox
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import tornadofx.Dimension
+import tornadofx.add
+import tornadofx.combobox
+import tornadofx.hbox
+import tornadofx.hgrow
+import tornadofx.onChange
+import tornadofx.style
+import tornadofx.textfield
+import java.io.File
 
 /**
  * @author Kevin Ludwig
  */
-class Manifest(
-    val defaultFileIcon: FileIcon,
-    val fileIcons: List<FileIcon>,
-    val defaultFolderIcon: FolderIcon,
-    val folderIcons: List<FolderIcon>
-) {
-    class FileIcon(
-        val name: String,
-        val fileNames: List<String> = emptyList(),
-        val fileExtensions: List<String> = emptyList()
-    ) {
-        @get:JsonIgnore val image by lazy { Image(Manifest::class.java.getResourceAsStream("/explorer/$name.svg"), 20.0, 20.0, false, false) }
-    }
+class TreePane<T : Entry<T>>(
+    private val entry: Entry<T>,
+) : VBox() {
+    private val root = SimpleStringProperty(File("").absolutePath).onChange {
+        tree.root = entry.item
 
-    class FolderIcon(
-        val name: String,
-        val folderNames: List<String> = emptyList()
-    ) {
-        @get:JsonIgnore val image by lazy { Image(Manifest::class.java.getResourceAsStream("/explorer/$name.svg"), 20.0, 20.0, false, false) }
+        tree.populate(tree.root)
+    }
+    private val tree = Tree(entry, Dispatchers.IO + SupervisorJob()).also { it.startUpdates() }
+
+    init {
+        hgrow = Priority.ALWAYS
+
+        hbox {
+            combobox<String> { items = FXCollections.observableArrayList("Local", "root@127.0.0.1") }
+            textfield(root) {
+                hgrow = Priority.ALWAYS
+
+                style(append = true) { prefHeight = Dimension(27.0, Dimension.LinearUnits.px) }
+            }
+        }
+        add(tree)
     }
 }
