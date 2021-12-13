@@ -29,12 +29,16 @@ import javafx.scene.control.TreeItem
 /**
  * @author Kevin Ludwig
  */
-interface Entry<T : Entry<T>> {
-    val item: TreeItem<Entry<T>>
+abstract class Entry<T : Entry<T>> : Comparable<Entry<T>> {
+    abstract val item: TreeItem<Entry<T>>
+    val self get() = this
 
-    val name: String
-    val size: Long
-    val children: Iterable<T>
+    abstract val name: String
+    abstract val size: Long
+    abstract val directory: Boolean
+    abstract val children: List<T>
 
-    fun update()
+    abstract fun update()
+
+    override fun compareTo(other: Entry<T>) = name.compareTo(other.name)
 }

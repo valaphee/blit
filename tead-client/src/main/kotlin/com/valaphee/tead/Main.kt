@@ -26,6 +26,7 @@ package com.valaphee.tead
 
 import com.google.inject.Guice
 import com.valaphee.tead.explorer.Explorer
+import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory
 import javafx.scene.image.Image
 import tornadofx.App
 import tornadofx.DIContainer
@@ -39,6 +40,8 @@ import kotlin.reflect.KClass
 class Main : App(Image(Main::class.java.getResourceAsStream("/app.png")), Explorer::class)
 
 fun main(arguments: Array<String>) {
+    SvgImageLoaderFactory.install()
+
     FX.dicontainer = object : DIContainer {
         private val injector = Guice.createInjector()
 

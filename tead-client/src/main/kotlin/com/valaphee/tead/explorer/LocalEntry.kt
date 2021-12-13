@@ -35,12 +35,13 @@ import kotlin.io.path.name
  * @author Kevin Ludwig
  */
 class LocalEntry(
-    private val path: File
-) : Entry<LocalEntry> {
-    override val item: TreeItem<Entry<LocalEntry>> = TreeItem(this)
+    internal val path: File
+) : Entry<LocalEntry>() {
+    override val item = TreeItem<Entry<LocalEntry>>(this)
 
     override val name: String get() = path.name
-    override val size get() = if (path.isDirectory) children.size.toLong() else path.length()
+    override val size get() = path.length()
+    override val directory get() = path.isDirectory
     override val children get() = path.listFiles()?.map { LocalEntry(it) } ?: emptyList()
 
     private val watchKey = if (path.isDirectory) path.toPath().register(watcherService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE) else null
@@ -67,7 +68,6 @@ class LocalEntry(
 
         children.forEach { it.update() }
     }
-
     companion object {
         private val watcherService = FileSystems.getDefault().newWatchService()
     }
