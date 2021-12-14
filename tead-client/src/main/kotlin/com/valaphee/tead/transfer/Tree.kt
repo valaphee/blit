@@ -26,35 +26,28 @@ package com.valaphee.tead.transfer
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.valaphee.tead.util.humanReadableSizeBinary
-import javafx.scene.control.ContextMenu
 import javafx.scene.control.SelectionMode
 import javafx.scene.control.TreeItem
+import javafx.scene.control.TreeTableRow
 import javafx.scene.control.TreeTableView
 import javafx.scene.image.ImageView
+import javafx.scene.input.TransferMode
 import javafx.scene.layout.Priority
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import tornadofx.cellFormat
-import tornadofx.checkmenuitem
 import tornadofx.column
-import tornadofx.item
 import tornadofx.onChange
 import tornadofx.populateTree
-import tornadofx.separator
+import tornadofx.setContent
 import tornadofx.vgrow
-import kotlin.coroutines.CoroutineContext
+import java.io.File
+import java.io.FileOutputStream
+import java.text.StringCharacterIterator
+import kotlin.math.abs
 
 /**
  * @author Kevin Ludwig
  */
-class Tree<T : Entry<T>>(
-    override val coroutineContext: CoroutineContext
-) : TreeTableView<Entry<T>>(), CoroutineScope {
-    lateinit var job: Job
-
+class Tree<T : Entry<T>> : TreeTableView<Entry<T>>() {
     init {
         vgrow = Priority.ALWAYS
         isShowRoot = false
@@ -70,54 +63,64 @@ class Tree<T : Entry<T>>(
                 }
             }
         }
-        column("Size", Entry<T>::self) {
-            cellFormat {
-                text = if (it.directory) "${it.children.size}" else humanReadableSizeBinary(it.size)
-            }
-        }
+        column("Size", Entry<T>::self) { cellFormat { text = if (it.directory) "${it.children.size}" else humanReadableSizeBinary(it.size) } }
 
-        selectionModel.selectedItemProperty().onChange {
-            it?.let {
-                contextMenu = ContextMenu().apply {
-                    if (it.value.directory) {
-                        item("Open")
-                    } else {
-                        item("Open")
-                        item("Open with")
+        setRowFactory {
+            object : TreeTableRow<Entry<T>>() {
+                init {
+                    setOnDragDetected {
+                        startDragAndDrop(TransferMode.MOVE).apply { setContent { putFiles(selectionModel.selectedItems.mapNotNull { if (it.value.directory) null else File(tmpdir, it.value.name) }) } }
+                        it.consume()
                     }
-                    separator()
-                    item("Rename")
-                    item("Delete")
-                    separator()
-                    checkmenuitem("Sync")
+                    setOnDragDone {
+                        selectionModel.selectedItems.zip(it.dragboard.files).forEach { (item, file) -> if (!item.value.directory) FileOutputStream(file).use { item.value.transferTo(it) } }
+                        it.consume()
+                    }
+                    setOnDragOver {
+                        if (it.dragboard.hasFiles()) it.acceptTransferModes(*TransferMode.COPY_OR_MOVE)
+                        it.consume()
+                    }
+                    setOnDragDropped {
+                        if (it.dragboard.hasFiles()) it.isDropCompleted = true
+                        it.consume()
+                    }
                 }
             }
         }
     }
 
     fun populate(item: TreeItem<Entry<T>>) {
-        launch { populateTree(item, { entry -> TreeItem(entry).apply { expandedProperty().onChange { if (it) populate(this) } } }) { if (it.isExpanded || it.parent.isExpanded) it.value.children else emptyList() } }
-    }
-
-    fun startUpdates() {
-        stopUpdates()
-        job = launch {
-            while (true) {
-                update()
-                delay(1000)
-            }
-        }
-    }
-
-    fun update() {
-        root.value.update()
-    }
-
-    fun stopUpdates() {
-        if (this::job.isInitialized) job.cancel()
+        populateTree(item, { entry -> TreeItem(entry).apply { expandedProperty().onChange { if (it) populate(this) } } }) { if (it.isExpanded || it.parent.isExpanded) it.value.children else emptyList() }
     }
 
     companion object {
         private val manifest = jacksonObjectMapper().readValue<Manifest>(Tree::class.java.getResourceAsStream("/transfer/.manifest")!!)
+        private val tmpdir = System.getProperty("java.io.tmpdir")
+
+        private fun humanReadableSizeSi(size: Long): String {
+            var sizeVar = size
+            if (-1000 < sizeVar && sizeVar < 1000) return "$sizeVar B"
+            val suffix = StringCharacterIterator("kMGTPE")
+            while (sizeVar <= -999950 || sizeVar >= 999950) {
+                sizeVar /= 1000
+                suffix.next()
+            }
+            return String.format("%.1f %cB", sizeVar / 1000.0, suffix.current())
+        }
+
+        private fun humanReadableSizeBinary(size: Long): String {
+            val sizeAbs = if (size == Long.MIN_VALUE) Long.MAX_VALUE else abs(size)
+            if (sizeAbs < 1024) return "$size B"
+            var sizeVar = sizeAbs
+            val suffix = StringCharacterIterator("KMGTPE")
+            var i = 40
+            while (i >= 0 && sizeAbs > 0xfffccccccccccccL shr i) {
+                sizeVar = sizeVar shr 10
+                suffix.next()
+                i -= 10
+            }
+            sizeVar *= java.lang.Long.signum(size).toLong()
+            return String.format("%.1f %ciB", sizeVar / 1024.0, suffix.current())
+        }
     }
 }

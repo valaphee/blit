@@ -24,16 +24,32 @@
 
 package com.valaphee.tead.transfer.sftp
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.valaphee.tead.transfer.Source
+import org.apache.sshd.client.SshClient
 import org.apache.sshd.sftp.client.SftpClient
+import org.apache.sshd.sftp.client.impl.DefaultSftpClientFactory
 import org.apache.sshd.sftp.common.SftpException
 
 /**
  * @author Kevin Ludwig
  */
 class SftpSource(
-    private val sftpClient: SftpClient
-) : Source<SftpEntry> {
+    name: String,
+    @get:JsonProperty("host") val host: String,
+    @get:JsonProperty("port") val port: Int,
+    @get:JsonProperty("username") val username: String,
+    @get:JsonProperty("password") val password: String,
+) : Source<SftpEntry>(name) {
+    private val sftpClient: SftpClient by lazy {
+        val sshSession = ssh.connect(username, host, port).verify(30000).session
+        sshSession.addPasswordIdentity(password)
+        sshSession.auth().verify(30000)
+        DefaultSftpClientFactory.INSTANCE.createSftpClient(sshSession)
+    }
+
+    override val home get() = "."
+
     override fun isValid(path: String) = try {
         sftpClient.stat(SftpEntry.Path(path, "").toString()).isDirectory
     } catch (_: SftpException) {
@@ -41,4 +57,8 @@ class SftpSource(
     }
 
     override fun get(path: String) = SftpEntry(sftpClient, SftpEntry.Path(path, ""))
+
+    companion object {
+        private val ssh = SshClient.setUpDefaultClient().apply { start() }
+    }
 }

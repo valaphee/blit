@@ -30,7 +30,11 @@ import java.io.File
 /**
  * @author Kevin Ludwig
  */
-class LocalSource : Source<LocalEntry> {
+class LocalSource(
+    name: String
+) : Source<LocalEntry>(name) {
+    override val home: String get() = File(".").absolutePath
+
     override fun isValid(path: String) = File(path).isDirectory
 
     override fun get(path: String) = LocalEntry(File(path))

@@ -22,33 +22,15 @@
  * SOFTWARE.
  */
 
-package com.valaphee.tead.util
+package com.valaphee.tead
 
-import java.text.StringCharacterIterator
-import kotlin.math.abs
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.valaphee.tead.transfer.Source
+import com.valaphee.tead.transfer.local.LocalSource
 
-fun humanReadableSizeSi(size: Long): String {
-    var sizeVar = size
-    if (-1000 < sizeVar && sizeVar < 1000) return "$sizeVar B"
-    val suffix = StringCharacterIterator("kMGTPE")
-    while (sizeVar <= -999950 || sizeVar >= 999950) {
-        sizeVar /= 1000
-        suffix.next()
-    }
-    return String.format("%.1f %cB", sizeVar / 1000.0, suffix.current())
-}
-
-fun humanReadableSizeBinary(size: Long): String {
-    val sizeAbs = if (size == Long.MIN_VALUE) Long.MAX_VALUE else abs(size)
-    if (sizeAbs < 1024) return "$size B"
-    var sizeVar = sizeAbs
-    val suffix = StringCharacterIterator("KMGTPE")
-    var i = 40
-    while (i >= 0 && sizeAbs > 0xfffccccccccccccL shr i) {
-        sizeVar = sizeVar shr 10
-        suffix.next()
-        i -= 10
-    }
-    sizeVar *= java.lang.Long.signum(size).toLong()
-    return String.format("%.1f %ciB", sizeVar / 1024.0, suffix.current())
-}
+/**
+ * @author Kevin Ludwig
+ */
+class Config(
+    @get:JsonProperty("sources") val sources: List<Source<*>> = listOf(LocalSource("local"))
+)

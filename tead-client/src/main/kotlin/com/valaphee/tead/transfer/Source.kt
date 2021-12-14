@@ -24,11 +24,32 @@
 
 package com.valaphee.tead.transfer
 
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.valaphee.tead.transfer.local.LocalSource
+import com.valaphee.tead.transfer.sftp.SftpSource
+
 /**
  * @author Kevin Ludwig
  */
-interface Source<T : Entry<T>> {
-    fun isValid(path: String): Boolean
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "type"
+)
+@JsonSubTypes(
+    JsonSubTypes.Type(LocalSource::class, name = "local"),
+    JsonSubTypes.Type(SftpSource::class, name = "sftp")
+)
+abstract class Source<T : Entry<T>>(
+    @get:JsonProperty("name") val name: String,
+) {
+    abstract val home: String
 
-    operator fun get(path: String): T
+    abstract fun isValid(path: String): Boolean
+
+    abstract operator fun get(path: String): T
+
+    override fun toString() = name
 }

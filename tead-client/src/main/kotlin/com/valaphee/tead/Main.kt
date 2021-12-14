@@ -24,19 +24,38 @@
 
 package com.valaphee.tead
 
-import com.valaphee.tead.transfer.TransferView
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
+import com.google.inject.AbstractModule
+import com.google.inject.Guice
+import com.valaphee.tead.transfer.View
 import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory
 import javafx.scene.image.Image
 import tornadofx.App
+import tornadofx.DIContainer
+import tornadofx.FX
 import tornadofx.launch
+import java.io.File
+import kotlin.reflect.KClass
 
 /**
  * @author Kevin Ludwig
  */
-class Main : App(Image(Main::class.java.getResourceAsStream("/app.png")), TransferView::class)
+class Main : App(Image(Main::class.java.getResourceAsStream("/app.png")), View::class)
 
 fun main(arguments: Array<String>) {
     SvgImageLoaderFactory.install()
+
+    FX.dicontainer = object : DIContainer {
+        private val injector = Guice.createInjector(object : AbstractModule() {
+            override fun configure() {
+                val configFile = File("config.json")
+                bind(Config::class.java).toInstance(if (configFile.exists()) jacksonObjectMapper().readValue<Config>(configFile) else Config().also { jacksonObjectMapper().writeValue(configFile, it) })
+            }
+        })
+
+        override fun <T : Any> getInstance(type: KClass<T>) = injector.getInstance(type.java)
+    }
 
     launch<Main>(arguments)
 }

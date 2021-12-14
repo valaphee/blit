@@ -25,28 +25,29 @@
 package com.valaphee.tead.transfer
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import javafx.scene.image.Image
 
 /**
  * @author Kevin Ludwig
  */
 class Manifest(
-    val defaultFileIcon: FileIcon,
-    val fileIcons: List<FileIcon>,
-    val defaultFolderIcon: FolderIcon,
-    val folderIcons: List<FolderIcon>
+    @get:JsonProperty("defaultFileIcon") val defaultFileIcon: FileIcon,
+    @get:JsonProperty("fileIcons") val fileIcons: List<FileIcon>,
+    @get:JsonProperty("defaultFolderIcon") val defaultFolderIcon: FolderIcon,
+    @get:JsonProperty("folderIcons") val folderIcons: List<FolderIcon>
 ) {
     class FileIcon(
-        val name: String,
-        val fileNames: List<String> = emptyList(),
-        val fileExtensions: List<String> = emptyList()
+        @get:JsonProperty("name") val name: String,
+        @get:JsonProperty("fileNames") val fileNames: List<String> = emptyList(),
+        @get:JsonProperty("fileExtensions") val fileExtensions: List<String> = emptyList()
     ) {
         @get:JsonIgnore val image by lazy { Image(Manifest::class.java.getResourceAsStream("/transfer/$name.svg"), 16.0, 16.0, false, false) }
     }
 
     class FolderIcon(
-        val name: String,
-        val folderNames: List<String> = emptyList()
+        @get:JsonProperty("name") val name: String,
+        @get:JsonProperty("folderNames") val folderNames: List<String> = emptyList()
     ) {
         @get:JsonIgnore val image by lazy { Image(Manifest::class.java.getResourceAsStream("/transfer/$name.svg"), 16.0, 16.0, false, false) }
     }

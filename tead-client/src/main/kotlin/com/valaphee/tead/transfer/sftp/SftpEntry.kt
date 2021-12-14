@@ -27,6 +27,7 @@ package com.valaphee.tead.transfer.sftp
 import com.valaphee.tead.transfer.Entry
 import javafx.scene.control.TreeItem
 import org.apache.sshd.sftp.client.SftpClient
+import java.io.OutputStream
 
 /**
  * @author Kevin Ludwig
@@ -68,6 +69,10 @@ class SftpEntry(
             item.children += it.item
             it.update()
         }
+    }
+
+    override fun transferTo(stream: OutputStream) {
+        sftpClient.read(this@SftpEntry.path.toString()).use { it.transferTo(stream) }
     }
 
     override fun toString() = path.toString()

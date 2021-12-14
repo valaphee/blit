@@ -25,6 +25,7 @@
 package com.valaphee.tead.transfer
 
 import javafx.scene.control.TreeItem
+import java.io.OutputStream
 
 /**
  * @author Kevin Ludwig
@@ -39,6 +40,8 @@ abstract class Entry<T : Entry<T>> : Comparable<Entry<T>> {
     abstract val children: List<T>
 
     abstract fun update()
+
+    abstract fun transferTo(stream: OutputStream)
 
     override fun compareTo(other: Entry<T>) = name.compareTo(other.name)
 }

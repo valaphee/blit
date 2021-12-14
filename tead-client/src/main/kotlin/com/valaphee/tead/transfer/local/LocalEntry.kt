@@ -27,6 +27,8 @@ package com.valaphee.tead.transfer.local
 import com.valaphee.tead.transfer.Entry
 import javafx.scene.control.TreeItem
 import java.io.File
+import java.io.FileInputStream
+import java.io.OutputStream
 import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.nio.file.StandardWatchEventKinds
@@ -35,8 +37,8 @@ import kotlin.io.path.name
 /**
  * @author Kevin Ludwig
  */
-open class LocalEntry(
-    internal val path: File
+class LocalEntry(
+    private val path: File
 ) : Entry<LocalEntry>() {
     override val item = TreeItem<Entry<LocalEntry>>(this)
 
@@ -71,6 +73,10 @@ open class LocalEntry(
 
         _children = path.listFiles()?.map { LocalEntry(it) } ?: emptyList()
         children.forEach { it.update() }
+    }
+
+    override fun transferTo(stream: OutputStream) {
+        FileInputStream(path).use { it.transferTo(stream) }
     }
 
     override fun toString() = path.toString()
