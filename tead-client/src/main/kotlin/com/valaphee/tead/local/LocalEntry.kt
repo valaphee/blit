@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-package com.valaphee.tead.transfer.local
+package com.valaphee.tead.local
 
-import com.valaphee.tead.transfer.Entry
+import com.valaphee.tead.Entry
 import javafx.scene.control.TreeItem
 import java.io.File
 import java.io.FileInputStream

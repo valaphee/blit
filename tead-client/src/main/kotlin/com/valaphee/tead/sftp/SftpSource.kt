@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
-package com.valaphee.tead.transfer.sftp
+package com.valaphee.tead.sftp
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.valaphee.tead.transfer.Source
+import com.valaphee.tead.Source
 import org.apache.sshd.client.SshClient
 import org.apache.sshd.sftp.client.SftpClient
 import org.apache.sshd.sftp.client.impl.DefaultSftpClientFactory

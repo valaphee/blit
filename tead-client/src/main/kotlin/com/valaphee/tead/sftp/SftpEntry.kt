@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-package com.valaphee.tead.transfer.sftp
+package com.valaphee.tead.sftp
 
-import com.valaphee.tead.transfer.Entry
+import com.valaphee.tead.Entry
 import javafx.scene.control.TreeItem
 import org.apache.sshd.sftp.client.SftpClient
 import java.io.OutputStream

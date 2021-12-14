@@ -22,20 +22,26 @@
  * SOFTWARE.
  */
 
-package com.valaphee.tead.transfer.local
+package com.valaphee.tead
 
-import com.valaphee.tead.transfer.Source
-import java.io.File
+import javafx.scene.control.TreeItem
+import java.io.OutputStream
 
 /**
  * @author Kevin Ludwig
  */
-class LocalSource(
-    name: String
-) : Source<LocalEntry>(name) {
-    override val home: String get() = File(".").absolutePath
+abstract class Entry<T : Entry<T>> : Comparable<Entry<T>> {
+    abstract val item: TreeItem<Entry<T>>
+    val self get() = this
 
-    override fun isValid(path: String) = File(path).isDirectory
+    abstract val name: String
+    abstract val size: Long
+    abstract val directory: Boolean
+    abstract val children: List<T>
 
-    override fun get(path: String) = LocalEntry(File(path))
+    abstract fun update()
+
+    abstract fun transferTo(stream: OutputStream)
+
+    override fun compareTo(other: Entry<T>) = name.compareTo(other.name)
 }

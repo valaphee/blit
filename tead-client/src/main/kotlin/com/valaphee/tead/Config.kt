@@ -25,8 +25,7 @@
 package com.valaphee.tead
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.valaphee.tead.transfer.Source
-import com.valaphee.tead.transfer.local.LocalSource
+import com.valaphee.tead.local.LocalSource
 
 /**
  * @author Kevin Ludwig

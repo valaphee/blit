@@ -22,13 +22,13 @@
  * SOFTWARE.
  */
 
-package com.valaphee.tead.transfer
+package com.valaphee.tead
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.valaphee.tead.transfer.local.LocalSource
-import com.valaphee.tead.transfer.sftp.SftpSource
+import com.valaphee.tead.local.LocalSource
+import com.valaphee.tead.sftp.SftpSource
 
 /**
  * @author Kevin Ludwig

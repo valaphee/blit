@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.valaphee.tead.transfer
+package com.valaphee.tead
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -57,9 +57,9 @@ class Tree<T : Entry<T>> : TreeTableView<Entry<T>>() {
             cellFormat {
                 val name = it.name
                 text = name
-                graphic = if (it.directory) ImageView((manifest.folderIcons.firstOrNull { it.folderNames.contains(name) } ?: manifest.defaultFolderIcon).image) else {
+                graphic = if (it.directory) ImageView((iconManifest.folderIcons.firstOrNull { it.folderNames.contains(name) } ?: iconManifest.defaultFolderIcon).image) else {
                     val extension = name.substringAfterLast('.', "")
-                    ImageView((manifest.fileIcons.firstOrNull { it.fileExtensions.contains(extension) || it.fileNames.contains(name) } ?: manifest.defaultFileIcon).image)
+                    ImageView((iconManifest.fileIcons.firstOrNull { it.fileExtensions.contains(extension) || it.fileNames.contains(name) } ?: iconManifest.defaultFileIcon).image)
                 }
             }
         }
@@ -94,7 +94,7 @@ class Tree<T : Entry<T>> : TreeTableView<Entry<T>>() {
     }
 
     companion object {
-        private val manifest = jacksonObjectMapper().readValue<Manifest>(Tree::class.java.getResourceAsStream("/transfer/.manifest")!!)
+        private val iconManifest = jacksonObjectMapper().readValue<IconManifest>(Tree::class.java.getResourceAsStream("/icons/.manifest")!!)
         private val tmpdir = System.getProperty("java.io.tmpdir")
 
         private fun humanReadableSizeSi(size: Long): String {

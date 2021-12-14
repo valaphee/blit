@@ -22,9 +22,8 @@
  * SOFTWARE.
  */
 
-package com.valaphee.tead.transfer
+package com.valaphee.tead
 
-import com.valaphee.tead.Config
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
@@ -40,9 +39,13 @@ import jfxtras.styles.jmetro.Style
 import org.controlsfx.control.BreadCrumbBar
 import tornadofx.Dimension
 import tornadofx.View
+import tornadofx.action
 import tornadofx.combobox
 import tornadofx.hbox
 import tornadofx.hgrow
+import tornadofx.item
+import tornadofx.menu
+import tornadofx.menubar
 import tornadofx.onChange
 import tornadofx.splitpane
 import tornadofx.style
@@ -54,12 +57,21 @@ import tornadofx.vgrow
 /**
  * @author Kevin Ludwig
  */
-class View : View("Transfer") {
+class View : View("Tead") {
     private val _config by di<Config>()
 
     override val root = vbox {
         JMetro(this, Style.DARK)
         styleClass.add(JMetroStyleClass.BACKGROUND)
+
+        menubar {
+            menu("File") {
+                item("Exit") { action(::close) }
+            }
+            menu("Help") {
+                item("About")
+            }
+        }
 
         splitpane {
             vgrow = Priority.ALWAYS

@@ -28,7 +28,6 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.inject.AbstractModule
 import com.google.inject.Guice
-import com.valaphee.tead.transfer.View
 import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory
 import javafx.scene.image.Image
 import tornadofx.App
