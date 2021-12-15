@@ -28,48 +28,32 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.inject.AbstractModule
 import com.google.inject.Guice
+import com.valaphee.blit.data.Config
+import com.valaphee.blit.data.IconManifest
 import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory
-import javafx.application.Platform
 import javafx.scene.image.Image
-import javafx.stage.Stage
 import tornadofx.App
 import tornadofx.DIContainer
 import tornadofx.FX
 import tornadofx.launch
-import java.awt.MenuItem
-import java.awt.PopupMenu
-import java.awt.SystemTray
-import java.awt.Toolkit
-import java.awt.TrayIcon
 import java.io.File
 import kotlin.reflect.KClass
-import kotlin.system.exitProcess
 
 /**
  * @author Kevin Ludwig
  */
-class Main : App(Image(Main::class.java.getResourceAsStream("/app.png")), View::class) {
-    override fun start(stage: Stage) {
-        stage.setOnCloseRequest {
-            if (SystemTray.isSupported()) SystemTray.getSystemTray().add(TrayIcon(Toolkit.getDefaultToolkit().getImage(Main::class.java.getResource("/app.png")).getScaledInstance(16, 16, java.awt.Image.SCALE_DEFAULT)).apply {
-                popupMenu = PopupMenu().apply {
-                    add(MenuItem("Exit").apply { setOnAction { exitProcess(0) } })
-                }
-            })
-        }
-        super.start(stage)
-    }
-}
+class Main : App(Image(Main::class.java.getResourceAsStream("/app.png")), View::class)
 
 fun main(arguments: Array<String>) {
-    Platform.setImplicitExit(false)
     SvgImageLoaderFactory.install()
 
     FX.dicontainer = object : DIContainer {
         private val injector = Guice.createInjector(object : AbstractModule() {
             override fun configure() {
+                val objectMapper = jacksonObjectMapper()
+                bind(IconManifest::class.java).toInstance(objectMapper.readValue<IconManifest>(Main::class.java.getResourceAsStream("/icon/.manifest")!!))
                 val configFile = File("config.json")
-                bind(Config::class.java).toInstance(if (configFile.exists()) jacksonObjectMapper().readValue<Config>(configFile) else Config().also { jacksonObjectMapper().writeValue(configFile, it) })
+                bind(Config::class.java).toInstance(if (configFile.exists()) objectMapper.readValue<Config>(configFile) else Config().also { objectMapper.writeValue(configFile, it) })
             }
         })
 

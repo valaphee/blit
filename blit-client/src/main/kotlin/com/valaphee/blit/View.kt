@@ -24,6 +24,8 @@
 
 package com.valaphee.blit
 
+import com.valaphee.blit.data.Config
+import com.valaphee.blit.data.IconManifest
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
@@ -36,10 +38,14 @@ import javafx.scene.layout.VBox
 import jfxtras.styles.jmetro.JMetro
 import jfxtras.styles.jmetro.JMetroStyleClass
 import jfxtras.styles.jmetro.Style
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.controlsfx.control.BreadCrumbBar
 import tornadofx.Dimension
 import tornadofx.View
 import tornadofx.action
+import tornadofx.button
 import tornadofx.combobox
 import tornadofx.hbox
 import tornadofx.hgrow
@@ -58,9 +64,14 @@ import tornadofx.vgrow
  * @author Kevin Ludwig
  */
 class View : View("Blit") {
+    private val iconManifest by di<IconManifest>()
     private val _config by di<Config>()
+    private val ioScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     override val root = vbox {
+        prefWidth = 1000.0
+        prefHeight = 800.0
+
         JMetro(this, Style.DARK)
         styleClass.add(JMetroStyleClass.BACKGROUND)
 
@@ -82,10 +93,10 @@ class View : View("Blit") {
     }
 
     inner class Pane<T : Entry<T>> : VBox() {
-        private val source: Property<Source<T>> = SimpleObjectProperty<Source<T>>().apply { onChange { it?.let { cd(it.home) } } }
+        private val source: Property<Source<T>> = SimpleObjectProperty<Source<T>>().apply { onChange { it?.let { navigate(it.home) } } }
         private lateinit var _path: String
         private val name = SimpleStringProperty()
-        private val tree = Tree<T>()
+        private val tree = Tree<T>(iconManifest, ioScope)
 
         init {
             hgrow = Priority.ALWAYS
@@ -110,7 +121,7 @@ class View : View("Blit") {
                             path.insert(0, "${item!!.value}/")
                             item = item!!.parent
                         }
-                        cd(path.toString())
+                        navigate(path.toString())
                     }
                 })
                 textfield(name) {
@@ -118,13 +129,16 @@ class View : View("Blit") {
 
                     style(append = true) { prefHeight = Dimension(27.0, Dimension.LinearUnits.px) }
 
-                    addEventFilter(KeyEvent.KEY_PRESSED) { if (it.code == KeyCode.ENTER) text?.let { if (it.startsWith('/')) cd(it) else cd(tree.root.value.toString() + "/$it") } }
+                    addEventFilter(KeyEvent.KEY_PRESSED) { if (it.code == KeyCode.ENTER) text?.let(::navigateRelative) }
                 }
+                button("Go") { action { name.value?.let(::navigateRelative) } }
             }
             add(tree)
         }
 
-        private fun cd(path: String) {
+        private fun navigateRelative(path: String) = navigate(if (path.startsWith('/')) path else tree.root.value.toString() + "/$path")
+
+        private fun navigate(path: String) {
             val normalizedPath = normalizePath(path)
 
             if (::_path.isInitialized && normalizedPath == _path) return

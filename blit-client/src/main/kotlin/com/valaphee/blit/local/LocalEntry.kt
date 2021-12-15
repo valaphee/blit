@@ -25,14 +25,9 @@
 package com.valaphee.blit.local
 
 import com.valaphee.blit.Entry
-import javafx.scene.control.TreeItem
 import java.io.File
 import java.io.FileInputStream
 import java.io.OutputStream
-import java.nio.file.FileSystems
-import java.nio.file.Path
-import java.nio.file.StandardWatchEventKinds
-import kotlin.io.path.name
 
 /**
  * @author Kevin Ludwig
@@ -40,49 +35,16 @@ import kotlin.io.path.name
 class LocalEntry(
     private val path: File
 ) : Entry<LocalEntry>() {
-    override val item = TreeItem<Entry<LocalEntry>>(this)
-
     override val name: String get() = path.name
     override val size get() = path.length()
     override val modifyTime get() = path.lastModified()
     override val directory get() = path.isDirectory
 
-    override val children get() = _children ?: (path.listFiles()?.map { LocalEntry(it) } ?: emptyList()).also { _children = it }
-    private var _children: List<LocalEntry>? = null
-
-    private val watchKey = if (path.isDirectory) path.toPath().register(watcherService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE) else null
-
-    override fun update() {
-        if (!item.isExpanded) return
-
-        watchKey?.pollEvents()?.forEach {
-            when (it.kind()) {
-                StandardWatchEventKinds.ENTRY_CREATE -> item.children.add(LocalEntry(path.toPath().resolve((it.context() as Path)).toFile()).item)
-                StandardWatchEventKinds.ENTRY_DELETE -> {
-                    val name = (it.context() as Path).name
-                    val iterator = item.children.iterator()
-                    while (iterator.hasNext()) {
-                        val child = iterator.next().value
-                        if (child.name == name) {
-                            iterator.remove()
-                            break
-                        }
-                    }
-                }
-            }
-        }
-
-        _children = path.listFiles()?.map { LocalEntry(it) } ?: emptyList()
-        children.forEach { it.update() }
-    }
+    override val children get() = path.listFiles()?.map { LocalEntry(it) } ?: emptyList()
 
     override fun transferTo(stream: OutputStream) {
         FileInputStream(path).use { it.transferTo(stream) }
     }
 
     override fun toString() = path.toString()
-
-    companion object {
-        private val watcherService = FileSystems.getDefault().newWatchService()
-    }
 }

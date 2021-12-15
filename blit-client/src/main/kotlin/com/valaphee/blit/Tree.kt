@@ -24,15 +24,18 @@
 
 package com.valaphee.blit
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
+import com.valaphee.blit.data.IconManifest
+import javafx.application.Platform
 import javafx.scene.control.SelectionMode
+import javafx.scene.control.TableColumnBase
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeTableRow
 import javafx.scene.control.TreeTableView
 import javafx.scene.image.ImageView
 import javafx.scene.input.TransferMode
 import javafx.scene.layout.Priority
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import tornadofx.cellFormat
 import tornadofx.column
 import tornadofx.onChange
@@ -49,14 +52,17 @@ import kotlin.math.abs
 /**
  * @author Kevin Ludwig
  */
-class Tree<T : Entry<T>> : TreeTableView<Entry<T>>() {
+class Tree<T : Entry<T>>(
+    private val iconManifest: IconManifest,
+    private val ioScope: CoroutineScope
+) : TreeTableView<Entry<T>>() {
     init {
         vgrow = Priority.ALWAYS
         isShowRoot = false
         selectionModel.selectionMode = SelectionMode.MULTIPLE
 
         column("Name", Entry<T>::self) {
-            prefWidth(32.0)
+            tableColumnBaseSetWidth(this, 250.0)
             cellFormat {
                 val name = it.name
                 text = name
@@ -68,10 +74,14 @@ class Tree<T : Entry<T>> : TreeTableView<Entry<T>>() {
             setComparator { a, b -> a.name.compareTo(b.name) }
         }
         column("Size", Entry<T>::self) {
-            cellFormat { text = if (it.directory) "${it.children.size}" else humanReadableSizeBinary(it.size) }
+            tableColumnBaseSetWidth(this, 75.0)
+            cellFormat { text = if (it.directory) "" else humanReadableSizeBinary(it.size) }
             setComparator { a, b -> a.size.compareTo(b.size) }
         }
-        column("Modified", Entry<T>::modifyTime) { cellFormat { text = dateFormat.format(it) } }
+        column("Modified", Entry<T>::modifyTime) {
+            tableColumnBaseSetWidth(this, 125.0)
+            cellFormat { text = dateFormat.format(it) }
+        }
 
         setRowFactory {
             object : TreeTableRow<Entry<T>>() {
@@ -98,12 +108,25 @@ class Tree<T : Entry<T>> : TreeTableView<Entry<T>>() {
     }
 
     fun populate(item: TreeItem<Entry<T>>) {
-        populateTree(item, { entry -> TreeItem(entry).apply { expandedProperty().onChange { if (it) populate(this) } } }) { if (it.isExpanded || it.parent.isExpanded) it.value.children else emptyList() }
+        ioScope.launch {
+            val children = item.value!!.children
+            Platform.runLater {
+                populateTree(item, { entry ->
+                    if (entry.directory) object : TreeItem<Entry<T>>(entry) {
+                        init {
+                            expandedProperty().onChange { if (it) populate(this) }
+                        }
+
+                        override fun isLeaf() = false
+                    } else TreeItem(entry)
+                }) {if (it.isExpanded) children else emptyList() }
+            }
+        }
     }
 
     companion object {
-        private val iconManifest = jacksonObjectMapper().readValue<IconManifest>(Tree::class.java.getResourceAsStream("/icon/.manifest")!!)
-        private val dateFormat = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault())
+        private val tableColumnBaseSetWidth = TableColumnBase::class.java.getDeclaredMethod("setWidth", Double::class.java).apply { isAccessible = true }
+        private val dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault())
         private val tmpdir = System.getProperty("java.io.tmpdir")
 
         private fun humanReadableSizeSi(size: Long): String {

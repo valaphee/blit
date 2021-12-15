@@ -22,33 +22,15 @@
  * SOFTWARE.
  */
 
-package com.valaphee.blit
+package com.valaphee.blit.data
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
-import javafx.scene.image.Image
+import com.valaphee.blit.Source
+import com.valaphee.blit.local.LocalSource
 
 /**
  * @author Kevin Ludwig
  */
-class IconManifest(
-    @get:JsonProperty("defaultFileIcon") val defaultFileIcon: FileIcon,
-    @get:JsonProperty("fileIcons") val fileIcons: List<FileIcon>,
-    @get:JsonProperty("defaultFolderIcon") val defaultFolderIcon: FolderIcon,
-    @get:JsonProperty("folderIcons") val folderIcons: List<FolderIcon>
-) {
-    class FileIcon(
-        @get:JsonProperty("name") val name: String,
-        @get:JsonProperty("fileNames") val fileNames: List<String> = emptyList(),
-        @get:JsonProperty("fileExtensions") val fileExtensions: List<String> = emptyList()
-    ) {
-        @get:JsonIgnore val image by lazy { Image(IconManifest::class.java.getResourceAsStream("/icon/$name.svg"), 16.0, 16.0, false, false) }
-    }
-
-    class FolderIcon(
-        @get:JsonProperty("name") val name: String,
-        @get:JsonProperty("folderNames") val folderNames: List<String> = emptyList()
-    ) {
-        @get:JsonIgnore val image by lazy { Image(IconManifest::class.java.getResourceAsStream("/icon/$name.svg"), 16.0, 16.0, false, false) }
-    }
-}
+class Config(
+    @get:JsonProperty("sources") val sources: List<Source<*>> = listOf(LocalSource("local"))
+)

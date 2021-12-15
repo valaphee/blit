@@ -31,7 +31,8 @@ import java.io.OutputStream
  * @author Kevin Ludwig
  */
 abstract class Entry<T : Entry<T>> {
-    abstract val item: TreeItem<Entry<T>>
+    val item = TreeItem(this)
+
     val self get() = this
 
     abstract val name: String
@@ -39,8 +40,6 @@ abstract class Entry<T : Entry<T>> {
     abstract val modifyTime: Long
     abstract val directory: Boolean
     abstract val children: List<T>
-
-    abstract fun update()
 
     abstract fun transferTo(stream: OutputStream)
 }

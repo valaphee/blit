@@ -25,7 +25,6 @@
 package com.valaphee.blit.sftp
 
 import com.valaphee.blit.Entry
-import javafx.scene.control.TreeItem
 import org.apache.sshd.sftp.client.SftpClient
 import java.io.OutputStream
 
@@ -35,42 +34,21 @@ import java.io.OutputStream
 class SftpEntry(
     private val sftpClient: SftpClient,
     private val path: Path,
-    private val attributes: SftpClient.Attributes = sftpClient.stat(path.toString())
+    private var attributes: SftpClient.Attributes = sftpClient.stat(path.toString())
 ) : Entry<SftpEntry>() {
-    override val item = TreeItem<Entry<SftpEntry>>(this)
-
     override val name get() = path.name
     override val size get() = attributes.size
     override val modifyTime get() = attributes.modifyTime.toMillis()
     override val directory get() = attributes.isDirectory
 
-    override val children get() = _children ?: (if (directory) try {
+    override val children get() = if (directory) try {
         sftpClient.readDir(path.toString()).mapNotNull {
             val name = it.filename
             if (name != "." && name != "..") SftpEntry(sftpClient, path.subPath(name), it.attributes) else null
         }
     } catch (_: RuntimeException) {
         emptyList()
-    } else emptyList()).also { _children = it }
-    private var _children: List<SftpEntry>? = null
-
-    override fun update() {
-        if (!item.isExpanded) return
-
-        _children = if (directory) try {
-            sftpClient.readDir(path.toString()).mapNotNull {
-                val name = it.filename
-                if (name != "." && name != "..") SftpEntry(sftpClient, path.subPath(name), it.attributes) else null
-            }
-        } catch (_: RuntimeException) {
-            emptyList()
-        } else emptyList()
-        item.children.clear()
-        children.forEach {
-            item.children += it.item
-            it.update()
-        }
-    }
+    } else emptyList()
 
     override fun transferTo(stream: OutputStream) {
         sftpClient.read(this@SftpEntry.path.toString()).use { it.transferTo(stream) }
