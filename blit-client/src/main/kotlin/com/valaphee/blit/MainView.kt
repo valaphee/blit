@@ -35,6 +35,7 @@ import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
+import javafx.stage.Stage
 import jfxtras.styles.jmetro.JMetro
 import jfxtras.styles.jmetro.JMetroStyleClass
 import jfxtras.styles.jmetro.Style
@@ -63,7 +64,7 @@ import tornadofx.vgrow
 /**
  * @author Kevin Ludwig
  */
-class View : View("Blit") {
+class MainView : View("Blit") {
     private val iconManifest by di<IconManifest>()
     private val _config by di<Config>()
     private val ioScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -76,12 +77,8 @@ class View : View("Blit") {
         styleClass.add(JMetroStyleClass.BACKGROUND)
 
         menubar {
-            menu("File") {
-                item("Exit") { action(::close) }
-            }
-            menu("Help") {
-                item("About")
-            }
+            menu("File") { item("Exit") { action { (scene.window as Stage).close() } } }
+            menu("Help") { item("About") { action { AboutView().openWindow() } } }
         }
 
         splitpane {

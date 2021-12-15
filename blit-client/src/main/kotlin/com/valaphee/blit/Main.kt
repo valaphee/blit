@@ -42,7 +42,7 @@ import kotlin.reflect.KClass
 /**
  * @author Kevin Ludwig
  */
-class Main : App(Image(Main::class.java.getResourceAsStream("/app.png")), View::class)
+class Main : App(Image(Main::class.java.getResourceAsStream("/app.png")), MainView::class)
 
 fun main(arguments: Array<String>) {
     SvgImageLoaderFactory.install()

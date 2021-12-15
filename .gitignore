@@ -16,7 +16,7 @@ $RECYCLE.BIN/
 .DS_Store
 .AppleDouble
 .LSOverride
-Icon
+#Icon
 ._*
 .DocumentRevision-V100
 .fseventsd
