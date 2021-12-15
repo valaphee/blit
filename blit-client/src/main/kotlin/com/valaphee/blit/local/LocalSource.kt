@@ -24,6 +24,7 @@
 
 package com.valaphee.blit.local
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.valaphee.blit.Source
 import java.io.File
 
@@ -33,7 +34,7 @@ import java.io.File
 class LocalSource(
     name: String
 ) : Source<LocalEntry>(name) {
-    override val home: String get() = File(".").absolutePath
+    @get:JsonIgnore override val home: String get() = File(".").absolutePath
 
     override fun isValid(path: String) = File(path).isDirectory
 

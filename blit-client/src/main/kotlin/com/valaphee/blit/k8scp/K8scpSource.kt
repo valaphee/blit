@@ -24,6 +24,7 @@
 
 package com.valaphee.blit.k8scp
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.valaphee.blit.Source
 import io.kubernetes.client.Copy
@@ -43,7 +44,7 @@ class K8scpSource(
     internal val exec = Exec()
     internal val copy = Copy()
 
-    override val home: String get() {
+    @get:JsonIgnore override val home: String get() {
         val process = exec.exec(namespace, pod, arrayOf("pwd", toString()), false)
         val home = BufferedReader(InputStreamReader(process.inputStream)).use { it.readLine() }
         process.waitFor()

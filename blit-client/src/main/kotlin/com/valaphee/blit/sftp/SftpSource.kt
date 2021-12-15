@@ -24,6 +24,7 @@
 
 package com.valaphee.blit.sftp
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.valaphee.blit.Source
 import org.apache.sshd.client.SshClient
@@ -48,7 +49,7 @@ class SftpSource(
         DefaultSftpClientFactory.INSTANCE.createSftpClient(sshSession)
     }
 
-    override val home get() = "." // TODO
+    @get:JsonIgnore override val home get() = "." // TODO
 
     override fun isValid(path: String) = try {
         sftpClient.stat(path).isDirectory
