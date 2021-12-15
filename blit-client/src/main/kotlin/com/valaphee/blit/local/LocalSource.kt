@@ -22,5 +22,20 @@
  * SOFTWARE.
  */
 
-rootProject.name = "blit"
-file(".").walk().maxDepth(1).filter { it.isDirectory && it.name != rootProject.name && File(it, "build.gradle.kts").exists() }.forEach { include(it.name) }
+package com.valaphee.blit.local
+
+import com.valaphee.blit.Source
+import java.io.File
+
+/**
+ * @author Kevin Ludwig
+ */
+class LocalSource(
+    name: String
+) : Source<LocalEntry>(name) {
+    override val home: String get() = File(".").absolutePath
+
+    override fun isValid(path: String) = File(path).isDirectory
+
+    override fun get(path: String) = LocalEntry(File(path))
+}

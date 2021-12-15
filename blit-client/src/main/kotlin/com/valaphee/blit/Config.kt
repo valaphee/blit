@@ -22,5 +22,14 @@
  * SOFTWARE.
  */
 
-rootProject.name = "blit"
-file(".").walk().maxDepth(1).filter { it.isDirectory && it.name != rootProject.name && File(it, "build.gradle.kts").exists() }.forEach { include(it.name) }
+package com.valaphee.blit
+
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.valaphee.blit.local.LocalSource
+
+/**
+ * @author Kevin Ludwig
+ */
+class Config(
+    @get:JsonProperty("sources") val sources: List<Source<*>> = listOf(LocalSource("local"))
+)

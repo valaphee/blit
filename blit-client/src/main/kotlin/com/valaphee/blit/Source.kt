@@ -22,5 +22,34 @@
  * SOFTWARE.
  */
 
-rootProject.name = "blit"
-file(".").walk().maxDepth(1).filter { it.isDirectory && it.name != rootProject.name && File(it, "build.gradle.kts").exists() }.forEach { include(it.name) }
+package com.valaphee.blit
+
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.valaphee.blit.local.LocalSource
+import com.valaphee.blit.sftp.SftpSource
+
+/**
+ * @author Kevin Ludwig
+ */
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "type"
+)
+@JsonSubTypes(
+    JsonSubTypes.Type(LocalSource::class, name = "local"),
+    JsonSubTypes.Type(SftpSource::class, name = "sftp")
+)
+abstract class Source<T : Entry<T>>(
+    @get:JsonProperty("name") val name: String,
+) {
+    abstract val home: String
+
+    abstract fun isValid(path: String): Boolean
+
+    abstract operator fun get(path: String): T
+
+    override fun toString() = name
+}

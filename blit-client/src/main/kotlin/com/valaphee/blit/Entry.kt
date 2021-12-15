@@ -22,5 +22,25 @@
  * SOFTWARE.
  */
 
-rootProject.name = "blit"
-file(".").walk().maxDepth(1).filter { it.isDirectory && it.name != rootProject.name && File(it, "build.gradle.kts").exists() }.forEach { include(it.name) }
+package com.valaphee.blit
+
+import javafx.scene.control.TreeItem
+import java.io.OutputStream
+
+/**
+ * @author Kevin Ludwig
+ */
+abstract class Entry<T : Entry<T>> {
+    abstract val item: TreeItem<Entry<T>>
+    val self get() = this
+
+    abstract val name: String
+    abstract val size: Long
+    abstract val modifyTime: Long
+    abstract val directory: Boolean
+    abstract val children: List<T>
+
+    abstract fun update()
+
+    abstract fun transferTo(stream: OutputStream)
+}
