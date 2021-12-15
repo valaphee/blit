@@ -26,16 +26,9 @@ package com.valaphee.blit.k8scp
 
 import com.valaphee.blit.Entry
 import org.apache.sshd.sftp.client.SftpClient
-import org.apache.sshd.sftp.common.SftpConstants
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.OutputStream
-import java.nio.file.attribute.FileTime
-import java.time.LocalDateTime
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatterBuilder
-import java.time.temporal.ChronoField
-import java.util.Calendar
 
 /**
  * @author Kevin Ludwig
@@ -44,7 +37,7 @@ class K8scpEntry(
     private val k8scpSource: K8scpSource,
     private val path: String,
     override val name: String,
-    private val attributes: SftpClient.Attributes
+    private val attributes: SftpClient.Attributes = k8scpSource.stat(path)!!
 ) : Entry<K8scpEntry>() {
     override val size get() = attributes.size
     override val modifyTime get() = attributes.modifyTime.toMillis()
@@ -62,25 +55,4 @@ class K8scpEntry(
     }
 
     override fun toString() = if (name.isEmpty()) path else if (path.endsWith("/")) "$path$name" else "$path/$name"
-
-    companion object {
-        private val spaces = "\\s+".toRegex()
-        private val dateTimeFormatter = DateTimeFormatterBuilder().appendPattern("MMM dd HH:mm").parseDefaulting(ChronoField.YEAR, Calendar.getInstance().get(Calendar.YEAR).toLong()).toFormatter()
-
-        private fun parseLsEntry(entry: String): Pair<String, SftpClient.Attributes>? {
-            val entryColumns = entry.replace(spaces, " ").split(' ')
-            return if (entryColumns.size >= 6) entryColumns[8] to SftpClient.Attributes().apply {
-                val permission = entryColumns[0]
-                permissions = when (permission[0]) {
-                    '-' -> SftpConstants.S_IFREG
-                    'd' -> SftpConstants.S_IFDIR
-                    else -> 0
-                }
-                owner = entryColumns[2]
-                group = entryColumns[3]
-                entryColumns[4].toLongOrNull()?.let { size = it }
-                modifyTime(FileTime.from(LocalDateTime.parse("${entryColumns[5]} ${entryColumns[6]} ${entryColumns[7]}", dateTimeFormatter).toInstant(ZoneOffset.UTC)))
-            } else null
-        }
-    }
 }

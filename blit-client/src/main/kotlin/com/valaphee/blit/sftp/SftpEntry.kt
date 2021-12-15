@@ -35,7 +35,7 @@ class SftpEntry(
     private val sftpSource: SftpSource,
     private val path: String,
     override val name: String,
-    private var attributes: SftpClient.Attributes
+    private var attributes: SftpClient.Attributes = sftpSource.sftpClient.stat(path)
 ) : Entry<SftpEntry>() {
     override val size get() = attributes.size
     override val modifyTime get() = attributes.modifyTime.toMillis()

@@ -29,8 +29,8 @@ import com.valaphee.blit.Source
 import io.kubernetes.client.Copy
 import io.kubernetes.client.Exec
 import io.kubernetes.client.openapi.Configuration
-import org.apache.sshd.sftp.client.SftpClient
-import org.apache.sshd.sftp.common.SftpConstants
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 /**
  * @author Kevin Ludwig
@@ -43,11 +43,16 @@ class K8scpSource(
     internal val exec = Exec()
     internal val copy = Copy()
 
-    override val home get() = "." // TODO
+    override val home: String get() {
+        val process = exec.exec(namespace, pod, arrayOf("pwd", toString()), false)
+        val home = BufferedReader(InputStreamReader(process.inputStream)).use { it.readLine() }
+        process.waitFor()
+        return home
+    }
 
-    override fun isValid(path: String) = true // TODO
+    override fun isValid(path: String) = stat(path) != null
 
-    override fun get(path: String) = K8scpEntry(this, path, "", SftpClient.Attributes().apply { permissions = SftpConstants.S_IFDIR }) // TODO
+    override fun get(path: String) = K8scpEntry(this, path, "")
 
     companion object {
         init {
