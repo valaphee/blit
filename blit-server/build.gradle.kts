@@ -36,4 +36,4 @@ dependencies {
 
 application { mainClass.set("com.valaphee.blit.MainKt") }
 
-tasks { shadowJar { archiveName = "blit.jar" } }
+tasks { shadowJar { archiveName = "blit-server.jar" } }

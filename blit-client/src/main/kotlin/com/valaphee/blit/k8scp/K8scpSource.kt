@@ -22,37 +22,36 @@
  * SOFTWARE.
  */
 
-package com.valaphee.blit.sftp
+package com.valaphee.blit.k8scp
 
-import com.valaphee.blit.Entry
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.valaphee.blit.Source
+import io.kubernetes.client.Copy
+import io.kubernetes.client.Exec
+import io.kubernetes.client.openapi.Configuration
 import org.apache.sshd.sftp.client.SftpClient
-import java.io.OutputStream
+import org.apache.sshd.sftp.common.SftpConstants
 
 /**
  * @author Kevin Ludwig
  */
-class SftpEntry(
-    private val sftpSource: SftpSource,
-    private val path: String,
-    override val name: String,
-    private var attributes: SftpClient.Attributes
-) : Entry<SftpEntry>() {
-    override val size get() = attributes.size
-    override val modifyTime get() = attributes.modifyTime.toMillis()
-    override val directory get() = attributes.isDirectory
+class K8scpSource(
+    name: String,
+    @get:JsonProperty("namespace") val namespace: String,
+    @get:JsonProperty("pod") val pod: String
+) : Source<K8scpEntry>(name) {
+    internal val exec = Exec()
+    internal val copy = Copy()
 
-    override val children get() = if (directory) try {
-        sftpSource.sftpClient.readDir(toString()).mapNotNull {
-            val name = it.filename
-            if (name != "." && name != "..") SftpEntry(sftpSource, toString(), name, it.attributes) else null
+    override val home get() = "." // TODO
+
+    override fun isValid(path: String) = true // TODO
+
+    override fun get(path: String) = K8scpEntry(this, path, "", SftpClient.Attributes().apply { permissions = SftpConstants.S_IFDIR }) // TODO
+
+    companion object {
+        init {
+            Configuration.setDefaultApiClient(io.kubernetes.client.util.Config.defaultClient())
         }
-    } catch (_: RuntimeException) {
-        emptyList()
-    } else emptyList()
-
-    override fun transferTo(stream: OutputStream) {
-        sftpSource.sftpClient.read(toString()).use { it.transferTo(stream) }
     }
-
-    override fun toString() = if (name.isEmpty()) path else if (path.endsWith("/")) "$path$name" else "$path/$name"
 }

@@ -41,14 +41,14 @@ class SftpSource(
     @get:JsonProperty("username") val username: String,
     @get:JsonProperty("password") val password: String,
 ) : Source<SftpEntry>(name) {
-    private val sftpClient: SftpClient by lazy {
+    internal val sftpClient: SftpClient by lazy {
         val sshSession = ssh.connect(username, host, port).verify(30000).session
         sshSession.addPasswordIdentity(password)
         sshSession.auth().verify(30000)
         DefaultSftpClientFactory.INSTANCE.createSftpClient(sshSession)
     }
 
-    override val home get() = "."
+    override val home get() = "." // TODO
 
     override fun isValid(path: String) = try {
         sftpClient.stat(path).isDirectory
@@ -56,7 +56,7 @@ class SftpSource(
         false
     }
 
-    override fun get(path: String) = SftpEntry(sftpClient, path, "", sftpClient.stat(path))
+    override fun get(path: String) = SftpEntry(this, path, "", sftpClient.stat(path))
 
     companion object {
         private val ssh = SshClient.setUpDefaultClient().apply { start() }
