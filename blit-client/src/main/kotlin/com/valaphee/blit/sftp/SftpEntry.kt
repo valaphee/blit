@@ -33,35 +33,26 @@ import java.io.OutputStream
  */
 class SftpEntry(
     private val sftpClient: SftpClient,
-    private val path: Path,
-    private var attributes: SftpClient.Attributes = sftpClient.stat(path.toString())
+    private val path: String,
+    override val name: String,
+    private var attributes: SftpClient.Attributes
 ) : Entry<SftpEntry>() {
-    override val name get() = path.name
     override val size get() = attributes.size
     override val modifyTime get() = attributes.modifyTime.toMillis()
     override val directory get() = attributes.isDirectory
 
     override val children get() = if (directory) try {
-        sftpClient.readDir(path.toString()).mapNotNull {
+        sftpClient.readDir(toString()).mapNotNull {
             val name = it.filename
-            if (name != "." && name != "..") SftpEntry(sftpClient, path.subPath(name), it.attributes) else null
+            if (name != "." && name != "..") SftpEntry(sftpClient, toString(), name, it.attributes) else null
         }
     } catch (_: RuntimeException) {
         emptyList()
     } else emptyList()
 
     override fun transferTo(stream: OutputStream) {
-        sftpClient.read(this@SftpEntry.path.toString()).use { it.transferTo(stream) }
+        sftpClient.read(toString()).use { it.transferTo(stream) }
     }
 
-    override fun toString() = path.toString()
-
-    class Path(
-        private val cd: String,
-        val name: String
-    ) {
-        fun subPath(name: String) = Path(toString(), name)
-
-        override fun toString() = if (name.isEmpty()) cd else if (cd.endsWith("/")) "$cd$name" else "$cd/$name"
-    }
+    override fun toString() = if (name.isEmpty()) path else if (path.endsWith("/")) "$path$name" else "$path/$name"
 }

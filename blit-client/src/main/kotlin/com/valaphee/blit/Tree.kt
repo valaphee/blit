@@ -32,6 +32,8 @@ import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeTableRow
 import javafx.scene.control.TreeTableView
 import javafx.scene.image.ImageView
+import javafx.scene.input.Clipboard
+import javafx.scene.input.KeyCode
 import javafx.scene.input.TransferMode
 import javafx.scene.layout.Priority
 import kotlinx.coroutines.CoroutineScope
@@ -87,21 +89,38 @@ class Tree<T : Entry<T>>(
             object : TreeTableRow<Entry<T>>() {
                 init {
                     setOnDragDetected {
-                        startDragAndDrop(TransferMode.MOVE).apply { setContent { putFiles(selectionModel.selectedItems.mapNotNull { if (it.value.directory) null else File(tmpdir, it.value.name) }) } }
-                        it.consume()
-                    }
-                    setOnDragDone {
-                        selectionModel.selectedItems.zip(it.dragboard.files).forEach { (item, file) -> if (!item.value.directory) FileOutputStream(file).use { item.value.transferTo(it) } }
+                        startDragAndDrop(TransferMode.MOVE).apply {
+                            setContent {
+                                fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
+                                    File(tmpdir, entry.name).mkdir()
+                                    entry.children.flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
+                                } else listOf(File(tmpdir, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
+
+                                putFiles(selectionModel.selectedItems.flatMap { flatten(it.value) })
+                            }
+                        }
                         it.consume()
                     }
                     setOnDragOver {
-                        if (it.dragboard.hasFiles()) it.acceptTransferModes(*TransferMode.COPY_OR_MOVE)
+                        if (it.gestureSource != this && it.dragboard.hasFiles()) it.acceptTransferModes(*TransferMode.COPY_OR_MOVE)
                         it.consume()
                     }
                     setOnDragDropped {
-                        if (it.dragboard.hasFiles()) it.isDropCompleted = true
+                        it.isDropCompleted = true
                         it.consume()
                     }
+                }
+            }
+        }
+        setOnKeyPressed {
+            if (it.isControlDown) when (it.code) {
+                KeyCode.C -> Clipboard.getSystemClipboard().setContent {
+                    fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
+                        File(tmpdir, entry.name).mkdir()
+                        entry.children.flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
+                    } else listOf(File(tmpdir, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
+
+                    putFiles(selectionModel.selectedItems.flatMap { flatten(it.value) })
                 }
             }
         }
@@ -119,7 +138,7 @@ class Tree<T : Entry<T>>(
 
                         override fun isLeaf() = false
                     } else TreeItem(entry)
-                }) {if (it.isExpanded) children else emptyList() }
+                }) { if (it.isExpanded) children else emptyList() }
             }
         }
     }

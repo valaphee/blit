@@ -30,7 +30,6 @@ import javafx.beans.property.Property
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.ObservableList
-import javafx.scene.control.TreeItem
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
 import javafx.scene.layout.Priority
@@ -43,9 +42,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import org.controlsfx.control.BreadCrumbBar
+import org.controlsfx.control.textfield.CustomTextField
 import tornadofx.Dimension
 import tornadofx.View
 import tornadofx.action
+import tornadofx.bind
 import tornadofx.button
 import tornadofx.combobox
 import tornadofx.hbox
@@ -54,9 +55,9 @@ import tornadofx.item
 import tornadofx.menu
 import tornadofx.menubar
 import tornadofx.onChange
+import tornadofx.paddingTop
 import tornadofx.splitpane
 import tornadofx.style
-import tornadofx.textfield
 import tornadofx.toObservable
 import tornadofx.vbox
 import tornadofx.vgrow
@@ -78,7 +79,7 @@ class MainView : View("Blit") {
 
         menubar {
             menu("File") { item("Exit") { action { (scene.window as Stage).close() } } }
-            menu("Help") { item("About") { action { AboutView().openWindow() } } }
+            menu("Help") { item("About") { action { find<AboutView>().openModal(resizable = false) } } }
         }
 
         splitpane {
@@ -103,37 +104,33 @@ class MainView : View("Blit") {
                     @Suppress("UNCHECKED_CAST")
                     items = _config.sources.toObservable() as ObservableList<Source<T>>
                 }
-                add(BreadCrumbBar<String>().apply {
-                    tree.rootProperty().onChange {
-                        it?.let {
-                            var item: TreeItem<String>? = null
-                            normalizePath(it.value.toString()).split('/').forEach { item = TreeItem(it).also { item?.children?.add(it) } }
-                            selectedCrumb = item
-                        }
-                    }
-                    selectedCrumbProperty().onChange {
-                        val path = StringBuilder()
-                        var item = it
-                        while (item != null) {
-                            path.insert(0, "${item!!.value}/")
-                            item = item!!.parent
-                        }
-                        navigate(path.toString())
-                    }
-                })
-                textfield(name) {
-                    hgrow = Priority.ALWAYS
+                add(CustomTextField().apply {
+                    bind(name)
 
-                    style(append = true) { prefHeight = Dimension(27.0, Dimension.LinearUnits.px) }
+                    hgrow = Priority.ALWAYS
+                    style(true) { prefHeight = Dimension(27.0, Dimension.LinearUnits.px) }
+
+                    left = BreadCrumbBar<String>().apply {
+                        style(true) { paddingTop = 2.0 }
+
+                        tree.rootProperty().onChange { it?.let { selectedCrumb = BreadCrumbBar.buildTreeModel(*normalizePath(it.value.toString()).split('/').toTypedArray()) } }
+                        selectedCrumbProperty().onChange {
+                            val path = StringBuilder()
+                            var item = it
+                            while (item != null) {
+                                path.insert(0, "${item.value}/")
+                                item = item.parent
+                            }
+                            navigate(path.toString())
+                        }
+                    }
 
                     addEventFilter(KeyEvent.KEY_PRESSED) { if (it.code == KeyCode.ENTER) text?.let(::navigateRelative) }
-                }
+                })
                 button("Go") { action { name.value?.let(::navigateRelative) } }
             }
             add(tree)
         }
-
-        private fun navigateRelative(path: String) = navigate(if (path.startsWith('/')) path else tree.root.value.toString() + "/$path")
 
         private fun navigate(path: String) {
             val normalizedPath = normalizePath(path)
@@ -149,10 +146,12 @@ class MainView : View("Blit") {
                 }
             }
         }
+
+        private fun navigateRelative(path: String) = navigate(if (path.startsWith('/')) path else tree.root.value.toString() + "/$path")
     }
 
     companion object {
-        private fun normalizePath(path: String): String {
+        internal fun normalizePath(path: String): String {
             val normalizedPath = path.replace('\\', '/').replace("//", "/").replace("//", "/")
             return if (normalizedPath.length <= 1) normalizedPath else normalizedPath.removeSuffix("/")
         }
