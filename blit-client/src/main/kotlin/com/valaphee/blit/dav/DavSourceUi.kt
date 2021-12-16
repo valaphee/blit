@@ -22,38 +22,35 @@
  * SOFTWARE.
  */
 
-package com.valaphee.blit.sftp
+package com.valaphee.blit.dav
 
-import com.valaphee.blit.AbstractEntry
-import org.apache.sshd.sftp.client.SftpClient
-import java.io.OutputStream
+import com.valaphee.blit.Source
+import com.valaphee.blit.SourceUi
+import javafx.event.EventTarget
+import javafx.scene.control.TextField
+import tornadofx.Field
+import tornadofx.field
+import tornadofx.passwordfield
+import tornadofx.textfield
 
 /**
  * @author Kevin Ludwig
  */
-class SftpEntry(
-    private val sftpSource: SftpSource,
-    private val path: String,
-    override val name: String,
-    private var attributes: SftpClient.Attributes = sftpSource.sftpClient.stat(path)
-) : AbstractEntry<SftpEntry>() {
-    override val size get() = attributes.size
-    override val modifyTime get() = attributes.modifyTime.toMillis()
-    override val directory get() = attributes.isDirectory
-
-    override val children get() = if (directory) try {
-        val path = toString()
-        sftpSource.sftpClient.readDir(path).mapNotNull {
-            val name = it.filename
-            if (name != "." && name != "..") SftpEntry(sftpSource, path, name, it.attributes) else null
-        }
-    } catch (_: RuntimeException) {
-        emptyList()
-    } else emptyList()
-
-    override fun transferTo(stream: OutputStream) {
-        sftpSource.sftpClient.read(toString()).use { it.transferTo(stream) }
+object DavSourceUi : SourceUi {
+    override fun getFields(eventTarget: EventTarget, source: Source<*>?) = with(eventTarget) {
+        val davSource = source as? DavSource
+        listOf(
+            field("Name") { textfield(source?.name ?: "") },
+            field ("Url") { textfield(davSource?.url ?: "") },
+            field ("Username") { textfield(davSource?.username ?: "") },
+            field ("Password") { passwordfield(davSource?.password ?: "") }
+        )
     }
 
-    override fun toString() = if (name.isEmpty()) path else if (path.endsWith("/")) "$path$name" else "$path/$name"
+    override fun getSource(fields: List<Field>) = DavSource(
+        (fields[0].inputs.first() as TextField).text,
+        (fields[1].inputs.first() as TextField).text,
+        (fields[2].inputs.first() as TextField).text,
+        (fields[3].inputs.first() as TextField).text
+    )
 }

@@ -42,7 +42,7 @@ class SftpSource(
     @get:JsonProperty("host") val host: String,
     @get:JsonProperty("port") val port: Int,
     @get:JsonProperty("username") val username: String,
-    @get:JsonProperty("password") val password: String,
+    @get:JsonProperty("password") val password: String
 ) : AbstractSource<SftpEntry>(name) {
     @get:JsonIgnore internal val sftpClient: SftpClient by lazy {
         val sshSession = ssh.connect(username, host, port).verify(30000).session

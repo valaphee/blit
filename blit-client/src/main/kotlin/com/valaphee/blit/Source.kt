@@ -28,6 +28,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.valaphee.blit.dav.DavSource
 import com.valaphee.blit.k8scp.K8scpSource
 import com.valaphee.blit.local.LocalSource
 import com.valaphee.blit.sftp.SftpSource
@@ -41,6 +42,7 @@ import com.valaphee.blit.sftp.SftpSource
     property = "type"
 )
 @JsonSubTypes(
+    JsonSubTypes.Type(DavSource::class),
     JsonSubTypes.Type(K8scpSource::class),
     JsonSubTypes.Type(LocalSource::class),
     JsonSubTypes.Type(SftpSource::class)

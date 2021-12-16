@@ -26,6 +26,8 @@ package com.valaphee.blit.app.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.valaphee.blit.Source
+import com.valaphee.blit.dav.DavSource
+import com.valaphee.blit.dav.DavSourceUi
 import com.valaphee.blit.k8scp.K8scpSource
 import com.valaphee.blit.k8scp.K8scpSourceUi
 import com.valaphee.blit.local.LocalSource
@@ -42,7 +44,6 @@ import tornadofx.action
 import tornadofx.asObservable
 import tornadofx.bindSelected
 import tornadofx.button
-import tornadofx.buttonbar
 import tornadofx.combobox
 import tornadofx.dynamicContent
 import tornadofx.field
@@ -68,26 +69,29 @@ class ConfigViewSources : Fragment("Sources") {
             it?.let {
                 type.value = null
                 type.value = when (it) {
+                    is DavSource -> "dav"
                     is K8scpSource -> "k8scp"
                     is LocalSource -> "local"
                     is SftpSource -> "sftp"
                     else -> TODO(it::class.java.name)
-                }
+                } // TODO
             }
         }
-    }
-    private val sources = listview(_config.sources) {
-        vgrow = Priority.ALWAYS
-
-        bindSelected(source)
     }
     private val type = SimpleStringProperty()
     private lateinit var fields: List<Field>
 
     override val root = hbox {
         vbox {
+            val sources = listview(_config.sources) {
+                bindSelected(source)
+
+                vgrow = Priority.ALWAYS
+
+                selectionModel.selectFirst()
+            }
             add(sources)
-            buttonbar {
+            hbox {
                 button("New") {
                     action {
                         sources.selectionModel.select(null)
@@ -120,15 +124,14 @@ class ConfigViewSources : Fragment("Sources") {
             fieldset(labelPosition = Orientation.VERTICAL) { field("Type") { combobox<String>(type) { items = sourceUis.keys.toList().asObservable() } } }
             fieldset(labelPosition = Orientation.VERTICAL) { dynamicContent(type) { it?.let { sourceUis[it]!!.getFields(this, source.value).also { fields = it } } } }
         }
-
-        sources.selectionModel.selectFirst()
     }
 
     companion object {
         private val sourceUis = mutableMapOf(
+            "dav" to DavSourceUi,
             "k8scp" to K8scpSourceUi,
             "local" to LocalSourceUi,
             "sftp" to SftpSourceUi
-        )
+        ) // TODO
     }
 }

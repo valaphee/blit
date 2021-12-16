@@ -44,8 +44,11 @@ class K8scpEntry(
     override val directory get() = attributes.isDirectory
 
     override val children: List<K8scpEntry> get() = if (directory) {
-        val process = K8scpSource.exec.exec(k8scpSource.namespace, k8scpSource.pod, arrayOf("ls", "-l", "--full-time", toString()), false)
-        val children = BufferedReader(InputStreamReader(process.inputStream)).use { it.readLines().mapNotNull { parseLsEntry(it)?.let { K8scpEntry(k8scpSource, toString(), it.first, it.second) } } }
+        val path = toString()
+        val process = K8scpSource.exec.exec(k8scpSource.namespace, k8scpSource.pod, arrayOf("ls", "-l", "--full-time", path), false)
+        val children = BufferedReader(InputStreamReader(process.inputStream)).use {
+            it.readLines().mapNotNull { parseLsEntry(it)?.let { K8scpEntry(k8scpSource, path, it.first, it.second) } }
+        }
         process.waitFor()
         children
     } else emptyList()

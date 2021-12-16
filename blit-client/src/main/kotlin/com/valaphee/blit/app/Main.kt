@@ -24,7 +24,9 @@
 
 package com.valaphee.blit.app
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.afterburner.AfterburnerModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.inject.AbstractModule
@@ -32,11 +34,16 @@ import com.google.inject.Guice
 import com.valaphee.blit.app.config.Config
 import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory
 import javafx.scene.image.Image
+import okhttp3.OkHttpClient
 import tornadofx.App
 import tornadofx.DIContainer
 import tornadofx.FX
 import tornadofx.launch
 import java.io.File
+import java.security.cert.X509Certificate
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 import kotlin.reflect.KClass
 
 /**
@@ -44,13 +51,40 @@ import kotlin.reflect.KClass
  */
 class Main : App(Image(Main::class.java.getResourceAsStream("/app.png")), MainView::class)
 
+private fun getUnsafeOkHttpClient(): OkHttpClient {
+    // Create a trust manager that does not validate certificate chains
+    val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
+        override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {
+        }
+
+        override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {
+        }
+
+        override fun getAcceptedIssuers() = arrayOf<X509Certificate>()
+    })
+
+    // Install the all-trusting trust manager
+    val sslContext = SSLContext.getInstance("SSL")
+    sslContext.init(null, trustAllCerts, java.security.SecureRandom())
+    // Create an ssl socket factory with our all-trusting manager
+    val sslSocketFactory = sslContext.socketFactory
+
+    return OkHttpClient.Builder()
+        .sslSocketFactory(sslSocketFactory, trustAllCerts[0] as X509TrustManager)
+        .hostnameVerifier { _, _ -> true }.build()
+}
+
 fun main(arguments: Array<String>) {
     SvgImageLoaderFactory.install()
 
     FX.dicontainer = object : DIContainer {
         private val injector = Guice.createInjector(object : AbstractModule() {
             override fun configure() {
-                val objectMapper = jacksonObjectMapper().also { bind(ObjectMapper::class.java).toInstance(it) }
+                val objectMapper = jacksonObjectMapper().apply {
+                    registerModule(AfterburnerModule())
+
+                    disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                }.also { bind(ObjectMapper::class.java).toInstance(it) }
                 bind(IconManifest::class.java).toInstance(objectMapper.readValue<IconManifest>(Main::class.java.getResourceAsStream("/icon/.manifest")!!))
                 val configFile = File("config.json")
                 bind(Config::class.java).toInstance(if (configFile.exists()) objectMapper.readValue<Config>(configFile) else Config().also { objectMapper.writeValue(configFile, it) })

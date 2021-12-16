@@ -30,6 +30,7 @@ import jfxtras.styles.jmetro.JMetroStyleClass
 import jfxtras.styles.jmetro.Style
 import tornadofx.View
 import tornadofx.borderpane
+import tornadofx.center
 import tornadofx.label
 
 /**
@@ -43,11 +44,13 @@ class AboutView : View("About Blit") {
         JMetro(this, Style.DARK)
         styleClass.add(JMetroStyleClass.BACKGROUND)
 
-        center = label(
-            """
-                Blit
-                Copyright (c) 2021, Valaphee.
-            """.trimIndent()
-        ) { textAlignment = TextAlignment.CENTER }
+        center {
+            label(
+                """
+                    Blit
+                    Copyright (c) 2021, Valaphee.
+                """.trimIndent()
+            ) { textAlignment = TextAlignment.CENTER }
+        }
     }
 }
