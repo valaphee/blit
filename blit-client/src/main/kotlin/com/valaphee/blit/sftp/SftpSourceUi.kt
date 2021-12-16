@@ -22,34 +22,36 @@
  * SOFTWARE.
  */
 
-package com.valaphee.blit
+package com.valaphee.blit.sftp
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.valaphee.blit.k8scp.K8scpSource
-import com.valaphee.blit.local.LocalSource
-import com.valaphee.blit.sftp.SftpSource
+import com.valaphee.blit.Source
+import com.valaphee.blit.SourceUi
+import javafx.event.EventTarget
+import javafx.scene.control.TextField
+import tornadofx.Field
+import tornadofx.field
+import tornadofx.textfield
 
 /**
  * @author Kevin Ludwig
  */
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    include = JsonTypeInfo.As.PROPERTY,
-    property = "type"
-)
-@JsonSubTypes(
-    JsonSubTypes.Type(K8scpSource::class),
-    JsonSubTypes.Type(LocalSource::class),
-    JsonSubTypes.Type(SftpSource::class)
-)
-interface Source<T : Entry<T>> {
-    @get:JsonProperty("name") val name: String
-    @get:JsonIgnore val home: String
+object SftpSourceUi : SourceUi {
+    override fun getFields(eventTarget: EventTarget, source: Source<*>?) = with(eventTarget) {
+        val sftpSource = source as? SftpSource
+        listOf(
+            field("Name") { textfield(source?.name ?: "") },
+            field("Host") { textfield(sftpSource?.host ?: "") },
+            field("Port") { textfield(sftpSource?.port?.toString() ?: "") },
+            field("Username") { textfield(sftpSource?.username ?: "") },
+            field("Password") { textfield(sftpSource?.password ?: "") }
+        )
+    }
 
-    fun isValid(path: String): Boolean
-
-    operator fun get(path: String): T
+    override fun getSource(fields: List<Field>) = SftpSource(
+        (fields[0].inputs.first() as TextField).text,
+        (fields[1].inputs.first() as TextField).text,
+        (fields[2].inputs.first() as TextField).text.toInt(),
+        (fields[3].inputs.first() as TextField).text,
+        (fields[4].inputs.first() as TextField).text
+    )
 }

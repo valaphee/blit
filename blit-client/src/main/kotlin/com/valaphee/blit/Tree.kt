@@ -24,7 +24,6 @@
 
 package com.valaphee.blit
 
-import com.valaphee.blit.data.IconManifest
 import javafx.application.Platform
 import javafx.scene.control.SelectionMode
 import javafx.scene.control.TableColumnBase

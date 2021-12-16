@@ -24,32 +24,14 @@
 
 package com.valaphee.blit
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.valaphee.blit.k8scp.K8scpSource
-import com.valaphee.blit.local.LocalSource
-import com.valaphee.blit.sftp.SftpSource
+import javafx.event.EventTarget
+import tornadofx.Field
 
 /**
  * @author Kevin Ludwig
  */
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    include = JsonTypeInfo.As.PROPERTY,
-    property = "type"
-)
-@JsonSubTypes(
-    JsonSubTypes.Type(K8scpSource::class),
-    JsonSubTypes.Type(LocalSource::class),
-    JsonSubTypes.Type(SftpSource::class)
-)
-interface Source<T : Entry<T>> {
-    @get:JsonProperty("name") val name: String
-    @get:JsonIgnore val home: String
+interface SourceUi {
+    fun getFields(eventTarget: EventTarget, source: Source<*>?): List<Field>
 
-    fun isValid(path: String): Boolean
-
-    operator fun get(path: String): T
+    fun getSource(fields: List<Field>): Source<*>?
 }

@@ -24,12 +24,12 @@
 
 package com.valaphee.blit
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.inject.AbstractModule
 import com.google.inject.Guice
-import com.valaphee.blit.data.Config
-import com.valaphee.blit.data.IconManifest
+import com.valaphee.blit.config.Config
 import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory
 import javafx.scene.image.Image
 import tornadofx.App
@@ -50,7 +50,7 @@ fun main(arguments: Array<String>) {
     FX.dicontainer = object : DIContainer {
         private val injector = Guice.createInjector(object : AbstractModule() {
             override fun configure() {
-                val objectMapper = jacksonObjectMapper()
+                val objectMapper = jacksonObjectMapper().also { bind(ObjectMapper::class.java).toInstance(it) }
                 bind(IconManifest::class.java).toInstance(objectMapper.readValue<IconManifest>(Main::class.java.getResourceAsStream("/icon/.manifest")!!))
                 val configFile = File("config.json")
                 bind(Config::class.java).toInstance(if (configFile.exists()) objectMapper.readValue<Config>(configFile) else Config().also { objectMapper.writeValue(configFile, it) })

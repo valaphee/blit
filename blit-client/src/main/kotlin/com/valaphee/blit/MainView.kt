@@ -24,9 +24,8 @@
 
 package com.valaphee.blit
 
-import com.valaphee.blit.data.Config
-import com.valaphee.blit.data.IconManifest
-import javafx.beans.property.Property
+import com.valaphee.blit.config.Config
+import com.valaphee.blit.config.ConfigView
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.ObservableList
@@ -56,9 +55,9 @@ import tornadofx.menu
 import tornadofx.menubar
 import tornadofx.onChange
 import tornadofx.paddingTop
+import tornadofx.separator
 import tornadofx.splitpane
 import tornadofx.style
-import tornadofx.toObservable
 import tornadofx.vbox
 import tornadofx.vgrow
 
@@ -71,14 +70,18 @@ class MainView : View("Blit") {
     private val ioScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     override val root = vbox {
-        prefWidth = 1000.0
-        prefHeight = 800.0
-
         JMetro(this, Style.DARK)
         styleClass.add(JMetroStyleClass.BACKGROUND)
 
+        prefWidth = 1000.0
+        prefHeight = 800.0
+
         menubar {
-            menu("File") { item("Exit") { action { (scene.window as Stage).close() } } }
+            menu("File") {
+                item("Sources") { action { find<ConfigView>().openModal() } }
+                separator()
+                item("Exit") { action { (scene.window as Stage).close() } }
+            }
             menu("Help") { item("About") { action { find<AboutView>().openModal(resizable = false) } } }
         }
 
@@ -91,7 +94,7 @@ class MainView : View("Blit") {
     }
 
     inner class Pane<T : Entry<T>> : VBox() {
-        private val source: Property<Source<T>> = SimpleObjectProperty<Source<T>>().apply { onChange { it?.let { navigate(it.home) } } }
+        private val source = SimpleObjectProperty<Source<T>>().apply { onChange { it?.let { navigate(it.home) } } }
         private lateinit var _path: String
         private val name = SimpleStringProperty()
         private val tree = Tree<T>(iconManifest, ioScope)
@@ -102,7 +105,7 @@ class MainView : View("Blit") {
             hbox {
                 combobox(source) {
                     @Suppress("UNCHECKED_CAST")
-                    items = _config.sources.toObservable() as ObservableList<Source<T>>
+                    items = _config.sources as ObservableList<Source<T>>
                 }
                 add(CustomTextField().apply {
                     bind(name)

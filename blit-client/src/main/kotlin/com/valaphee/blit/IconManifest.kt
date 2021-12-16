@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.valaphee.blit.data
+package com.valaphee.blit
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty

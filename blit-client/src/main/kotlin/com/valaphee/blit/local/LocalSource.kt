@@ -24,17 +24,18 @@
 
 package com.valaphee.blit.local
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.valaphee.blit.Source
+import com.fasterxml.jackson.annotation.JsonTypeName
+import com.valaphee.blit.AbstractSource
 import java.io.File
 
 /**
  * @author Kevin Ludwig
  */
+@JsonTypeName("local")
 class LocalSource(
     name: String
-) : Source<LocalEntry>(name) {
-    @get:JsonIgnore override val home: String get() = File(".").absolutePath
+) : AbstractSource<LocalEntry>(name) {
+    override val home: String get() = File(System.getProperty("user.home")).absolutePath
 
     override fun isValid(path: String) = File(path).isDirectory
 

@@ -22,44 +22,31 @@
  * SOFTWARE.
  */
 
-package com.valaphee.blit.k8scp
+package com.valaphee.blit.config
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonTypeName
-import com.valaphee.blit.AbstractSource
-import io.kubernetes.client.Copy
-import io.kubernetes.client.Exec
-import io.kubernetes.client.openapi.Configuration
-import java.io.BufferedReader
-import java.io.InputStreamReader
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.DeserializationContext
+import com.fasterxml.jackson.databind.JsonDeserializer
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.valaphee.blit.Source
+import com.valaphee.blit.local.LocalSource
+import javafx.collections.FXCollections
+import javafx.collections.ObservableList
 
 /**
  * @author Kevin Ludwig
  */
-@JsonTypeName("k8scp")
-class K8scpSource(
-    name: String,
-    @get:JsonProperty("namespace") val namespace: String,
-    @get:JsonProperty("pod") val pod: String
-) : AbstractSource<K8scpEntry>(name) {
-    @get:JsonIgnore internal val exec = Exec()
-    @get:JsonIgnore internal val copy = Copy()
-
-    override val home: String get() {
-        val process = exec.exec(namespace, pod, arrayOf("pwd", toString()), false)
-        val home = BufferedReader(InputStreamReader(process.inputStream)).use { it.readLine() }
-        process.waitFor()
-        return home
-    }
-
-    override fun isValid(path: String) = stat(path) != null
-
-    override fun get(path: String) = K8scpEntry(this, path, "")
-
+class Config(
+    @JsonDeserialize(using = SourceObservableListDeserializer::class)
+    @JsonProperty("sources") val sources: ObservableList<Source<*>> = FXCollections.observableArrayList(LocalSource("local"))
+) {
     companion object {
-        init {
-            Configuration.setDefaultApiClient(io.kubernetes.client.util.Config.defaultClient())
+        class SourceObservableListDeserializer : JsonDeserializer<ObservableList<Source<*>>>() {
+            override fun deserialize(parser: JsonParser, context: DeserializationContext): ObservableList<Source<*>> = FXCollections.observableList(parser.readValueAs<List<Source<*>>>(object : TypeReference<List<Source<*>>>() {}))
         }
     }
 }
+
+

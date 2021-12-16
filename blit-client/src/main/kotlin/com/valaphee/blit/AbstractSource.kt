@@ -22,15 +22,13 @@
  * SOFTWARE.
  */
 
-package com.valaphee.blit.data
-
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.valaphee.blit.Source
-import com.valaphee.blit.local.LocalSource
+package com.valaphee.blit
 
 /**
  * @author Kevin Ludwig
  */
-class Config(
-    @get:JsonProperty("sources") val sources: List<Source<*>> = listOf(LocalSource("local"))
-)
+abstract class AbstractSource<T : Entry<T>>(
+    override val name: String
+) : Source<T> {
+    override fun toString() = name
+}

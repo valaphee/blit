@@ -22,34 +22,40 @@
  * SOFTWARE.
  */
 
-package com.valaphee.blit
+package com.valaphee.blit.config
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.valaphee.blit.k8scp.K8scpSource
-import com.valaphee.blit.local.LocalSource
-import com.valaphee.blit.sftp.SftpSource
+import javafx.scene.control.TabPane
+import javafx.scene.layout.Priority
+import javafx.stage.Stage
+import jfxtras.styles.jmetro.JMetro
+import jfxtras.styles.jmetro.JMetroStyleClass
+import jfxtras.styles.jmetro.Style
+import tornadofx.View
+import tornadofx.action
+import tornadofx.button
+import tornadofx.buttonbar
+import tornadofx.tab
+import tornadofx.tabpane
+import tornadofx.vbox
+import tornadofx.vgrow
 
 /**
  * @author Kevin Ludwig
  */
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    include = JsonTypeInfo.As.PROPERTY,
-    property = "type"
-)
-@JsonSubTypes(
-    JsonSubTypes.Type(K8scpSource::class),
-    JsonSubTypes.Type(LocalSource::class),
-    JsonSubTypes.Type(SftpSource::class)
-)
-interface Source<T : Entry<T>> {
-    @get:JsonProperty("name") val name: String
-    @get:JsonIgnore val home: String
+class ConfigView : View("Configure Blit") {
+    override val root = vbox {
+        JMetro(this, Style.DARK)
+        styleClass.add(JMetroStyleClass.BACKGROUND)
 
-    fun isValid(path: String): Boolean
+        prefWidth = 800.0
+        prefHeight = 600.0
 
-    operator fun get(path: String): T
+        tabpane {
+            vgrow = Priority.ALWAYS
+            tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
+
+            tab(ConfigViewSources::class)
+        }
+        buttonbar { button("OK") { action { (scene.window as Stage).close() } } }
+    }
 }
