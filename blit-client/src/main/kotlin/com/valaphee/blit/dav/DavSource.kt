@@ -44,7 +44,6 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import java.net.URLEncoder
 import java.security.cert.X509Certificate
@@ -73,9 +72,9 @@ class DavSource(
 
     override val home get() = ""
 
-    override fun isValid(path: String) = runBlocking { httpClient.request<HttpResponse>("$url/${URLEncoder.encode(path, "utf-8")}") { method = httpMethodPropfind }.status == HttpStatusCode.MultiStatus }
+    override suspend fun isValid(path: String) = httpClient.request<HttpResponse>("$url/${URLEncoder.encode(path, "utf-8")}") { method = httpMethodPropfind }.status == HttpStatusCode.MultiStatus
 
-    override fun get(path: String) = DavEntry(this, path, "")
+    override suspend fun get(path: String) = DavEntry(this, path, "", httpClient.request<Multistatus>("$url/$path") { method = httpMethodPropfind }.response.first().propstat.first().prop) // TODO
 
     companion object {
         internal val httpMethodPropfind = HttpMethod("PROPFIND")

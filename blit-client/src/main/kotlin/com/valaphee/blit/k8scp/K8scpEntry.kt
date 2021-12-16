@@ -37,13 +37,13 @@ class K8scpEntry(
     private val k8scpSource: K8scpSource,
     private val path: String,
     override val name: String,
-    private val attributes: SftpClient.Attributes = k8scpSource.stat(path)!!
+    private val attributes: SftpClient.Attributes
 ) : AbstractEntry<K8scpEntry>() {
     override val size get() = attributes.size
     override val modifyTime get() = attributes.modifyTime.toMillis()
     override val directory get() = attributes.isDirectory
 
-    override val children: List<K8scpEntry> get() = if (directory) {
+    override suspend fun list() = if (directory) {
         val path = toString()
         val process = K8scpSource.exec.exec(k8scpSource.namespace, k8scpSource.pod, arrayOf("ls", "-l", "--full-time", path), false)
         val children = BufferedReader(InputStreamReader(process.inputStream)).use {
@@ -53,7 +53,7 @@ class K8scpEntry(
         children
     } else emptyList()
 
-    override fun transferTo(stream: OutputStream) {
+    override suspend fun transferTo(stream: OutputStream) {
         K8scpSource.copy.copyFileFromPod(k8scpSource.namespace, k8scpSource.pod, toString()).use { it.transferTo(stream) }
     }
 

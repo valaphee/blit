@@ -32,7 +32,6 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.readBytes
 import io.ktor.http.HttpStatusCode
 import io.ktor.utils.io.jvm.javaio.copyTo
-import kotlinx.coroutines.runBlocking
 import java.io.OutputStream
 
 /**
@@ -42,16 +41,16 @@ class DavEntry(
     private val davSource: DavSource,
     private val path: String,
     override val name: String,
-    private val prop: Multistatus.Response.Propstat.Prop = runBlocking { davSource.httpClient.request<Multistatus>("${davSource.url}/$path") { method = DavSource.httpMethodPropfind }.response.first().propstat.first().prop }
+    private val prop: Multistatus.Response.Propstat.Prop
 ) : AbstractEntry<DavEntry>() {
     override val size get() = prop.getcontentlength
     override val modifyTime get() = 0L
     override val directory get() = prop.resourcetype?.collection != null
 
-    override val children: List<DavEntry> get() = runBlocking {
+    override suspend fun list(): List<DavEntry> {
         val path = this@DavEntry.toString()
         val httpResponse = davSource.httpClient.request<HttpResponse>("${davSource.url}/$path") { method = DavSource.httpMethodPropfind }
-        if (httpResponse.status == HttpStatusCode.MultiStatus) {
+        return if (httpResponse.status == HttpStatusCode.MultiStatus) {
             DavSource.xmlMapper.readValue<Multistatus>(httpResponse.readBytes()).response.mapNotNull {
                 val name = it.href.removeSuffix("/").split('/').last()
                 if (name != this@DavEntry.name) DavEntry(davSource, path, name, it.propstat.first().prop) else null
@@ -59,8 +58,8 @@ class DavEntry(
         } else emptyList()
     }
 
-    override fun transferTo(stream: OutputStream) {
-        runBlocking { davSource.httpClient.get<HttpResponse>("${davSource.url}/${this@DavEntry}").content.copyTo(stream) }
+    override suspend fun transferTo(stream: OutputStream) {
+        davSource.httpClient.get<HttpResponse>("${davSource.url}/${this@DavEntry}").content.copyTo(stream)
     }
 
     override fun toString() = if (name.isEmpty()) path else if (path.endsWith("/")) "$path$name" else "$path/$name"

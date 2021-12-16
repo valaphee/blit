@@ -40,9 +40,9 @@ class LocalEntry(
     override val modifyTime get() = path.lastModified()
     override val directory get() = path.isDirectory
 
-    override val children get() = path.listFiles()?.map { LocalEntry(it) } ?: emptyList()
+    override suspend fun list() = path.listFiles()?.map { LocalEntry(it) } ?: emptyList()
 
-    override fun transferTo(stream: OutputStream) {
+    override suspend fun transferTo(stream: OutputStream) {
         FileInputStream(path).use { it.transferTo(stream) }
     }
 

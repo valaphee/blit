@@ -37,7 +37,7 @@ class LocalSource(
 ) : AbstractSource<LocalEntry>(name) {
     override val home: String get() = File(System.getProperty("user.home")).absolutePath
 
-    override fun isValid(path: String) = File(path).isDirectory
+    override suspend fun isValid(path: String) = File(path).isDirectory
 
-    override fun get(path: String) = LocalEntry(File(path))
+    override suspend fun get(path: String) = LocalEntry(File(path))
 }

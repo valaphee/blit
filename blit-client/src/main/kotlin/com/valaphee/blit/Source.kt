@@ -51,7 +51,7 @@ interface Source<T : Entry<T>> {
     @get:JsonProperty("name") val name: String
     @get:JsonIgnore val home: String
 
-    fun isValid(path: String): Boolean
+    suspend fun isValid(path: String): Boolean
 
-    operator fun get(path: String): T
+    suspend fun get(path: String): T
 }

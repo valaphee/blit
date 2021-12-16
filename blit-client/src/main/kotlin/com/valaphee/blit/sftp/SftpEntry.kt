@@ -35,13 +35,13 @@ class SftpEntry(
     private val sftpSource: SftpSource,
     private val path: String,
     override val name: String,
-    private var attributes: SftpClient.Attributes = sftpSource.sftpClient.stat(path)
+    private var attributes: SftpClient.Attributes
 ) : AbstractEntry<SftpEntry>() {
     override val size get() = attributes.size
     override val modifyTime get() = attributes.modifyTime.toMillis()
     override val directory get() = attributes.isDirectory
 
-    override val children get() = if (directory) try {
+    override suspend fun list() = if (directory) try {
         val path = toString()
         sftpSource.sftpClient.readDir(path).mapNotNull {
             val name = it.filename
@@ -51,7 +51,7 @@ class SftpEntry(
         emptyList()
     } else emptyList()
 
-    override fun transferTo(stream: OutputStream) {
+    override suspend fun transferTo(stream: OutputStream) {
         sftpSource.sftpClient.read(toString()).use { it.transferTo(stream) }
     }
 

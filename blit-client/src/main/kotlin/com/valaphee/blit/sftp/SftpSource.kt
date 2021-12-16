@@ -53,13 +53,13 @@ class SftpSource(
 
     override val home get() = "." // TODO
 
-    override fun isValid(path: String) = try {
+    override suspend fun isValid(path: String) = try {
         sftpClient.stat(path).isDirectory
     } catch (_: SftpException) {
         false
     }
 
-    override fun get(path: String) = SftpEntry(this, path, "")
+    override suspend fun get(path: String) = SftpEntry(this, path, "", sftpClient.stat(path))
 
     companion object {
         private val ssh = SshClient.setUpDefaultClient().apply { start() }

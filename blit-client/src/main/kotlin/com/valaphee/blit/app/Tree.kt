@@ -25,7 +25,6 @@
 package com.valaphee.blit.app
 
 import com.valaphee.blit.Entry
-import javafx.application.Platform
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.SelectionMode
 import javafx.scene.control.TableColumnBase
@@ -39,12 +38,14 @@ import javafx.scene.input.TransferMode
 import javafx.scene.layout.Priority
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import tornadofx.action
 import tornadofx.cellFormat
 import tornadofx.column
 import tornadofx.item
 import tornadofx.onChange
 import tornadofx.populateTree
+import tornadofx.runLater
 import tornadofx.separator
 import tornadofx.setContent
 import tornadofx.vgrow
@@ -96,22 +97,27 @@ class Tree<T : Entry<T>>(
                     setOnDragDetected {
                         startDragAndDrop(TransferMode.MOVE).apply {
                             setContent {
-                                fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
-                                    File(tmpdir, entry.name).mkdir()
-                                    entry.children.flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
-                                } else listOf(File(tmpdir, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
+                                runBlocking {
+                                    suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
+                                        File(tmpdir, entry.name).mkdir()
+                                        entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
+                                    } else listOf(File(tmpdir, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
 
-                                putFiles(selectionModel.selectedItems.flatMap { flatten(it.value) })
+                                    putFiles(selectionModel.selectedItems.flatMap { flatten(it.value) })
+                                }
                             }
                         }
+
                         it.consume()
                     }
                     setOnDragOver {
                         if (it.gestureSource != this && it.dragboard.hasFiles()) it.acceptTransferModes(*TransferMode.COPY_OR_MOVE)
+
                         it.consume()
                     }
                     setOnDragDropped {
                         it.isDropCompleted = true
+
                         it.consume()
                     }
                 }
@@ -120,12 +126,16 @@ class Tree<T : Entry<T>>(
         setOnKeyPressed {
             if (it.isControlDown) when (it.code) {
                 KeyCode.C -> Clipboard.getSystemClipboard().setContent {
-                    fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
-                        File(tmpdir, entry.name).mkdir()
-                        entry.children.flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
-                    } else listOf(File(tmpdir, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
+                    runBlocking {
+                        suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
+                            File(tmpdir, entry.name).mkdir()
+                            entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
+                        } else listOf(File(tmpdir, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
 
-                    putFiles(selectionModel.selectedItems.flatMap { flatten(it.value) })
+                        putFiles(selectionModel.selectedItems.flatMap { flatten(it.value) })
+
+                        it.consume()
+                    }
                 }
             }
         }
@@ -145,8 +155,8 @@ class Tree<T : Entry<T>>(
 
     fun populate(item: TreeItem<Entry<T>>) {
         ioScope.launch {
-            val children = item.value!!.children
-            Platform.runLater {
+            val children = item.value!!.list()
+            runLater {
                 populateTree(item, { entry ->
                     if (entry.directory) object : TreeItem<Entry<T>>(entry) {
                         init {

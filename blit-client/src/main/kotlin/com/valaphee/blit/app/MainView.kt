@@ -42,6 +42,7 @@ import jfxtras.styles.jmetro.Style
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import org.controlsfx.control.BreadCrumbBar
 import org.controlsfx.control.textfield.CustomTextField
 import tornadofx.Dimension
@@ -57,6 +58,7 @@ import tornadofx.menu
 import tornadofx.menubar
 import tornadofx.onChange
 import tornadofx.paddingTop
+import tornadofx.runLater
 import tornadofx.separator
 import tornadofx.splitpane
 import tornadofx.style
@@ -144,10 +146,16 @@ class MainView : View("Blit") {
             _path = normalizedPath
 
             source.value?.let { source ->
-                if (source.isValid(normalizedPath)) {
-                    name.value = null
-                    tree.root = source[normalizedPath].item
-                    tree.populate(tree.root)
+                ioScope.launch {
+                    if (source.isValid(normalizedPath)) {
+                        val item = source.get(normalizedPath).item
+
+                        runLater {
+                            name.value = null
+                            tree.root = item
+                            tree.populate(tree.root)
+                        }
+                    }
                 }
             }
         }

@@ -39,7 +39,8 @@ interface Entry<T : Entry<T>> {
     val size: Long
     val modifyTime: Long
     val directory: Boolean
-    val children: List<T>
 
-    fun transferTo(stream: OutputStream)
+    suspend fun list(): List<T>
+
+    suspend fun transferTo(stream: OutputStream)
 }
