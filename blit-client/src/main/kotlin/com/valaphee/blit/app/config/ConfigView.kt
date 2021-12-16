@@ -22,37 +22,40 @@
  * SOFTWARE.
  */
 
-package com.valaphee.blit.sftp
+package com.valaphee.blit.app.config
 
-import com.valaphee.blit.AbstractEntry
-import org.apache.sshd.sftp.client.SftpClient
-import java.io.OutputStream
+import javafx.scene.control.TabPane
+import javafx.scene.layout.Priority
+import javafx.stage.Stage
+import jfxtras.styles.jmetro.JMetro
+import jfxtras.styles.jmetro.JMetroStyleClass
+import jfxtras.styles.jmetro.Style
+import tornadofx.View
+import tornadofx.action
+import tornadofx.button
+import tornadofx.buttonbar
+import tornadofx.tab
+import tornadofx.tabpane
+import tornadofx.vbox
+import tornadofx.vgrow
 
 /**
  * @author Kevin Ludwig
  */
-class SftpEntry(
-    private val sftpSource: SftpSource,
-    private val path: String,
-    override val name: String,
-    private var attributes: SftpClient.Attributes = sftpSource.sftpClient.stat(path)
-) : AbstractEntry<SftpEntry>() {
-    override val size get() = attributes.size
-    override val modifyTime get() = attributes.modifyTime.toMillis()
-    override val directory get() = attributes.isDirectory
+class ConfigView : View("Configure Blit") {
+    override val root = vbox {
+        JMetro(this, Style.DARK)
+        styleClass.add(JMetroStyleClass.BACKGROUND)
 
-    override val children get() = if (directory) try {
-        sftpSource.sftpClient.readDir(toString()).mapNotNull {
-            val name = it.filename
-            if (name != "." && name != "..") SftpEntry(sftpSource, toString(), name, it.attributes) else null
+        prefWidth = 800.0
+        prefHeight = 600.0
+
+        tabpane {
+            vgrow = Priority.ALWAYS
+            tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
+
+            tab(ConfigViewSources::class)
         }
-    } catch (_: RuntimeException) {
-        emptyList()
-    } else emptyList()
-
-    override fun transferTo(stream: OutputStream) {
-        sftpSource.sftpClient.read(toString()).use { it.transferTo(stream) }
+        buttonbar { button("OK") { action { (scene.window as Stage).close() } } }
     }
-
-    override fun toString() = if (name.isEmpty()) path else if (path.endsWith("/")) "$path$name" else "$path/$name"
 }

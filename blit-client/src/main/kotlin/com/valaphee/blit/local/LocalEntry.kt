@@ -24,7 +24,7 @@
 
 package com.valaphee.blit.local
 
-import com.valaphee.blit.Entry
+import com.valaphee.blit.AbstractEntry
 import java.io.File
 import java.io.FileInputStream
 import java.io.OutputStream
@@ -34,7 +34,7 @@ import java.io.OutputStream
  */
 class LocalEntry(
     private val path: File
-) : Entry<LocalEntry>() {
+) : AbstractEntry<LocalEntry>() {
     override val name: String get() = path.name
     override val size get() = path.length()
     override val modifyTime get() = path.lastModified()

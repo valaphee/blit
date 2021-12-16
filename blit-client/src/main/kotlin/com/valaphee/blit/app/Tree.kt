@@ -22,9 +22,11 @@
  * SOFTWARE.
  */
 
-package com.valaphee.blit
+package com.valaphee.blit.app
 
+import com.valaphee.blit.Entry
 import javafx.application.Platform
+import javafx.scene.control.ContextMenu
 import javafx.scene.control.SelectionMode
 import javafx.scene.control.TableColumnBase
 import javafx.scene.control.TreeItem
@@ -37,10 +39,13 @@ import javafx.scene.input.TransferMode
 import javafx.scene.layout.Priority
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import tornadofx.action
 import tornadofx.cellFormat
 import tornadofx.column
+import tornadofx.item
 import tornadofx.onChange
 import tornadofx.populateTree
+import tornadofx.separator
 import tornadofx.setContent
 import tornadofx.vgrow
 import java.io.File
@@ -55,7 +60,8 @@ import kotlin.math.abs
  */
 class Tree<T : Entry<T>>(
     private val iconManifest: IconManifest,
-    private val ioScope: CoroutineScope
+    private val ioScope: CoroutineScope,
+    private val navigator: Navigator
 ) : TreeTableView<Entry<T>>() {
     init {
         vgrow = Priority.ALWAYS
@@ -120,6 +126,18 @@ class Tree<T : Entry<T>>(
                     } else listOf(File(tmpdir, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
 
                     putFiles(selectionModel.selectedItems.flatMap { flatten(it.value) })
+                }
+            }
+        }
+
+        selectionModel.selectedItemProperty().onChange {
+            it?.let {
+                contextMenu = ContextMenu().apply {
+                    val value = it.value
+                    item("Open") { action { if (value.directory) navigator.navigateRelative(value.name) } }
+                    separator()
+                    item("Rename")
+                    item("Delete")
                 }
             }
         }

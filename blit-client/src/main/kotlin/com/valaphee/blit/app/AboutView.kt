@@ -22,40 +22,32 @@
  * SOFTWARE.
  */
 
-package com.valaphee.blit.config
+package com.valaphee.blit.app
 
-import javafx.scene.control.TabPane
-import javafx.scene.layout.Priority
-import javafx.stage.Stage
+import javafx.scene.text.TextAlignment
 import jfxtras.styles.jmetro.JMetro
 import jfxtras.styles.jmetro.JMetroStyleClass
 import jfxtras.styles.jmetro.Style
 import tornadofx.View
-import tornadofx.action
-import tornadofx.button
-import tornadofx.buttonbar
-import tornadofx.tab
-import tornadofx.tabpane
-import tornadofx.vbox
-import tornadofx.vgrow
+import tornadofx.borderpane
+import tornadofx.label
 
 /**
  * @author Kevin Ludwig
  */
-class ConfigView : View("Configure Blit") {
-    override val root = vbox {
+class AboutView : View("About Blit") {
+    override val root = borderpane {
+        prefWidth = 300.0
+        prefHeight = 100.0
+
         JMetro(this, Style.DARK)
         styleClass.add(JMetroStyleClass.BACKGROUND)
 
-        prefWidth = 800.0
-        prefHeight = 600.0
-
-        tabpane {
-            vgrow = Priority.ALWAYS
-            tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
-
-            tab(ConfigViewSources::class)
-        }
-        buttonbar { button("OK") { action { (scene.window as Stage).close() } } }
+        center = label(
+            """
+                Blit
+                Copyright (c) 2021, Valaphee.
+            """.trimIndent()
+        ) { textAlignment = TextAlignment.CENTER }
     }
 }

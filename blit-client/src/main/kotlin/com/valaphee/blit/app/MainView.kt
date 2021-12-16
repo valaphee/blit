@@ -22,10 +22,12 @@
  * SOFTWARE.
  */
 
-package com.valaphee.blit
+package com.valaphee.blit.app
 
-import com.valaphee.blit.config.Config
-import com.valaphee.blit.config.ConfigView
+import com.valaphee.blit.Entry
+import com.valaphee.blit.Source
+import com.valaphee.blit.app.config.Config
+import com.valaphee.blit.app.config.ConfigView
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.ObservableList
@@ -93,11 +95,11 @@ class MainView : View("Blit") {
         }
     }
 
-    inner class Pane<T : Entry<T>> : VBox() {
+    inner class Pane<T : Entry<T>> : VBox(), Navigator {
         private val source = SimpleObjectProperty<Source<T>>().apply { onChange { it?.let { navigate(it.home) } } }
         private lateinit var _path: String
         private val name = SimpleStringProperty()
-        private val tree = Tree<T>(iconManifest, ioScope)
+        private val tree = Tree<T>(iconManifest, ioScope, this)
 
         init {
             hgrow = Priority.ALWAYS
@@ -135,7 +137,7 @@ class MainView : View("Blit") {
             add(tree)
         }
 
-        private fun navigate(path: String) {
+        override fun navigate(path: String) {
             val normalizedPath = normalizePath(path)
 
             if (::_path.isInitialized && normalizedPath == _path) return
@@ -150,7 +152,7 @@ class MainView : View("Blit") {
             }
         }
 
-        private fun navigateRelative(path: String) = navigate(if (path.startsWith('/')) path else tree.root.value.toString() + "/$path")
+        override fun navigateRelative(path: String) = navigate(if (path.startsWith('/')) path else tree.root.value.toString() + "/$path")
     }
 
     companion object {

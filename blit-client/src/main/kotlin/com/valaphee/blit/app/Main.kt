@@ -22,14 +22,14 @@
  * SOFTWARE.
  */
 
-package com.valaphee.blit
+package com.valaphee.blit.app
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.inject.AbstractModule
 import com.google.inject.Guice
-import com.valaphee.blit.config.Config
+import com.valaphee.blit.app.config.Config
 import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory
 import javafx.scene.image.Image
 import tornadofx.App

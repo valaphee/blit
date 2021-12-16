@@ -29,26 +29,22 @@ import org.apache.sshd.sftp.common.SftpConstants
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.file.attribute.FileTime
-import java.time.LocalDateTime
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatterBuilder
-import java.time.temporal.ChronoField
-import java.util.Calendar
-import java.util.Locale
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 private val spaces = "\\s+".toRegex()
-private val dateTimeFormatter = DateTimeFormatterBuilder().appendPattern("MMM d HH:mm").parseDefaulting(ChronoField.YEAR, Calendar.getInstance().get(Calendar.YEAR).toLong()).toFormatter(Locale.ENGLISH)
+private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSSSSS Z")
 
 internal fun K8scpSource.stat(path: String): SftpClient.Attributes? {
-    val process = exec.exec(namespace, pod, arrayOf("ls", "-l", path), false)
-    val children = BufferedReader(InputStreamReader(process.inputStream)).use { it.readLines().mapNotNull { parseLsEntry(it)?.second } }
+    val process = K8scpSource.exec.exec(namespace, pod, arrayOf("stat", "--format", "%A 0 %U %G %s %y %n", path), false)
+    val attributes = BufferedReader(InputStreamReader(process.inputStream)).use { parseLsEntry(it.readText())?.second }
     process.waitFor()
-    return children.firstOrNull()
+    return attributes
 }
 
 internal fun parseLsEntry(entry: String): Pair<String, SftpClient.Attributes>? {
-    val entryColumns = entry.replace(spaces, " ").split(' ')
-    return if (entryColumns.size >= 6) entryColumns[8] to SftpClient.Attributes().apply {
+    val entryColumns = entry.replace(spaces, " ").trim().split(' ')
+    return if (entryColumns.size == 9) entryColumns[8] to SftpClient.Attributes().apply {
         val permission = entryColumns[0]
         permissions = when (permission[0]) {
             '-' -> SftpConstants.S_IFREG
@@ -58,6 +54,6 @@ internal fun parseLsEntry(entry: String): Pair<String, SftpClient.Attributes>? {
         owner = entryColumns[2]
         group = entryColumns[3]
         entryColumns[4].toLongOrNull()?.let { size = it }
-        modifyTime(FileTime.from(LocalDateTime.parse("${entryColumns[5]} ${entryColumns[6]} ${entryColumns[7]}", dateTimeFormatter).toInstant(ZoneOffset.UTC)))
+        modifyTime(FileTime.from(ZonedDateTime.parse("${entryColumns[5]} ${entryColumns[6]} ${entryColumns[7]}", dateTimeFormatter).toInstant()))
     } else null
 }

@@ -22,33 +22,31 @@
  * SOFTWARE.
  */
 
-package com.valaphee.blit
+package com.valaphee.blit.app.config
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
-import javafx.scene.image.Image
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.DeserializationContext
+import com.fasterxml.jackson.databind.JsonDeserializer
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.valaphee.blit.Source
+import com.valaphee.blit.local.LocalSource
+import javafx.collections.FXCollections
+import javafx.collections.ObservableList
 
 /**
  * @author Kevin Ludwig
  */
-class IconManifest(
-    @get:JsonProperty("defaultFileIcon") val defaultFileIcon: FileIcon,
-    @get:JsonProperty("fileIcons") val fileIcons: List<FileIcon>,
-    @get:JsonProperty("defaultFolderIcon") val defaultFolderIcon: FolderIcon,
-    @get:JsonProperty("folderIcons") val folderIcons: List<FolderIcon>
+class Config(
+    @JsonDeserialize(using = SourceObservableListDeserializer::class)
+    @JsonProperty("sources") val sources: ObservableList<Source<*>> = FXCollections.observableArrayList(LocalSource("local"))
 ) {
-    class FileIcon(
-        @get:JsonProperty("name") val name: String,
-        @get:JsonProperty("fileNames") val fileNames: List<String> = emptyList(),
-        @get:JsonProperty("fileExtensions") val fileExtensions: List<String> = emptyList()
-    ) {
-        @get:JsonIgnore val image by lazy { Image(IconManifest::class.java.getResourceAsStream("/icon/$name.svg"), 16.0, 16.0, false, false) }
-    }
-
-    class FolderIcon(
-        @get:JsonProperty("name") val name: String,
-        @get:JsonProperty("folderNames") val folderNames: List<String> = emptyList()
-    ) {
-        @get:JsonIgnore val image by lazy { Image(IconManifest::class.java.getResourceAsStream("/icon/$name.svg"), 16.0, 16.0, false, false) }
+    companion object {
+        class SourceObservableListDeserializer : JsonDeserializer<ObservableList<Source<*>>>() {
+            override fun deserialize(parser: JsonParser, context: DeserializationContext): ObservableList<Source<*>> = FXCollections.observableList(parser.readValueAs<List<Source<*>>>(object : TypeReference<List<Source<*>>>() {}))
+        }
     }
 }
+
+

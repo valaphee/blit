@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.valaphee.blit.config
+package com.valaphee.blit.app.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.valaphee.blit.Source
@@ -96,14 +96,20 @@ class ConfigViewSources : Fragment("Sources") {
                 }
                 button("Save") {
                     action {
-                        _config.sources[sources.selectionModel.selectedIndex] = sourceUis[type.value]!!.getSource(fields)!!
+                        val source = sourceUis[type.value]!!.getSource(fields)!!
+                        if (sources.selectionModel.selectedIndex != -1) _config.sources[sources.selectionModel.selectedIndex] = source
+                        else {
+                            _config.sources.add(source)
+                            sources.selectionModel.select(source)
+                        }
                         objectMapper.writeValue(File("config.json"), _config)
                     }
                 }
                 button("Delete") {
                     action {
                         _config.sources.remove(source.value)
-                        sources.selectionModel.select(_config.sources.firstOrNull())
+                        sources.selectionModel.selectFirst()
+                        objectMapper.writeValue(File("config.json"), _config)
                     }
                 }
             }
@@ -115,7 +121,7 @@ class ConfigViewSources : Fragment("Sources") {
             fieldset(labelPosition = Orientation.VERTICAL) { dynamicContent(type) { it?.let { sourceUis[it]!!.getFields(this, source.value).also { fields = it } } } }
         }
 
-        sources.selectionModel.select(_config.sources.firstOrNull())
+        sources.selectionModel.selectFirst()
     }
 
     companion object {

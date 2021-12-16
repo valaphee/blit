@@ -22,31 +22,13 @@
  * SOFTWARE.
  */
 
-package com.valaphee.blit.config
-
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonDeserializer
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.valaphee.blit.Source
-import com.valaphee.blit.local.LocalSource
-import javafx.collections.FXCollections
-import javafx.collections.ObservableList
+package com.valaphee.blit.app
 
 /**
  * @author Kevin Ludwig
  */
-class Config(
-    @JsonDeserialize(using = SourceObservableListDeserializer::class)
-    @JsonProperty("sources") val sources: ObservableList<Source<*>> = FXCollections.observableArrayList(LocalSource("local"))
-) {
-    companion object {
-        class SourceObservableListDeserializer : JsonDeserializer<ObservableList<Source<*>>>() {
-            override fun deserialize(parser: JsonParser, context: DeserializationContext): ObservableList<Source<*>> = FXCollections.observableList(parser.readValueAs<List<Source<*>>>(object : TypeReference<List<Source<*>>>() {}))
-        }
-    }
+interface Navigator {
+    fun navigate(path: String)
+
+    fun navigateRelative(path: String)
 }
-
-

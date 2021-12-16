@@ -30,6 +30,7 @@ import javafx.event.EventTarget
 import javafx.scene.control.TextField
 import tornadofx.Field
 import tornadofx.field
+import tornadofx.passwordfield
 import tornadofx.textfield
 
 /**
@@ -43,15 +44,15 @@ object SftpSourceUi : SourceUi {
             field("Host") { textfield(sftpSource?.host ?: "") },
             field("Port") { textfield(sftpSource?.port?.toString() ?: "") },
             field("Username") { textfield(sftpSource?.username ?: "") },
-            field("Password") { textfield(sftpSource?.password ?: "") }
+            field("Password") { passwordfield(sftpSource?.password ?: "") }
         )
     }
 
     override fun getSource(fields: List<Field>) = SftpSource(
-        (fields[0].inputs.first() as TextField).text,
-        (fields[1].inputs.first() as TextField).text,
-        (fields[2].inputs.first() as TextField).text.toInt(),
-        (fields[3].inputs.first() as TextField).text,
-        (fields[4].inputs.first() as TextField).text
+        (fields[0].inputs[0] as TextField).text,
+        (fields[1].inputs[0] as TextField).text,
+        (fields[2].inputs[0] as TextField).text.toInt(),
+        (fields[3].inputs[0] as TextField).text,
+        (fields[4].inputs[0] as TextField).text
     )
 }

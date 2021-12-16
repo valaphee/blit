@@ -30,16 +30,16 @@ import java.io.OutputStream
 /**
  * @author Kevin Ludwig
  */
-abstract class Entry<T : Entry<T>> {
-    val item = TreeItem(this)
+interface Entry<T : Entry<T>> {
+    val item: TreeItem<Entry<T>>
 
-    val self get() = this
+    val self: Entry<T>
 
-    abstract val name: String
-    abstract val size: Long
-    abstract val modifyTime: Long
-    abstract val directory: Boolean
-    abstract val children: List<T>
+    val name: String
+    val size: Long
+    val modifyTime: Long
+    val directory: Boolean
+    val children: List<T>
 
-    abstract fun transferTo(stream: OutputStream)
+    fun transferTo(stream: OutputStream)
 }

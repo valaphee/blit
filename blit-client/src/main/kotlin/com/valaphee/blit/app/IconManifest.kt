@@ -22,40 +22,33 @@
  * SOFTWARE.
  */
 
-package com.valaphee.blit.k8scp
+package com.valaphee.blit.app
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonTypeName
-import com.valaphee.blit.AbstractSource
-import io.kubernetes.client.Copy
-import io.kubernetes.client.Exec
-import io.kubernetes.client.util.Config
-import java.io.BufferedReader
-import java.io.InputStreamReader
+import javafx.scene.image.Image
 
 /**
  * @author Kevin Ludwig
  */
-@JsonTypeName("k8scp")
-class K8scpSource(
-    name: String,
-    @get:JsonProperty("namespace") val namespace: String,
-    @get:JsonProperty("pod") val pod: String
-) : AbstractSource<K8scpEntry>(name) {
-    override val home: String get() {
-        val process = exec.exec(namespace, pod, arrayOf("pwd", toString()), false)
-        val home = BufferedReader(InputStreamReader(process.inputStream)).use { it.readLine() }
-        process.waitFor()
-        return home
+class IconManifest(
+    @get:JsonProperty("defaultFileIcon") val defaultFileIcon: FileIcon,
+    @get:JsonProperty("fileIcons") val fileIcons: List<FileIcon>,
+    @get:JsonProperty("defaultFolderIcon") val defaultFolderIcon: FolderIcon,
+    @get:JsonProperty("folderIcons") val folderIcons: List<FolderIcon>
+) {
+    class FileIcon(
+        @get:JsonProperty("name") val name: String,
+        @get:JsonProperty("fileNames") val fileNames: List<String> = emptyList(),
+        @get:JsonProperty("fileExtensions") val fileExtensions: List<String> = emptyList()
+    ) {
+        @get:JsonIgnore val image by lazy { Image(IconManifest::class.java.getResourceAsStream("/icon/$name.svg"), 16.0, 16.0, false, false) }
     }
 
-    override fun isValid(path: String) = stat(path)?.isDirectory ?: false
-
-    override fun get(path: String) = K8scpEntry(this, path, "")
-
-    companion object {
-        private val apiClient = Config.defaultClient()
-        internal val exec = Exec(apiClient)
-        internal val copy = Copy(apiClient)
+    class FolderIcon(
+        @get:JsonProperty("name") val name: String,
+        @get:JsonProperty("folderNames") val folderNames: List<String> = emptyList()
+    ) {
+        @get:JsonIgnore val image by lazy { Image(IconManifest::class.java.getResourceAsStream("/icon/$name.svg"), 16.0, 16.0, false, false) }
     }
 }

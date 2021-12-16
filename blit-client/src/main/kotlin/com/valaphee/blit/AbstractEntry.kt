@@ -24,30 +24,13 @@
 
 package com.valaphee.blit
 
-import javafx.scene.text.TextAlignment
-import jfxtras.styles.jmetro.JMetro
-import jfxtras.styles.jmetro.JMetroStyleClass
-import jfxtras.styles.jmetro.Style
-import tornadofx.View
-import tornadofx.borderpane
-import tornadofx.label
+import javafx.scene.control.TreeItem
 
 /**
  * @author Kevin Ludwig
  */
-class AboutView : View("About Blit") {
-    override val root = borderpane {
-        prefWidth = 300.0
-        prefHeight = 100.0
+abstract class AbstractEntry<T : Entry<T>> : Entry<T> {
+    override val item: TreeItem<Entry<T>> = TreeItem(this)
 
-        JMetro(this, Style.DARK)
-        styleClass.add(JMetroStyleClass.BACKGROUND)
-
-        center = label(
-            """
-                Blit
-                Copyright (c) 2021, Valaphee.
-            """.trimIndent()
-        ) { textAlignment = TextAlignment.CENTER }
-    }
+    override val self get() = this
 }
