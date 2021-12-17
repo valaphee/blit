@@ -30,16 +30,20 @@ import com.fasterxml.jackson.annotation.JsonTypeName
 import com.valaphee.blit.source.AbstractSource
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.features.HttpTimeout
 import io.ktor.client.features.auth.Auth
 import io.ktor.client.features.auth.providers.BasicAuthCredentials
 import io.ktor.client.features.auth.providers.basic
+import io.ktor.client.features.cookies.HttpCookies
 import io.ktor.client.features.json.JacksonSerializer
 import io.ktor.client.features.json.Json
 import io.ktor.client.request.request
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import java.security.cert.X509Certificate
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 
 /**
  * @author Kevin Ludwig
@@ -54,8 +58,13 @@ class DavSource(
 ) : AbstractSource<DavEntry>(name) {
     @get:JsonIgnore internal val httpClient by lazy {
         HttpClient(OkHttp) {
-            engine { preconfigured = getTrustAllOkHttpClient() }
-            install(HttpTimeout) { requestTimeoutMillis = 60000 }
+            engine {
+                config {
+                    sslSocketFactory(SSLContext.getInstance("SSL").apply { init(null, trustManagers, java.security.SecureRandom()) }.socketFactory, trustManagers[0] as X509TrustManager)
+                    hostnameVerifier { _, _ -> true }
+                }
+            }
+            install(HttpCookies)
             Auth {
                 basic {
                     sendWithoutRequest { true }
@@ -75,4 +84,14 @@ class DavSource(
     override suspend fun isValid(path: String) = httpClient.request<HttpResponse>("$_url/$path") { method = httpMethodPropfind }.status == HttpStatusCode.MultiStatus
 
     override suspend fun get(path: String) = DavEntry(this, path, httpClient.request<Multistatus>("$_url/$path") { method = httpMethodPropfind }.response.first().propstat.first().prop) // TODO
+
+    companion object {
+        private val trustManagers = arrayOf<TrustManager>(object : X509TrustManager {
+            override fun checkClientTrusted(chain: Array<out X509Certificate>, authType: String) = Unit
+
+            override fun checkServerTrusted(chain: Array<out X509Certificate>, authType: String) = Unit
+
+            override fun getAcceptedIssuers() = arrayOf<X509Certificate>()
+        })
+    }
 }

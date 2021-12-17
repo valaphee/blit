@@ -44,7 +44,7 @@ class ConfigViewGeneral : Fragment("General") {
 
     override val root = form {
         fieldset {
-            field(locale["config.general.data_size_unit"]) { combobox(dataSizeUnit, values = Config.DataSizeUnit.values().toList()) }
+            field(locale["config.general.data_size_unit.text"]) { combobox(dataSizeUnit, values = Config.DataSizeUnit.values().toList()) }
         }
     }
 }

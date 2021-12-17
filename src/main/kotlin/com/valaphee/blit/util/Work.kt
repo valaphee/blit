@@ -24,19 +24,21 @@
 
 package com.valaphee.blit.util
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder
 import javafx.beans.property.DoubleProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import tornadofx.onChange
 import tornadofx.runLater
+import java.util.concurrent.Executors
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 
@@ -44,7 +46,7 @@ import kotlin.coroutines.CoroutineContext
  * @author Kevin Ludwig
  */
 class Work {
-    private val coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val coroutineScope = CoroutineScope(Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), ThreadFactoryBuilder().setNameFormat("blit-%d").build()).asCoroutineDispatcher() + SupervisorJob())
     private val tasks = mutableListOf<Task>()
 
     val name: StringProperty = SimpleStringProperty("")
@@ -61,8 +63,9 @@ class Work {
     }
 
     private suspend fun <T> run(name: String, block: suspend () -> T): T {
-        val task = Task(name, SimpleDoubleProperty(0.0).apply { onChange { runLater { progress.value = tasks.map { it.progress.value }.average() } } })
+        val task = Task(name, SimpleDoubleProperty().apply { onChange { runLater { progress.value = tasks.map { it.progress.value }.average() } } })
         tasks += task
+        task.progress.value = 0.0
         val value = withContext(task) { block() }
         tasks -= task
         runLater {

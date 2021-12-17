@@ -107,7 +107,7 @@ class MainView : View("Blit") {
                 separator()
                 item(locale["main.menu.file.exit.name"]) { action { (scene.window as Stage).close() } }
             }
-            menu(locale["main.menu.help.name"]) { item(locale["main.menu.help.about"]) { action { find<AboutView>().openModal(resizable = false) } } }
+            menu(locale["main.menu.help.name"]) { item(locale["main.menu.help.about.name"]) { action { find<AboutView>().openModal(resizable = false) } } }
         }
         splitpane {
             vgrow = Priority.ALWAYS

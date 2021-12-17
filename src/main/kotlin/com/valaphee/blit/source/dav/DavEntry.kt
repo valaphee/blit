@@ -27,6 +27,7 @@ package com.valaphee.blit.source.dav
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.valaphee.blit.source.AbstractEntry
 import com.valaphee.blit.util.progress
+import io.ktor.client.features.timeout
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.put
@@ -83,7 +84,6 @@ class DavEntry(
                 }
                 length?.let { coroutineContext.progress = readSum / it.toDouble() }
             }
-            coroutineContext.progress = 1.0
         } finally {
             ByteArrayPool.recycle(buffer)
         }
@@ -103,9 +103,10 @@ class DavEntry(
                 /*}*/
             }
             /*jobs.joinAll()*/
-            coroutineContext.progress = 1.0
 
             davSource.httpClient.request<Unit>("${davSource.url}/uploads/${davSource.username}/blit-$id/.file") {
+                timeout { requestTimeoutMillis = Long.MAX_VALUE }
+
                 method = httpMethodMove
                 headers { this["Destination"] = "${davSource._url}/$path/$name" }
             }

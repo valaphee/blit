@@ -29,11 +29,6 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.ktor.http.HttpMethod
-import okhttp3.OkHttpClient
-import java.security.cert.X509Certificate
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
-import javax.net.ssl.X509TrustManager
 
 internal val httpMethodPropfind = HttpMethod("PROPFIND")
 internal val httpMethodMkcol = HttpMethod("MKCOL")
@@ -43,18 +38,4 @@ internal val xmlMapper = XmlMapper().apply {
     registerKotlinModule()
 
     disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-}
-
-internal fun getTrustAllOkHttpClient(): OkHttpClient {
-    val trustManagers = arrayOf<TrustManager>(object : X509TrustManager {
-        override fun checkClientTrusted(chain: Array<out X509Certificate>, authType: String) = Unit
-
-        override fun checkServerTrusted(chain: Array<out X509Certificate>, authType: String) = Unit
-
-        override fun getAcceptedIssuers() = arrayOf<X509Certificate>()
-    })
-    return OkHttpClient.Builder()
-        .sslSocketFactory(SSLContext.getInstance("SSL").apply { init(null, trustManagers, java.security.SecureRandom()) }.socketFactory, trustManagers[0] as X509TrustManager)
-        .hostnameVerifier { _, _ -> true }
-        .build()
 }

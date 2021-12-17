@@ -18,16 +18,13 @@
           "go.text": "Go",
           "task.navigate.name": "Navigating to {0}"
         },
-        "navigator.go.text": "Go",
         "tree": {
           "column": {
             "name.title": "Name",
             "size.title": "Size",
             "modified.title": "Modified"
           },
-          "menu": {
-            "open.name": "Open"
-          },
+          "menu.open.name": "Open",
           "task": {
             "populate.name": "Populating {0}",
             "download.name": "Downloading {0}",
@@ -36,19 +33,15 @@
         }
       },
       "config": {
-        "ok.text": "Ok",
-        "cancel.text": "Cancel",
-        "apply.text": "Apply",
-        "general": {
-          "data_size_unit": {
-            "text": "Data Size Unit"
-          }
-        },
+        "general.data_size_unit.text":  "Data Size Unit",
         "sources": {
           "new.text": "New",
           "save.text": "Save",
           "delete.text": "Delete"
-        }
+        },
+        "ok.text": "Ok",
+        "cancel.text": "Cancel",
+        "apply.text": "Apply"
       }
     }
   }
