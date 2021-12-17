@@ -38,6 +38,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.3")
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.3")
     implementation("de.codecentric.centerdevice:javafxsvg:1.3.0")
+    implementation("io.github.classgraph:classgraph:4.8.138")
     implementation("io.ktor:ktor-client-auth:1.6.7")
     implementation("io.ktor:ktor-client-jackson:1.6.7")
     implementation("io.ktor:ktor-client-logging-jvm:1.6.7")
@@ -51,7 +52,11 @@ dependencies {
     implementation("org.jfxtras:jmetro:11.6.15")
 }
 
-application { mainClass.set("com.valaphee.blit.app.MainKt") }
+repositories {
+    mavenCentral()
+}
+
+application { mainClass.set("com.valaphee.blit.MainKt") }
 
 tasks {
     shadowJar {
