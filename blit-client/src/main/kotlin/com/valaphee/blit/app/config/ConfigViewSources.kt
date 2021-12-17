@@ -24,15 +24,10 @@
 
 package com.valaphee.blit.app.config
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.valaphee.blit.Source
-import com.valaphee.blit.dav.DavSource
 import com.valaphee.blit.dav.DavSourceUi
-import com.valaphee.blit.k8scp.K8scpSource
 import com.valaphee.blit.k8scp.K8scpSourceUi
-import com.valaphee.blit.local.LocalSource
 import com.valaphee.blit.local.LocalSourceUi
-import com.valaphee.blit.sftp.SftpSource
 import com.valaphee.blit.sftp.SftpSourceUi
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
@@ -54,26 +49,18 @@ import tornadofx.listview
 import tornadofx.onChange
 import tornadofx.vbox
 import tornadofx.vgrow
-import java.io.File
 
 /**
  * @author Kevin Ludwig
  */
 class ConfigViewSources : Fragment("Sources") {
     private val _config by di<Config>()
-    private val objectMapper by di<ObjectMapper>()
 
     private val source = SimpleObjectProperty<Source<*>>().apply {
         onChange {
             it?.let {
                 type.value = null
-                type.value = when (it) {
-                    is DavSource -> "WebDAV"
-                    is K8scpSource -> "K8s CP"
-                    is LocalSource -> "Local"
-                    is SftpSource -> "SFTP"
-                    else -> TODO(it::class.java.name)
-                } // TODO
+                type.value = sourceUis.values.first { sourceUi -> sourceUi.`class` == it::class }.name
             }
         }
     }
@@ -105,14 +92,12 @@ class ConfigViewSources : Fragment("Sources") {
                             _config.sources.add(source)
                             sources.selectionModel.select(source)
                         }
-                        objectMapper.writeValue(File("config.json"), _config)
                     }
                 }
                 button("Delete") {
                     action {
                         _config.sources.remove(source.value)
                         sources.selectionModel.selectFirst()
-                        objectMapper.writeValue(File("config.json"), _config)
                     }
                 }
             }
@@ -120,17 +105,12 @@ class ConfigViewSources : Fragment("Sources") {
         form {
             hgrow = Priority.ALWAYS
 
-            fieldset { field("Type") { combobox<String>(type) { items = sourceUis.keys.toList().asObservable() } } }
+            fieldset { field("Type") { combobox<String>(type, sourceUis.keys.toList().asObservable()) } }
             fieldset { dynamicContent(type) { it?.let { sourceUis[it]!!.getFields(this, source.value).also { fields = it } } } }
         }
     }
 
     companion object {
-        private val sourceUis = mutableMapOf(
-            "WebDAV" to DavSourceUi,
-            "K8s CP" to K8scpSourceUi,
-            "Local" to LocalSourceUi,
-            "SFTP" to SftpSourceUi
-        ) // TODO
+        private val sourceUis = setOf(DavSourceUi, K8scpSourceUi, LocalSourceUi, SftpSourceUi).associateBy { it.name }
     }
 }

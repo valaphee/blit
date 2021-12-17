@@ -22,20 +22,27 @@
  * SOFTWARE.
  */
 
-package com.valaphee.blit
+package com.valaphee.blit.app.config
 
-import javafx.event.EventTarget
-import tornadofx.Field
-import kotlin.reflect.KClass
+import javafx.beans.property.SimpleObjectProperty
+import tornadofx.Fragment
+import tornadofx.combobox
+import tornadofx.field
+import tornadofx.fieldset
+import tornadofx.form
+import tornadofx.onChange
 
 /**
  * @author Kevin Ludwig
  */
-interface SourceUi {
-    val name: String
-    val `class`: KClass<out Source<*>>
+class ConfigViewGeneral : Fragment("General") {
+    private val _config by di<Config>()
 
-    fun getFields(eventTarget: EventTarget, source: Source<*>?): List<Field>
+    private val dataSizeUnit = SimpleObjectProperty(_config.dataSizeUnit).apply { onChange { it?.let { _config.dataSizeUnit = it } } }
 
-    fun getSource(fields: List<Field>): Source<*>?
+    override val root = form {
+        fieldset {
+            field("Data Size Unit") { combobox(dataSizeUnit, values = Config.DataSizeUnit.values().toList()) }
+        }
+    }
 }

@@ -22,30 +22,29 @@
  * SOFTWARE.
  */
 
-package com.valaphee.blit.local
+package com.valaphee.blit.app
 
-import com.valaphee.blit.Source
-import com.valaphee.blit.SourceUi
-import javafx.event.EventTarget
-import javafx.scene.control.TextField
-import tornadofx.Field
-import tornadofx.field
-import tornadofx.textfield
+import com.sun.javafx.tk.TKStage
+import javafx.stage.Stage
+import org.bridj.Pointer
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import kotlin.concurrent.thread
 
-/**
- * @author Kevin Ludwig
- */
-object LocalSourceUi : SourceUi {
-    override val name get() = "Local"
-    override val `class` get() = LocalSource::class
+val comExecutor: ExecutorService = Executors.newSingleThreadExecutor { thread(false, true, block = it::run) }
 
-    override fun getFields(eventTarget: EventTarget, source: Source<*>?) = with(eventTarget) {
-        listOf(
-            field("Name") { textfield(source?.name ?: "") }
-        )
+val Stage.hWnd: Pointer<Int>? get() {
+    return try {
+        val tkStage = try {
+            javaClass.superclass.getDeclaredMethod("getPeer")
+        } catch (_: NoSuchMethodException) {
+            javaClass.getMethod("impl_getPeer")
+        }.apply { isAccessible = true }.invoke(this) as TKStage
+        val platformWindow = tkStage.javaClass.getDeclaredMethod("getPlatformWindow").apply { isAccessible = true }.invoke(tkStage)
+        println(platformWindow.javaClass.getMethod("getNativeHandle").apply { isAccessible = true }.invoke(platformWindow) )
+        Pointer.pointerToAddress(platformWindow.javaClass.getMethod("getNativeHandle").apply { isAccessible = true }.invoke(platformWindow) as Long) as Pointer<Int>
+    } catch (ex: Throwable) {
+        ex.printStackTrace()
+        null
     }
-
-    override fun getSource(fields: List<Field>) = LocalSource(
-        (fields[0].inputs[0] as TextField).text
-    )
 }

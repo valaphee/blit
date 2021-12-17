@@ -25,6 +25,7 @@
 package com.valaphee.blit.app
 
 import com.valaphee.blit.Entry
+import com.valaphee.blit.app.config.Config
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.SelectionMode
 import javafx.scene.control.TableColumnBase
@@ -50,15 +51,14 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.text.DateFormat
-import java.text.StringCharacterIterator
 import java.util.Locale
-import kotlin.math.abs
 
 /**
  * @author Kevin Ludwig
  */
 class Tree<T : Entry<T>>(
     private val iconManifest: IconManifest,
+    private val _config: Config,
     private val work: Work,
     private val navigator: Navigator
 ) : TreeTableView<Entry<T>>() {
@@ -81,7 +81,7 @@ class Tree<T : Entry<T>>(
         }
         column("Size", Entry<T>::self) {
             tableColumnBaseSetWidth(this, 75.0)
-            cellFormat { text = if (it.directory) "" else humanReadableSizeBinary(it.size) }
+            cellFormat { text = if (it.directory) "" else _config.dataSizeUnit.format(it.size) }
             setComparator { a, b -> a.size.compareTo(b.size) }
         }
         column("Modified", Entry<T>::modifyTime) {
@@ -176,31 +176,5 @@ class Tree<T : Entry<T>>(
         private val tableColumnBaseSetWidth = TableColumnBase::class.java.getDeclaredMethod("setWidth", Double::class.java).apply { isAccessible = true }
         private val dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault())
         private val tmpdir = System.getProperty("java.io.tmpdir")
-
-        private fun humanReadableSizeSi(size: Long): String {
-            var sizeVar = size
-            if (-1000 < sizeVar && sizeVar < 1000) return "$sizeVar B"
-            val suffix = StringCharacterIterator("kMGTPE")
-            while (sizeVar <= -999950 || sizeVar >= 999950) {
-                sizeVar /= 1000
-                suffix.next()
-            }
-            return String.format("%.1f %cB", sizeVar / 1000.0, suffix.current())
-        }
-
-        private fun humanReadableSizeBinary(size: Long): String {
-            val sizeAbs = if (size == Long.MIN_VALUE) Long.MAX_VALUE else abs(size)
-            if (sizeAbs < 1024) return "$size B"
-            var sizeVar = sizeAbs
-            val suffix = StringCharacterIterator("KMGTPE")
-            var i = 40
-            while (i >= 0 && sizeAbs > 0xFFFCCCCCCCCCCCCL shr i) {
-                sizeVar = sizeVar shr 10
-                suffix.next()
-                i -= 10
-            }
-            sizeVar *= java.lang.Long.signum(size).toLong()
-            return String.format("%.1f %ciB", sizeVar / 1024.0, suffix.current())
-        }
     }
 }

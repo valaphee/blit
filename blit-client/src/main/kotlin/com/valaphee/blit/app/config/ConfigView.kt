@@ -24,6 +24,7 @@
 
 package com.valaphee.blit.app.config
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import javafx.scene.control.TabPane
 import javafx.scene.layout.Priority
 import javafx.stage.Stage
@@ -38,11 +39,15 @@ import tornadofx.tab
 import tornadofx.tabpane
 import tornadofx.vbox
 import tornadofx.vgrow
+import java.io.File
 
 /**
  * @author Kevin Ludwig
  */
 class ConfigView : View("Configure Blit") {
+    private val _config by di<Config>()
+    private val objectMapper by di<ObjectMapper>()
+
     override val root = vbox {
         JMetro(this, Style.DARK)
         styleClass.add(JMetroStyleClass.BACKGROUND)
@@ -54,8 +59,18 @@ class ConfigView : View("Configure Blit") {
             vgrow = Priority.ALWAYS
             tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
 
+            tab(ConfigViewGeneral::class)
             tab(ConfigViewSources::class)
         }
-        buttonbar { button("OK") { action { (scene.window as Stage).close() } } }
+        buttonbar {
+            button("Ok") {
+                action {
+                    objectMapper.writeValue(File("config.json"), _config)
+                    (scene.window as Stage).close()
+                }
+            }
+            button("Cancel") { action { (scene.window as Stage).close() } }
+            button("Apply") { action { objectMapper.writeValue(File("config.json"), _config) } }
+        }
     }
 }

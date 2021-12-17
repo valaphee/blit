@@ -36,6 +36,9 @@ import tornadofx.textfield
  * @author Kevin Ludwig
  */
 object K8scpSourceUi : SourceUi {
+    override val name get() = "K8s CP"
+    override val `class` get() = K8scpSource::class
+
     override fun getFields(eventTarget: EventTarget, source: Source<*>?) = with(eventTarget) {
         val k8scpSource = source as? K8scpSource
         listOf(
@@ -46,8 +49,8 @@ object K8scpSourceUi : SourceUi {
     }
 
     override fun getSource(fields: List<Field>) = K8scpSource(
-        (fields[0].inputs.first() as TextField).text,
-        (fields[1].inputs.first() as TextField).text,
-        (fields[2].inputs.first() as TextField).text
+        (fields[0].inputs[0] as TextField).text,
+        (fields[1].inputs[0] as TextField).text,
+        (fields[2].inputs[0] as TextField).text
     )
 }

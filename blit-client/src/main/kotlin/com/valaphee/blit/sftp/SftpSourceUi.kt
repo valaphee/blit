@@ -30,6 +30,8 @@ import javafx.event.EventTarget
 import javafx.scene.control.TextField
 import tornadofx.Field
 import tornadofx.field
+import tornadofx.filterInput
+import tornadofx.isInt
 import tornadofx.passwordfield
 import tornadofx.textfield
 
@@ -37,22 +39,29 @@ import tornadofx.textfield
  * @author Kevin Ludwig
  */
 object SftpSourceUi : SourceUi {
+    override val name get() = "SFTP"
+    override val `class` get() = SftpSource::class
+
     override fun getFields(eventTarget: EventTarget, source: Source<*>?) = with(eventTarget) {
         val sftpSource = source as? SftpSource
         listOf(
             field("Name") { textfield(source?.name ?: "") },
-            field("Host") { textfield(sftpSource?.host ?: "") },
-            field("Port") { textfield(sftpSource?.port?.toString() ?: "") },
-            field("Username") { textfield(sftpSource?.username ?: "") },
-            field("Password") { passwordfield(sftpSource?.password ?: "") }
+            field("Address") {
+                textfield(sftpSource?.host ?: "")
+                textfield(sftpSource?.port?.toString() ?: "") { filterInput { it.controlNewText.isInt() } }
+            },
+            field("Auth") {
+                textfield(sftpSource?.username ?: "")
+                passwordfield(sftpSource?.password ?: "")
+            }
         )
     }
 
     override fun getSource(fields: List<Field>) = SftpSource(
         (fields[0].inputs[0] as TextField).text,
         (fields[1].inputs[0] as TextField).text,
-        (fields[2].inputs[0] as TextField).text.toInt(),
-        (fields[3].inputs[0] as TextField).text,
-        (fields[4].inputs[0] as TextField).text
+        (fields[1].inputs[1] as TextField).text.toInt(),
+        (fields[2].inputs[0] as TextField).text,
+        (fields[2].inputs[1] as TextField).text
     )
 }

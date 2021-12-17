@@ -39,6 +39,8 @@ import javafx.stage.Stage
 import jfxtras.styles.jmetro.JMetro
 import jfxtras.styles.jmetro.JMetroStyleClass
 import jfxtras.styles.jmetro.Style
+import org.bridj.cpp.com.COMRuntime
+import org.bridj.cpp.com.shell.ITaskbarList3
 import org.controlsfx.control.BreadCrumbBar
 import org.controlsfx.control.textfield.CustomTextField
 import tornadofx.Dimension
@@ -62,6 +64,7 @@ import tornadofx.splitpane
 import tornadofx.style
 import tornadofx.vbox
 import tornadofx.vgrow
+import java.util.concurrent.CompletableFuture
 
 /**
  * @author Kevin Ludwig
@@ -69,7 +72,17 @@ import tornadofx.vgrow
 class MainView : View("Blit") {
     private val iconManifest by di<IconManifest>()
     private val _config by di<Config>()
-    private val work = Work()
+    private val work = Work().apply {
+        val iTaskbarList3 = CompletableFuture.supplyAsync({ COMRuntime.newInstance(ITaskbarList3::class.java) }, comExecutor).join()
+        val hWnd by lazy { primaryStage.hWnd }
+        progress.onChange {
+            val _hWnd = hWnd
+            comExecutor.execute {
+                iTaskbarList3.SetProgressState(_hWnd, ITaskbarList3.TbpFlag.TBPF_NORMAL)
+                iTaskbarList3.SetProgressValue(_hWnd, (it * 100).toLong(), 100)
+            }
+        }
+    }
 
     override val root = vbox {
         JMetro(this, Style.DARK)
@@ -80,7 +93,7 @@ class MainView : View("Blit") {
 
         menubar {
             menu("File") {
-                item("Sources") { action { find<ConfigView>().openModal() } }
+                item("Config") { action { find<ConfigView>().openModal() } }
                 separator()
                 item("Exit") { action { (scene.window as Stage).close() } }
             }
@@ -100,7 +113,7 @@ class MainView : View("Blit") {
         private val source = SimpleObjectProperty<Source<T>>().apply { onChange { it?.let { navigate(it.home) } } }
         private lateinit var _path: String
         private val name = SimpleStringProperty()
-        private val tree = Tree<T>(iconManifest, work, this)
+        private val tree = Tree<T>(iconManifest, _config, work, this)
 
         init {
             hgrow = Priority.ALWAYS
