@@ -73,13 +73,16 @@ class MainView : View("Blit") {
     private val iconManifest by di<IconManifest>()
     private val _config by di<Config>()
     private val work = Work().apply {
-        val iTaskbarList3 = CompletableFuture.supplyAsync({ COMRuntime.newInstance(ITaskbarList3::class.java) }, comExecutor).join()
-        val hWnd by lazy { primaryStage.hWnd }
-        progress.onChange {
-            val _hWnd = hWnd
-            comExecutor.execute {
-                iTaskbarList3.SetProgressState(_hWnd, ITaskbarList3.TbpFlag.TBPF_NORMAL)
-                iTaskbarList3.SetProgressValue(_hWnd, (it * 100).toLong(), 100)
+        val version = System.getProperty("os.version").toFloatOrNull()
+        if (System.getProperty("os.name").startsWith("Windows") && version != null && version >= 6.1f) {
+            val iTaskbarList3 = CompletableFuture.supplyAsync({ COMRuntime.newInstance(ITaskbarList3::class.java) }, comExecutor).join()
+            val hWnd by lazy { primaryStage.hWnd }
+            progress.onChange {
+                val _hWnd = hWnd
+                comExecutor.execute {
+                    iTaskbarList3.SetProgressState(_hWnd, ITaskbarList3.TbpFlag.TBPF_NORMAL)
+                    iTaskbarList3.SetProgressValue(_hWnd, (it * 100).toLong(), 100)
+                }
             }
         }
     }
