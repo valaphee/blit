@@ -26,6 +26,7 @@ package com.valaphee.blit.dav
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.valaphee.blit.AbstractEntry
+import com.valaphee.blit.app.progress
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.put
@@ -34,12 +35,15 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.readBytes
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.OutgoingContent
+import io.ktor.http.contentLength
 import io.ktor.utils.io.ByteWriteChannel
 import io.ktor.utils.io.jvm.javaio.copyTo
+import io.ktor.utils.io.pool.ByteArrayPool
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.URLDecoder
 import java.util.UUID
+import kotlin.coroutines.coroutineContext
 
 /**
  * @author Kevin Ludwig
@@ -54,18 +58,35 @@ class DavEntry(
     override val modifyTime get() = prop.getlastmodified?.time ?: 0
     override val directory get() = prop.resourcetype?.collection != null
 
-    override suspend fun list(): List<DavEntry> {
+    override suspend fun list() = if (directory) {
         val httpResponse = davSource.httpClient.request<HttpResponse>("${davSource._url}/$path") { method = httpMethodPropfind }
-        return if (httpResponse.status == HttpStatusCode.MultiStatus) {
+        if (httpResponse.status == HttpStatusCode.MultiStatus) {
             xmlMapper.readValue<Multistatus>(httpResponse.readBytes()).response.mapNotNull {
                 val name = URLDecoder.decode(it.href.removeSuffix("/").split('/').last(), "UTF-8")
                 if (name != this.name) DavEntry(davSource, "${path}/${name}", it.propstat.first().prop) else null
             }
         } else emptyList()
-    }
+    } else emptyList()
 
     override suspend fun transferTo(stream: OutputStream) {
-        davSource.httpClient.get<HttpResponse>("${davSource._url}/$path").content.copyTo(stream)
+        val httpResponse = davSource.httpClient.get<HttpResponse>("${davSource._url}/$path")
+        val buffer = ByteArrayPool.borrow()
+        val length = httpResponse.contentLength()
+        try {
+            var copied = 0L
+            while (true) {
+                val bytes = httpResponse.content.readAvailable(buffer, 0, buffer.size)
+                if (bytes == -1) break
+                if (bytes > 0) {
+                    stream.write(buffer, 0, bytes)
+                    copied += bytes
+                }
+                length?.let { coroutineContext.progress = copied / it.toDouble() }
+            }
+            coroutineContext.progress = 1.0
+        } finally {
+            ByteArrayPool.recycle(buffer)
+        }
     }
 
     override suspend fun transferFrom(name: String, stream: InputStream, length: Long) {

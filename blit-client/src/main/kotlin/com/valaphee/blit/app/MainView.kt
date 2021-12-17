@@ -39,10 +39,6 @@ import javafx.stage.Stage
 import jfxtras.styles.jmetro.JMetro
 import jfxtras.styles.jmetro.JMetroStyleClass
 import jfxtras.styles.jmetro.Style
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 import org.controlsfx.control.BreadCrumbBar
 import org.controlsfx.control.textfield.CustomTextField
 import tornadofx.Dimension
@@ -54,10 +50,12 @@ import tornadofx.combobox
 import tornadofx.hbox
 import tornadofx.hgrow
 import tornadofx.item
+import tornadofx.label
 import tornadofx.menu
 import tornadofx.menubar
 import tornadofx.onChange
 import tornadofx.paddingTop
+import tornadofx.progressbar
 import tornadofx.runLater
 import tornadofx.separator
 import tornadofx.splitpane
@@ -71,7 +69,7 @@ import tornadofx.vgrow
 class MainView : View("Blit") {
     private val iconManifest by di<IconManifest>()
     private val _config by di<Config>()
-    private val ioScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val work = Work()
 
     override val root = vbox {
         JMetro(this, Style.DARK)
@@ -88,20 +86,21 @@ class MainView : View("Blit") {
             }
             menu("Help") { item("About") { action { find<AboutView>().openModal(resizable = false) } } }
         }
-
         splitpane {
             vgrow = Priority.ALWAYS
 
             @Suppress("UPPER_BOUND_VIOLATED_WARNING") add(Pane<Entry<*>>())
             @Suppress("UPPER_BOUND_VIOLATED_WARNING") add(Pane<Entry<*>>())
         }
+        label(work.name)
+        progressbar(work.progress)
     }
 
     inner class Pane<T : Entry<T>> : VBox(), Navigator {
         private val source = SimpleObjectProperty<Source<T>>().apply { onChange { it?.let { navigate(it.home) } } }
         private lateinit var _path: String
         private val name = SimpleStringProperty()
-        private val tree = Tree<T>(iconManifest, ioScope, this)
+        private val tree = Tree<T>(iconManifest, work, this)
 
         init {
             hgrow = Priority.ALWAYS
@@ -146,7 +145,7 @@ class MainView : View("Blit") {
             _path = normalizedPath
 
             source.value?.let { source ->
-                ioScope.launch {
+                work.launch("Navigating to $path") {
                     if (source.isValid(normalizedPath)) {
                         val item = source.get(normalizedPath).item
 

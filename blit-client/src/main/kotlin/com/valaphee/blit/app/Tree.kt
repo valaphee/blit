@@ -36,9 +36,6 @@ import javafx.scene.input.Clipboard
 import javafx.scene.input.KeyCode
 import javafx.scene.input.TransferMode
 import javafx.scene.layout.Priority
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import tornadofx.action
 import tornadofx.cellFormat
 import tornadofx.column
@@ -62,7 +59,7 @@ import kotlin.math.abs
  */
 class Tree<T : Entry<T>>(
     private val iconManifest: IconManifest,
-    private val ioScope: CoroutineScope,
+    private val work: Work,
     private val navigator: Navigator
 ) : TreeTableView<Entry<T>>() {
     init {
@@ -98,7 +95,7 @@ class Tree<T : Entry<T>>(
                     setOnDragDetected {
                         startDragAndDrop(TransferMode.MOVE).apply {
                             setContent {
-                                runBlocking {
+                                work.runBlocking("Downloading") {
                                     suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
                                         File(tmpdir, entry.name).mkdir()
                                         entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
@@ -127,7 +124,7 @@ class Tree<T : Entry<T>>(
         setOnKeyPressed {
             if (it.isControlDown) when (it.code) {
                 KeyCode.C -> Clipboard.getSystemClipboard().setContent {
-                    runBlocking {
+                    work.runBlocking("Downloading") {
                         suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
                             File(tmpdir, entry.name).mkdir()
                             entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
@@ -142,7 +139,7 @@ class Tree<T : Entry<T>>(
                     if (hasFiles()) {
                         val entry = selectionModel.selectedItem.value
                         if (!entry.directory) TODO()
-                        runBlocking { files.forEach { file -> FileInputStream(file).use { entry.transferFrom(file.name, it, file.length()) } } }
+                        files.forEach { file -> work.launch("Uploading ${file.name}") { FileInputStream(file).use { entry.transferFrom(file.name, it, file.length()) } } }
                     }
                 }
             }
@@ -152,14 +149,14 @@ class Tree<T : Entry<T>>(
             it?.let {
                 contextMenu = ContextMenu().apply {
                     val value = it.value
-                    item("Open") { action { if (value.directory) navigator.navigateRelative(value.name) else if (Desktop.isDesktopSupported()) ioScope.launch { Desktop.getDesktop().open(File(tmpdir, value.name).apply { FileOutputStream(this).use { value.transferTo(it) } }) } } }
+                    item("Open") { action { if (value.directory) navigator.navigateRelative(value.name) else if (Desktop.isDesktopSupported()) work.launch("Downloading $value") { Desktop.getDesktop().open(File(tmpdir, value.name).apply { FileOutputStream(this).use { value.transferTo(it) } }) } } }
                 }
             }
         }
     }
 
     fun populate(item: TreeItem<Entry<T>>) {
-        ioScope.launch {
+        work.launch("Populating ${item.value}") {
             val children = item.value!!.list()
             runLater {
                 populateTree(item, { entry ->
