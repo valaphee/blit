@@ -46,4 +46,6 @@ interface Entry<T : Entry<T>> {
     suspend fun transferTo(stream: OutputStream)
 
     suspend fun transferFrom(name: String, stream: InputStream, length: Long)
+
+    suspend fun delete()
 }

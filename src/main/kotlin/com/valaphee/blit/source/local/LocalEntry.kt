@@ -52,5 +52,7 @@ class LocalEntry(
         FileOutputStream("$path/$name").use { stream.transferTo(it) }
     }
 
+    override suspend fun delete() = TODO()
+
     override fun toString() = path.toString()
 }

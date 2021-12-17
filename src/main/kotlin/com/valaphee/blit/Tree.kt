@@ -47,6 +47,7 @@ import tornadofx.item
 import tornadofx.onChange
 import tornadofx.populateTree
 import tornadofx.runLater
+import tornadofx.separator
 import tornadofx.setContent
 import tornadofx.vgrow
 import java.awt.Desktop
@@ -65,7 +66,6 @@ class Tree<T : Entry<T>>(
     private val work: Work,
     private val navigator: Navigator
 ) : TreeTableView<Entry<T>>() {
-
     init {
         vgrow = Priority.ALWAYS
         isShowRoot = false
@@ -126,8 +126,8 @@ class Tree<T : Entry<T>>(
             }
         }
         setOnKeyPressed {
-            if (it.isControlDown) when (it.code) {
-                KeyCode.C -> Clipboard.getSystemClipboard().setContent {
+            when (it.code) {
+                KeyCode.C -> if (it.isControlDown) Clipboard.getSystemClipboard().setContent {
                     work.runBlocking(locale["main.tree.task.download.name"]) {
                         suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
                             File(tmpdir, entry.name).mkdir()
@@ -139,21 +139,46 @@ class Tree<T : Entry<T>>(
                         it.consume()
                     }
                 }
-                KeyCode.V -> with(Clipboard.getSystemClipboard()) {
+                KeyCode.V -> if (it.isControlDown) with(Clipboard.getSystemClipboard()) {
                     if (hasFiles()) {
                         val entry = selectionModel.selectedItem.value
                         if (!entry.directory) TODO()
                         files.forEach { file -> work.launch(locale["main.tree.task.upload.name", file.name]) { FileInputStream(file).use { entry.transferFrom(file.name, it, file.length()) } } }
                     }
                 }
+                KeyCode.DELETE -> selectionModel.selectedItems.forEach {
+                    val entry = it.value
+                    work.launch(locale["main.tree.task.delete.name", entry]) {
+                        entry.delete()
+                        runLater { populate(it.parent) }
+                    }
+                }
             }
         }
 
-        selectionModel.selectedItemProperty().onChange {
-            it?.let {
-                contextMenu = ContextMenu().apply {
-                    val value = it.value
-                    item(locale["main.tree.menu.open.name"]) { action { if (value.directory) navigator.navigateRelative(value.name) else if (Desktop.isDesktopSupported()) work.launch(locale["main.tree.task.download.name", value]) { Desktop.getDesktop().open(File(tmpdir, value.name).apply { FileOutputStream(this).use { value.transferTo(it) } }) } } } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
+        selectionModel.selectedItems.onChange {
+            contextMenu = ContextMenu().apply {
+                item(locale["main.tree.menu.open.name"]) {
+                    action {
+                        it.list.firstOrNull { it.value.directory }?.value?.let { navigator.navigateRelative(it.name) } ?: if (Desktop.isDesktopSupported()) {
+                            it.list.forEach {
+                                val entry = it.value
+                                work.launch(locale["main.tree.task.download.name", entry]) { Desktop.getDesktop().open(File(tmpdir, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }) } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
+                            }
+                        }
+                    }
+                }
+                separator()
+                item(locale["main.tree.menu.delete.name"]) {
+                    action {
+                        it.list.forEach {
+                            val entry = it.value
+                            work.launch(locale["main.tree.task.delete.name", entry]) {
+                                entry.delete()
+                                runLater { populate(it.parent) }
+                            }
+                        }
+                    }
                 }
             }
         }

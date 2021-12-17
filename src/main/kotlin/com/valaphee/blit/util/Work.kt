@@ -30,7 +30,6 @@ import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -38,6 +37,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import tornadofx.onChange
 import tornadofx.runLater
+import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.Executors
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
@@ -47,30 +47,25 @@ import kotlin.coroutines.CoroutineContext
  */
 class Work {
     private val coroutineScope = CoroutineScope(Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), ThreadFactoryBuilder().setNameFormat("blit-%d").build()).asCoroutineDispatcher() + SupervisorJob())
-    private val tasks = mutableListOf<Task>()
+    private val tasks = ConcurrentLinkedDeque<Task>()
 
     val name: StringProperty = SimpleStringProperty("")
     val progress: DoubleProperty = SimpleDoubleProperty(0.0)
 
-    fun <T> runBlocking(name: String, block: suspend () -> T): T {
-        this.name.value = name
-        return runBlocking { run(name, block) }
-    }
+    fun <T> runBlocking(name: String, block: suspend () -> T) = runBlocking { run(name, block) }
 
-    fun launch(name: String, block: suspend () -> Unit): Job {
-        this.name.value = name
-        return coroutineScope.launch { run(name, block) }
-    }
+    fun launch(name: String, block: suspend () -> Unit) = coroutineScope.launch { run(name, block) }
 
     private suspend fun <T> run(name: String, block: suspend () -> T): T {
         val task = Task(name, SimpleDoubleProperty().apply { onChange { runLater { progress.value = tasks.map { it.progress.value }.average() } } })
         tasks += task
         task.progress.value = 0.0
+        runLater { this.name.value = tasks.joinToString(" | ") { it.name } }
         val value = withContext(task) { block() }
         tasks -= task
         runLater {
             progress.value = tasks.map { it.progress.value }.average()
-            this.name.value = tasks.lastOrNull()?.name ?: ""
+            this.name.value = tasks.joinToString(" | ") { it.name }
         }
         return value
     }

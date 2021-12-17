@@ -57,5 +57,7 @@ class K8scpEntry(
 
     override suspend fun transferFrom(name: String, stream: InputStream, length: Long) = TODO()
 
+    override suspend fun delete() = TODO()
+
     override fun toString() = path
 }
