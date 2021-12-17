@@ -25,6 +25,7 @@
 package com.valaphee.blit
 
 import javafx.scene.control.TreeItem
+import java.io.InputStream
 import java.io.OutputStream
 
 /**
@@ -43,4 +44,6 @@ interface Entry<T : Entry<T>> {
     suspend fun list(): List<T>
 
     suspend fun transferTo(stream: OutputStream)
+
+    suspend fun transferFrom(name: String, stream: InputStream, length: Long)
 }

@@ -51,7 +51,7 @@ class K8scpSource(
 
     override suspend fun isValid(path: String) = stat(path)?.isDirectory ?: false
 
-    override suspend fun get(path: String) = K8scpEntry(this, path, "", stat(path)!!)
+    override suspend fun get(path: String) = K8scpEntry(this, path, stat(path)!!)
 
     companion object {
         private val apiClient = Config.defaultClient()

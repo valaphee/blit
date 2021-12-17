@@ -27,6 +27,8 @@ package com.valaphee.blit.local
 import com.valaphee.blit.AbstractEntry
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.InputStream
 import java.io.OutputStream
 
 /**
@@ -44,6 +46,10 @@ class LocalEntry(
 
     override suspend fun transferTo(stream: OutputStream) {
         FileInputStream(path).use { it.transferTo(stream) }
+    }
+
+    override suspend fun transferFrom(name: String, stream: InputStream, length: Long) {
+        FileOutputStream("$path/$name").use { stream.transferTo(it) }
     }
 
     override fun toString() = path.toString()

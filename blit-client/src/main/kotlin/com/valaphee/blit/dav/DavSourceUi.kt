@@ -26,9 +26,12 @@ package com.valaphee.blit.dav
 
 import com.valaphee.blit.Source
 import com.valaphee.blit.SourceUi
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.event.EventTarget
+import javafx.scene.control.CheckBox
 import javafx.scene.control.TextField
 import tornadofx.Field
+import tornadofx.checkbox
 import tornadofx.field
 import tornadofx.passwordfield
 import tornadofx.textfield
@@ -41,16 +44,20 @@ object DavSourceUi : SourceUi {
         val davSource = source as? DavSource
         listOf(
             field("Name") { textfield(source?.name ?: "") },
-            field ("Url") { textfield(davSource?.url ?: "") },
-            field ("Username") { textfield(davSource?.username ?: "") },
-            field ("Password") { passwordfield(davSource?.password ?: "") }
+            field("Url") { textfield(davSource?.url ?: "") },
+            field("Auth") {
+                textfield(davSource?.username ?: "")
+                passwordfield(davSource?.password ?: "")
+            },
+            field("Nextcloud") { checkbox(property = SimpleBooleanProperty(davSource?.nextcloud ?: false)) },
         )
     }
 
     override fun getSource(fields: List<Field>) = DavSource(
-        (fields[0].inputs.first() as TextField).text,
-        (fields[1].inputs.first() as TextField).text,
-        (fields[2].inputs.first() as TextField).text,
-        (fields[3].inputs.first() as TextField).text
+        (fields[0].inputs[0] as TextField).text,
+        (fields[1].inputs[0] as TextField).text,
+        (fields[2].inputs[0] as TextField).text,
+        (fields[2].inputs[1] as TextField).text,
+        (fields[3].inputs[0] as CheckBox).isSelected,
     )
 }

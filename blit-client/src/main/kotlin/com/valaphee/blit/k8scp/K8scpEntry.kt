@@ -27,6 +27,7 @@ package com.valaphee.blit.k8scp
 import com.valaphee.blit.AbstractEntry
 import org.apache.sshd.sftp.client.SftpClient
 import java.io.BufferedReader
+import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.OutputStream
 
@@ -36,26 +37,25 @@ import java.io.OutputStream
 class K8scpEntry(
     private val k8scpSource: K8scpSource,
     private val path: String,
-    override val name: String,
     private val attributes: SftpClient.Attributes
 ) : AbstractEntry<K8scpEntry>() {
+    override val name = path.removeSuffix("/").split('/').last()
     override val size get() = attributes.size
     override val modifyTime get() = attributes.modifyTime.toMillis()
     override val directory get() = attributes.isDirectory
 
     override suspend fun list() = if (directory) {
-        val path = toString()
         val process = K8scpSource.exec.exec(k8scpSource.namespace, k8scpSource.pod, arrayOf("ls", "-l", "--full-time", path), false)
-        val children = BufferedReader(InputStreamReader(process.inputStream)).use {
-            it.readLines().mapNotNull { parseLsEntry(it)?.let { K8scpEntry(k8scpSource, path, it.first, it.second) } }
-        }
+        val list = BufferedReader(InputStreamReader(process.inputStream)).use { it.readLines().mapNotNull { parseLsEntry(it)?.let { K8scpEntry(k8scpSource, "$path/${it.first}", it.second) } } }
         process.waitFor()
-        children
+        list
     } else emptyList()
 
     override suspend fun transferTo(stream: OutputStream) {
         K8scpSource.copy.copyFileFromPod(k8scpSource.namespace, k8scpSource.pod, toString()).use { it.transferTo(stream) }
     }
 
-    override fun toString() = if (name.isEmpty()) path else if (path.endsWith("/")) "$path$name" else "$path/$name"
+    override suspend fun transferFrom(name: String, stream: InputStream, length: Long) = TODO()
+
+    override fun toString() = path
 }

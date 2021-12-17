@@ -26,6 +26,7 @@ package com.valaphee.blit.sftp
 
 import com.valaphee.blit.AbstractEntry
 import org.apache.sshd.sftp.client.SftpClient
+import java.io.InputStream
 import java.io.OutputStream
 
 /**
@@ -34,18 +35,17 @@ import java.io.OutputStream
 class SftpEntry(
     private val sftpSource: SftpSource,
     private val path: String,
-    override val name: String,
     private var attributes: SftpClient.Attributes
 ) : AbstractEntry<SftpEntry>() {
+    override val name = path.removeSuffix("/").split('/').last()
     override val size get() = attributes.size
     override val modifyTime get() = attributes.modifyTime.toMillis()
     override val directory get() = attributes.isDirectory
 
     override suspend fun list() = if (directory) try {
-        val path = toString()
         sftpSource.sftpClient.readDir(path).mapNotNull {
             val name = it.filename
-            if (name != "." && name != "..") SftpEntry(sftpSource, path, name, it.attributes) else null
+            if (name != "." && name != "..") SftpEntry(sftpSource, "$path/$name", it.attributes) else null
         }
     } catch (_: RuntimeException) {
         emptyList()
@@ -55,5 +55,7 @@ class SftpEntry(
         sftpSource.sftpClient.read(toString()).use { it.transferTo(stream) }
     }
 
-    override fun toString() = if (name.isEmpty()) path else if (path.endsWith("/")) "$path$name" else "$path/$name"
+    override suspend fun transferFrom(name: String, stream: InputStream, length: Long) = TODO()
+
+    override fun toString() = path
 }

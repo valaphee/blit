@@ -27,6 +27,7 @@ package com.valaphee.blit.dav
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement
+import java.util.Date
 
 /**
  * @author Kevin Ludwig
@@ -44,7 +45,7 @@ data class Multistatus(
             @get:JacksonXmlProperty(namespace = "DAV:", localName = "status") val status: String
         ) {
             class Prop(
-                @get:JacksonXmlProperty(namespace = "DAV:", localName = "getlastmodified") val getlastmodified: String? = null,
+                @get:JacksonXmlProperty(namespace = "DAV:", localName = "getlastmodified") val getlastmodified: Date? = null,
                 @get:JacksonXmlProperty(namespace = "DAV:", localName = "getetag") val getetag: String? = null,
                 @get:JacksonXmlProperty(namespace = "DAV:", localName = "getcontenttype") val getcontenttype: String? = null,
                 @get:JacksonXmlProperty(namespace = "DAV:", localName = "resourcetype") val resourcetype: Resourcetype? = null,

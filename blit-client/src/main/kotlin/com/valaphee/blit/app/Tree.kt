@@ -46,10 +46,11 @@ import tornadofx.item
 import tornadofx.onChange
 import tornadofx.populateTree
 import tornadofx.runLater
-import tornadofx.separator
 import tornadofx.setContent
 import tornadofx.vgrow
+import java.awt.Desktop
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.text.DateFormat
 import java.text.StringCharacterIterator
@@ -137,6 +138,13 @@ class Tree<T : Entry<T>>(
                         it.consume()
                     }
                 }
+                KeyCode.V -> with(Clipboard.getSystemClipboard()) {
+                    if (hasFiles()) {
+                        val entry = selectionModel.selectedItem.value
+                        if (!entry.directory) TODO()
+                        runBlocking { files.forEach { file -> FileInputStream(file).use { entry.transferFrom(file.name, it, file.length()) } } }
+                    }
+                }
             }
         }
 
@@ -144,10 +152,7 @@ class Tree<T : Entry<T>>(
             it?.let {
                 contextMenu = ContextMenu().apply {
                     val value = it.value
-                    item("Open") { action { if (value.directory) navigator.navigateRelative(value.name) } }
-                    separator()
-                    item("Rename")
-                    item("Delete")
+                    item("Open") { action { if (value.directory) navigator.navigateRelative(value.name) else if (Desktop.isDesktopSupported()) ioScope.launch { Desktop.getDesktop().open(File(tmpdir, value.name).apply { FileOutputStream(this).use { value.transferTo(it) } }) } } }
                 }
             }
         }

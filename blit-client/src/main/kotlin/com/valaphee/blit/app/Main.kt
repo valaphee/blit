@@ -34,45 +34,17 @@ import com.google.inject.Guice
 import com.valaphee.blit.app.config.Config
 import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory
 import javafx.scene.image.Image
-import okhttp3.OkHttpClient
 import tornadofx.App
 import tornadofx.DIContainer
 import tornadofx.FX
 import tornadofx.launch
 import java.io.File
-import java.security.cert.X509Certificate
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
-import javax.net.ssl.X509TrustManager
 import kotlin.reflect.KClass
 
 /**
  * @author Kevin Ludwig
  */
 class Main : App(Image(Main::class.java.getResourceAsStream("/app.png")), MainView::class)
-
-private fun getUnsafeOkHttpClient(): OkHttpClient {
-    // Create a trust manager that does not validate certificate chains
-    val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
-        override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {
-        }
-
-        override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {
-        }
-
-        override fun getAcceptedIssuers() = arrayOf<X509Certificate>()
-    })
-
-    // Install the all-trusting trust manager
-    val sslContext = SSLContext.getInstance("SSL")
-    sslContext.init(null, trustAllCerts, java.security.SecureRandom())
-    // Create an ssl socket factory with our all-trusting manager
-    val sslSocketFactory = sslContext.socketFactory
-
-    return OkHttpClient.Builder()
-        .sslSocketFactory(sslSocketFactory, trustAllCerts[0] as X509TrustManager)
-        .hostnameVerifier { _, _ -> true }.build()
-}
 
 fun main(arguments: Array<String>) {
     SvgImageLoaderFactory.install()

@@ -59,7 +59,7 @@ class SftpSource(
         false
     }
 
-    override suspend fun get(path: String) = SftpEntry(this, path, "", sftpClient.stat(path))
+    override suspend fun get(path: String) = SftpEntry(this, path, sftpClient.stat(path))
 
     companion object {
         private val ssh = SshClient.setUpDefaultClient().apply { start() }

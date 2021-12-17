@@ -36,7 +36,6 @@ import com.valaphee.blit.sftp.SftpSource
 import com.valaphee.blit.sftp.SftpSourceUi
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
-import javafx.geometry.Orientation
 import javafx.scene.layout.Priority
 import tornadofx.Field
 import tornadofx.Fragment
@@ -69,10 +68,10 @@ class ConfigViewSources : Fragment("Sources") {
             it?.let {
                 type.value = null
                 type.value = when (it) {
-                    is DavSource -> "dav"
-                    is K8scpSource -> "k8scp"
-                    is LocalSource -> "local"
-                    is SftpSource -> "sftp"
+                    is DavSource -> "WebDAV"
+                    is K8scpSource -> "K8s CP"
+                    is LocalSource -> "Local"
+                    is SftpSource -> "SFTP"
                     else -> TODO(it::class.java.name)
                 } // TODO
             }
@@ -121,17 +120,17 @@ class ConfigViewSources : Fragment("Sources") {
         form {
             hgrow = Priority.ALWAYS
 
-            fieldset(labelPosition = Orientation.VERTICAL) { field("Type") { combobox<String>(type) { items = sourceUis.keys.toList().asObservable() } } }
-            fieldset(labelPosition = Orientation.VERTICAL) { dynamicContent(type) { it?.let { sourceUis[it]!!.getFields(this, source.value).also { fields = it } } } }
+            fieldset { field("Type") { combobox<String>(type) { items = sourceUis.keys.toList().asObservable() } } }
+            fieldset { dynamicContent(type) { it?.let { sourceUis[it]!!.getFields(this, source.value).also { fields = it } } } }
         }
     }
 
     companion object {
         private val sourceUis = mutableMapOf(
-            "dav" to DavSourceUi,
-            "k8scp" to K8scpSourceUi,
-            "local" to LocalSourceUi,
-            "sftp" to SftpSourceUi
+            "WebDAV" to DavSourceUi,
+            "K8s CP" to K8scpSourceUi,
+            "Local" to LocalSourceUi,
+            "SFTP" to SftpSourceUi
         ) // TODO
     }
 }
