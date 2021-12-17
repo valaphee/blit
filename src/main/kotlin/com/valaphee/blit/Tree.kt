@@ -24,8 +24,8 @@
 
 package com.valaphee.blit
 
-import com.valaphee.blit.data.locale.Locale
 import com.valaphee.blit.data.config.Config
+import com.valaphee.blit.data.locale.Locale
 import com.valaphee.blit.data.manifest.IconManifest
 import com.valaphee.blit.source.Entry
 import com.valaphee.blit.util.Work
@@ -153,7 +153,7 @@ class Tree<T : Entry<T>>(
             it?.let {
                 contextMenu = ContextMenu().apply {
                     val value = it.value
-                    item("Open") { action { if (value.directory) navigator.navigateRelative(value.name) else if (Desktop.isDesktopSupported()) work.launch(locale["main.tree.task.download.name", value]) { Desktop.getDesktop().open(File(tmpdir, value.name).apply { FileOutputStream(this).use { value.transferTo(it) } }) } } }
+                    item(locale["main.tree.menu.open.name"]) { action { if (value.directory) navigator.navigateRelative(value.name) else if (Desktop.isDesktopSupported()) work.launch(locale["main.tree.task.download.name", value]) { Desktop.getDesktop().open(File(tmpdir, value.name).apply { FileOutputStream(this).use { value.transferTo(it) } }) } } } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
                 }
             }
         }

@@ -73,15 +73,15 @@ class DavEntry(
         val buffer = ByteArrayPool.borrow()
         val length = httpResponse.contentLength()
         try {
-            var copied = 0L
+            var readSum = 0L
             while (true) {
-                val bytes = httpResponse.content.readAvailable(buffer, 0, buffer.size)
-                if (bytes == -1) break
-                if (bytes > 0) {
-                    stream.write(buffer, 0, bytes)
-                    copied += bytes
+                val read = httpResponse.content.readAvailable(buffer, 0, buffer.size)
+                if (read == -1) break
+                if (read > 0) {
+                    stream.write(buffer, 0, read)
+                    readSum += read
                 }
-                length?.let { coroutineContext.progress = copied / it.toDouble() }
+                length?.let { coroutineContext.progress = readSum / it.toDouble() }
             }
             coroutineContext.progress = 1.0
         } finally {
@@ -95,8 +95,15 @@ class DavEntry(
             davSource.httpClient.request<Unit>("${davSource.url}/uploads/${davSource.username}/blit-$id") { method = httpMethodMkcol }
 
             /*val jobs = mutableListOf<Job>()*/
-            for (i in 0..ceil(length / chunkSize.toDouble())) /*jobs += ioScope.launch { */davSource.httpClient.put<Unit>("${davSource.url}/uploads/${davSource.username}/blit-$id/${i * chunkSize}") { body = stream.readNBytes(chunkSize.toInt()) }/* }*/
+            val chunkCount = ceil(length / chunkSize.toDouble())
+            for (i in 0..chunkCount) {
+                /*jobs += ioScope.launch { */
+                davSource.httpClient.put<Unit>("${davSource.url}/uploads/${davSource.username}/blit-$id/${i * chunkSize}") { body = stream.readNBytes(chunkSize.toInt()) }
+                coroutineContext.progress = i / chunkCount.toDouble()
+                /*}*/
+            }
             /*jobs.joinAll()*/
+            coroutineContext.progress = 1.0
 
             davSource.httpClient.request<Unit>("${davSource.url}/uploads/${davSource.username}/blit-$id/.file") {
                 method = httpMethodMove

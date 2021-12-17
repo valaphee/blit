@@ -25,6 +25,9 @@
             "size.title": "Size",
             "modified.title": "Modified"
           },
+          "menu": {
+            "open.name": "Open"
+          },
           "task": {
             "populate.name": "Populating {0}",
             "download.name": "Downloading {0}",

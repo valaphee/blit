@@ -51,7 +51,7 @@ class SftpSource(
         DefaultSftpClientFactory.INSTANCE.createSftpClient(sshSession)
     }
 
-    override val home get() = "." // TODO
+    override val home get() = "." // TODO: pwd
 
     override suspend fun isValid(path: String) = try {
         sftpClient.stat(path).isDirectory

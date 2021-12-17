@@ -30,6 +30,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName
 import com.valaphee.blit.source.AbstractSource
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.features.HttpTimeout
 import io.ktor.client.features.auth.Auth
 import io.ktor.client.features.auth.providers.BasicAuthCredentials
 import io.ktor.client.features.auth.providers.basic
@@ -54,6 +55,7 @@ class DavSource(
     @get:JsonIgnore internal val httpClient by lazy {
         HttpClient(OkHttp) {
             engine { preconfigured = getTrustAllOkHttpClient() }
+            install(HttpTimeout) { requestTimeoutMillis = 60000 }
             Auth {
                 basic {
                     sendWithoutRequest { true }
@@ -68,7 +70,7 @@ class DavSource(
     }
     @get:JsonIgnore internal val _url get() = if (nextcloud) "${url}/files/${username}" else url
 
-    override val home get() = "."
+    override val home get() = "." // TODO: pwd
 
     override suspend fun isValid(path: String) = httpClient.request<HttpResponse>("$_url/$path") { method = httpMethodPropfind }.status == HttpStatusCode.MultiStatus
 

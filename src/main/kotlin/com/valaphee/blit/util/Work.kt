@@ -47,7 +47,7 @@ class Work {
     private val coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val tasks = mutableListOf<Task>()
 
-    val name: StringProperty = SimpleStringProperty("Idle")
+    val name: StringProperty = SimpleStringProperty("")
     val progress: DoubleProperty = SimpleDoubleProperty(0.0)
 
     fun <T> runBlocking(name: String, block: suspend () -> T): T {
@@ -67,7 +67,7 @@ class Work {
         tasks -= task
         runLater {
             progress.value = tasks.map { it.progress.value }.average()
-            this.name.value = tasks.lastOrNull()?.name ?: "Idle"
+            this.name.value = tasks.lastOrNull()?.name ?: ""
         }
         return value
     }
