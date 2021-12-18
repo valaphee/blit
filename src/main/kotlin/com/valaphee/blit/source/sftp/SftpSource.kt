@@ -37,13 +37,13 @@ class SftpSource(
     @get:JsonProperty("host") val host: String,
     @get:JsonProperty("port") val port: Int,
     @get:JsonProperty("username") val username: String,
-    @get:JsonProperty("password") val password: String?,
-    @get:JsonProperty("private_key") val privateKey: String?
+    @get:JsonProperty("password") val password: String,
+    @get:JsonProperty("private_key") val privateKey: String
 ) : AbstractSource<SftpEntry>(name) {
     @get:JsonIgnore private val sshSession: ClientSession by lazy {
         val sshSession = ssh.connect(username, host, port).verify().session
-        password?.let { sshSession.addPasswordIdentity(it) }
-        privateKey?.let { OpenSSHKeyPairResourceParser.INSTANCE.loadKeyPairs(null, Paths.get(it), { _, _, _ -> TODO() }).firstOrNull()?.let { sshSession.addPublicKeyIdentity(it) } }
+        if (password.isNotEmpty()) sshSession.addPasswordIdentity(password)
+        if (privateKey.isNotEmpty()) OpenSSHKeyPairResourceParser.INSTANCE.loadKeyPairs(null, Paths.get(privateKey), { _, _, _ -> TODO() }).firstOrNull()?.let { sshSession.addPublicKeyIdentity(it) }
         sshSession.auth().verify()
         sshSession
     }

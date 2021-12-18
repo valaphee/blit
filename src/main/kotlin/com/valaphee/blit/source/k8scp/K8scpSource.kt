@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeName
 import com.valaphee.blit.source.AbstractSource
 import io.kubernetes.client.Copy
+import io.kubernetes.client.openapi.apis.CoreV1Api
 import io.kubernetes.client.util.Config
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -33,19 +34,37 @@ class K8scpSource(
     @get:JsonProperty("namespace") val namespace: String,
     @get:JsonProperty("pod") val pod: String
 ) : AbstractSource<K8scpEntry>(name) {
-    override val home: String get() {
+    override val home: String get() = if (namespace.isNotEmpty() && pod.isNotEmpty()) {
         val process = copy.exec(namespace, pod, arrayOf("pwd", toString()), false)
         val home = BufferedReader(InputStreamReader(process.inputStream)).use { it.readLine() }
         process.waitFor()
-        return home
-    }
+        home
+    } else "/"
 
     override suspend fun isValid(path: String) = stat(path)?.isDirectory ?: false
 
     override suspend fun get(path: String) = K8scpEntry(this, path, stat(path)!!)
 
+    internal fun getNamespacePodAndPath(path: String): Triple<String?, String?, String?> {
+        return if (namespace.isNotEmpty()) {
+            if (pod.isNotEmpty()) {
+                Triple(namespace, pod, path)
+            } else {
+                val podAndPath = path.split('/', limit = 3)
+                val pod = podAndPath.getOrNull(1)
+                Triple(namespace, if (pod.isNullOrEmpty()) null else pod, "/${podAndPath.getOrNull(2) ?: ""}")
+            }
+        } else {
+            val namespacePodAndPath = path.split('/', limit = 4)
+            val namespace = namespacePodAndPath.getOrNull(1)
+            val pod = namespacePodAndPath.getOrNull(2)
+            Triple(if (namespace.isNullOrEmpty()) null else namespace, if (pod.isNullOrEmpty()) null else pod, "/${namespacePodAndPath.getOrNull(3) ?: ""}")
+        }
+    }
+
     companion object {
         private val apiClient = Config.defaultClient()
         internal val copy = Copy(apiClient)
+        internal val coreV1Api = CoreV1Api(apiClient)
     }
 }

@@ -62,7 +62,7 @@ class DavEntry(
                     null
                 } else {
                     val name = URLDecoder.decode(it.href.removeSuffix("/").split('/').last(), "UTF-8")
-                    /*if (name != this.name) */DavEntry(davSource, "${path}/${name}", it.propstat.first().prop)/* else null*/
+                    /*if (name != this.name) */DavEntry(davSource, "${if (path == "/") "" else path}/${name}", it.propstat.first().prop)/* else null*/
                 } // TODO: it is not defined in the standard that the first entry has to be the entry itself
             }
         } else emptyList()

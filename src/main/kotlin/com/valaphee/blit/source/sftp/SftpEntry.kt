@@ -38,7 +38,7 @@ class SftpEntry(
     override suspend fun list() = if (directory) try {
         sftpSource.sftpClient.readDir(path).mapNotNull {
             val name = it.filename
-            if (name != "." && name != "..") SftpEntry(sftpSource, "$path/$name", it.attributes) else null
+            if (name != "." && name != "..") SftpEntry(sftpSource, "${if (path == "/") "" else path}/$name", it.attributes) else null
         }
     } catch (_: RuntimeException) {
         emptyList()

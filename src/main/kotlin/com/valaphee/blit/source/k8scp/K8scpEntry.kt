@@ -19,6 +19,7 @@ package com.valaphee.blit.source.k8scp
 import com.valaphee.blit.source.AbstractEntry
 import com.valaphee.blit.source.transferToWithProgress
 import org.apache.sshd.sftp.client.SftpClient
+import org.apache.sshd.sftp.common.SftpConstants
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -38,25 +39,40 @@ class K8scpEntry(
     override val directory get() = attributes.isDirectory
 
     override suspend fun list() = if (directory) {
-        val process = K8scpSource.copy.exec(k8scpSource.namespace, k8scpSource.pod, arrayOf("ls", "-l", "--full-time", path), false)
-        val list = BufferedReader(InputStreamReader(process.inputStream)).use { it.readLines().mapNotNull { parseLsEntry(it)?.let { K8scpEntry(k8scpSource, "$path/${it.first}", it.second) } } }
-        process.waitFor()
-        list
+        val (namespace, pod, podPath) = k8scpSource.getNamespacePodAndPath(path)
+        if (namespace != null) {
+            if (pod != null) {
+                val process = K8scpSource.copy.exec(namespace, pod, arrayOf("ls", "-l", "--full-time", podPath!!), false)
+                val list = BufferedReader(InputStreamReader(process.inputStream)).use { it.readLines().mapNotNull { parseLsEntry(it)?.let { K8scpEntry(k8scpSource, "${if (path == "/") "" else path}/${it.first}", it.second) } } }
+                process.waitFor()
+                list
+            } else K8scpSource.coreV1Api.listNamespacedPod(namespace, null, null, null, null, null, null, null, null, null, null).items.map { K8scpEntry(k8scpSource, "${if (path == "/") "" else path}/${it.metadata!!.name!!}", namespaceOrPodAttributes) }
+        } else emptyList()
     } else emptyList()
 
     override suspend fun transferTo(stream: OutputStream) {
-        K8scpSource.copy.copyFileFromPod(k8scpSource.namespace, k8scpSource.pod, toString()).use { it.transferToWithProgress(stream, size) }
+        val (namespace, pod, path) = k8scpSource.getNamespacePodAndPath(path)
+        K8scpSource.copy.copyFileFromPod(namespace, pod, path!!).use { it.transferToWithProgress(stream, size) }
     }
 
     override suspend fun transferFrom(name: String, stream: InputStream, length: Long) = TODO()
 
     override suspend fun rename(name: String) {
-        K8scpSource.copy.exec(k8scpSource.namespace, k8scpSource.pod, arrayOf("mv", path, "${path.substringBeforeLast('/', "")}/$name"), false).waitFor()
+        val (namespace, pod, path) = k8scpSource.getNamespacePodAndPath(path)
+        K8scpSource.copy.exec(namespace, pod, arrayOf("mv", path!!, "${path.substringBeforeLast('/', "")}/$name"), false).waitFor()
     }
 
     override suspend fun delete() {
-        K8scpSource.copy.exec(k8scpSource.namespace, k8scpSource.pod, arrayOf("rm", "-rf", path), false).waitFor()
+        val (namespace, pod, path) = k8scpSource.getNamespacePodAndPath(path)
+        K8scpSource.copy.exec(namespace, pod, arrayOf("rm", "-rf", path!!), false).waitFor()
     }
 
     override fun toString() = path
+
+    companion object {
+        internal val namespaceOrPodAttributes = SftpClient.Attributes().apply {
+            permissions = SftpConstants.S_IFDIR
+            modifyTime(0)
+        }
+    }
 }

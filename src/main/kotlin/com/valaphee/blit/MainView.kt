@@ -216,7 +216,7 @@ class MainView : View("Blit") {
                 }
                 column(locale["main.tree.column.modified.title"], Entry<T>::modifyTime) {
                     tableColumnBaseSetWidth(this, 125.0)
-                    cellFormat { text = dateFormat.format(it) }
+                    cellFormat { text = if (it != 0L) dateFormat.format(it) else "" }
                 }
 
                 setRowFactory {
@@ -251,7 +251,6 @@ class MainView : View("Blit") {
                         }
                     }
                 }
-
 
                 selectionModel.selectedItems.onChange {
                     contextMenu = ContextMenu().apply {
@@ -332,7 +331,7 @@ class MainView : View("Blit") {
                 setOnMousePressed {
                     if (it.isPrimaryButtonDown && it.clickCount == 2) selectionModel.selectedItem?.let {
                         val entry = it.value
-                        worker.launch(locale["main.tree.task.download.name", entry]) { Desktop.getDesktop().open(File(tmpdir, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }) } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
+                        if (!entry.directory) worker.launch(locale["main.tree.task.download.name", entry]) { Desktop.getDesktop().open(File(tmpdir, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }) } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
                     }
                 }
             }
