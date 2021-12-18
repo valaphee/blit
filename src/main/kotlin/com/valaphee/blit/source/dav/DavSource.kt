@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName
 import com.valaphee.blit.source.AbstractSource
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.features.HttpTimeout
 import io.ktor.client.features.auth.Auth
 import io.ktor.client.features.auth.providers.BasicAuthCredentials
 import io.ktor.client.features.auth.providers.basic
@@ -31,6 +32,7 @@ import io.ktor.client.features.json.Json
 import io.ktor.client.request.request
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import java.security.cert.X509Certificate
 import javax.net.ssl.SSLContext
@@ -57,6 +59,7 @@ class DavSource(
                 }
             }
             expectSuccess = false
+            install(HttpTimeout) { socketTimeoutMillis = 30 * 1000 }
             install(HttpCookies)
             Auth {
                 basic {

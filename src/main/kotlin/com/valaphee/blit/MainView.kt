@@ -254,46 +254,17 @@ class MainView : View("Blit") {
 
                 selectionModel.selectedItems.onChange {
                     contextMenu = ContextMenu().apply {
-                        item(locale["main.tree.menu.open.name"]) {
-                            action {
-                                it.list.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.name) } ?: if (Desktop.isDesktopSupported()) {
-                                    it.list.forEach {
-                                        val entry = it.value
-                                        worker.launch(locale["main.tree.task.download.name", entry]) { Desktop.getDesktop().open(File(tmpdir, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }) } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
-                                    }
-                                }
-                            }
-                        }
+                        item(locale["main.tree.menu.open.name"]) { action { it.list.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.toString()) } ?: it.list.forEach(::open) } }
                         separator()
-                        item(locale["main.tree.menu.rename.name"]) {
-                            action {
-                                it.list.forEach {
-                                    val entry = it.value
-                                    RenameView(entry.name) { name ->
-                                        worker.launch(locale["main.tree.task.rename.name", entry, name]) {
-                                            entry.rename(name)
-                                            runLater { populate(it.parent) }
-                                        }
-                                    }.openModal(resizable = false)
-                                }
-                            }
-                        }
-                        item(locale["main.tree.menu.delete.name"]) {
-                            action {
-                                it.list.forEach {
-                                    val entry = it.value
-                                    worker.launch(locale["main.tree.task.delete.name", entry]) {
-                                        entry.delete()
-                                        runLater { populate(it.parent) }
-                                    }
-                                }
-                            }
-                        }
+                        item(locale["main.tree.menu.rename.name"]) { action { it.list.forEach(::rename) } }
+                        item(locale["main.tree.menu.delete.name"]) { action { it.list.forEach(::delete) } }
                     }
                 }
 
                 setOnKeyPressed {
                     when (it.code) {
+                        KeyCode.ENTER -> selectionModel.selectedItems.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.toString()) } ?: selectionModel.selectedItems.forEach(::open)
+                        KeyCode.BACK_SPACE -> navigate(root.value.toString().substringBeforeLast('/'))
                         KeyCode.C -> if (it.isControlDown) Clipboard.getSystemClipboard().setContent {
                             worker.runBlocking(locale["main.tree.task.download.name"]) {
                                 suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
@@ -306,37 +277,43 @@ class MainView : View("Blit") {
                                 it.consume()
                             }
                         }
+                        KeyCode.D -> if (it.isControlDown) selectionModel.selectedItems.forEach(::delete)
                         KeyCode.V -> if (it.isControlDown) with(Clipboard.getSystemClipboard()) {
-                            if (hasFiles()) selectionModel.selectedItem?.let {
-                                val entry = it.value
+                            if (hasFiles()) {
+                                val item = selectionModel.selectedItem ?: root
+                                val entry = item.value
                                 if (!entry.directory) TODO()
-                                files.forEach { file ->
-                                    worker.launch(locale["main.tree.task.upload.name", file.name]) {
-                                        FileInputStream(file).use { entry.transferFrom(file.name, it, file.length()) }
-                                        runLater { populate(it.parent) }
-                                    }
-                                }
+                                files.forEach { file -> worker.launch(locale["main.tree.task.upload.name", file.name]) { FileInputStream(file).use { entry.transferFrom(file.name, it, file.length()) } } }
                             }
                         }
-                        KeyCode.DELETE -> selectionModel.selectedItems.forEach {
-                            val entry = it.value
-                            worker.launch(locale["main.tree.task.delete.name", entry]) {
-                                entry.delete()
-                                runLater { populate(it.parent) }
-                            }
-                        }
+                        KeyCode.DELETE -> selectionModel.selectedItems.forEach(::delete)
+                        KeyCode.F2 -> selectionModel.selectedItems.forEach(::rename)
                         KeyCode.F5 -> populate(root)
                     }
                 }
                 setOnMousePressed {
-                    if (it.isPrimaryButtonDown && it.clickCount == 2) selectionModel.selectedItem?.let {
-                        val entry = it.value
-                        if (!entry.directory) worker.launch(locale["main.tree.task.download.name", entry]) { Desktop.getDesktop().open(File(tmpdir, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }) } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
-                    }
+                    if (it.isPrimaryButtonDown && it.clickCount == 2) selectionModel.selectedItem?.let { if (!it.value.directory) open(it) }
                 }
             }
 
-            fun populate(item: TreeItem<Entry<T>>) {
+            private fun open(item: TreeItem<Entry<T>>) {
+                if (Desktop.isDesktopSupported()) {
+                    val entry = item.value
+                    worker.launch(locale["main.tree.task.download.name", entry]) { Desktop.getDesktop().open(File(tmpdir, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }) } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
+                }
+            }
+
+            private fun rename(item: TreeItem<Entry<T>>) {
+                val entry = item.value
+                RenameView(entry.name) { worker.launch(locale["main.tree.task.rename.name", entry, it]) { entry.rename(it) } }.openModal(resizable = false)
+            }
+
+            private fun delete(item: TreeItem<Entry<T>>) {
+                val entry = item.value
+                worker.launch(locale["main.tree.task.delete.name", entry]) { entry.delete() }
+            }
+
+            internal fun populate(item: TreeItem<Entry<T>>) {
                 worker.launch(locale["main.tree.task.populate.name", item.value]) {
                     val children = item.value!!.list()
                     runLater {

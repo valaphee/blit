@@ -20,7 +20,6 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.valaphee.blit.progress
 import com.valaphee.blit.source.AbstractEntry
 import com.valaphee.blit.source.transferToWithProgress
-import io.ktor.client.features.timeout
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
@@ -89,8 +88,6 @@ class DavEntry(
             /*jobs.joinAll()*/
 
             davSource.httpClient.request<Unit>("${davSource.url}/uploads/${davSource.username}/$id/.file") {
-                timeout { requestTimeoutMillis = Long.MAX_VALUE }
-
                 method = httpMethodMove
                 headers { this["Destination"] = "${davSource._url}/$path/$name" }
             }
@@ -122,7 +119,7 @@ class DavEntry(
     }
 
     companion object {
-        private const val chunkSize = 10485760L
+        private const val chunkSize = 10L * 1024 * 1024
 
         private fun ceil(value: Double): Int {
             val valueInt = (value + 1).toInt()
@@ -130,5 +127,3 @@ class DavEntry(
         }
     }
 }
-
-

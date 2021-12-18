@@ -18,7 +18,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     application
-    id("com.github.johnrengelman.shadow") version "7.0.0"
     id("com.palantir.git-version") version "0.12.3"
     id("edu.sc.seis.launch4j") version "2.5.0"
     kotlin("jvm") version "1.5.31"
@@ -90,6 +89,7 @@ launch4j {
     copyright = "Copyright (c) 2021, Valaphee"
     jvmOptions = setOf("--add-opens=java.base/java.nio=ALL-UNNAMED", "--add-opens java.base/jdk.internal.misc=ALL-UNNAMED", "-Dio.netty.tryReflectionSetAccessible=true")
     companyName = "Valaphee"
+    fileDescription = "Blit is a free and open-source, cross-platform WebDAV, K8s CP and SFTP client with a vast list of features."
     productName = "Blit"
 }
 
