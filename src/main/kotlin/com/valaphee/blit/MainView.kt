@@ -1,25 +1,17 @@
 /*
- * MIT License
- *
  * Copyright (c) 2021, Valaphee.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.valaphee.blit
@@ -36,8 +28,17 @@ import com.valaphee.blit.util.hWnd
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.ObservableList
+import javafx.scene.control.ContextMenu
+import javafx.scene.control.SelectionMode
+import javafx.scene.control.TableColumnBase
+import javafx.scene.control.TreeItem
+import javafx.scene.control.TreeTableRow
+import javafx.scene.control.TreeTableView
+import javafx.scene.image.ImageView
+import javafx.scene.input.Clipboard
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
+import javafx.scene.input.TransferMode
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
@@ -53,6 +54,8 @@ import tornadofx.View
 import tornadofx.action
 import tornadofx.bind
 import tornadofx.button
+import tornadofx.cellFormat
+import tornadofx.column
 import tornadofx.combobox
 import tornadofx.hbox
 import tornadofx.hgrow
@@ -62,13 +65,20 @@ import tornadofx.menu
 import tornadofx.menubar
 import tornadofx.onChange
 import tornadofx.paddingTop
+import tornadofx.populateTree
 import tornadofx.progressbar
 import tornadofx.runLater
 import tornadofx.separator
+import tornadofx.setContent
 import tornadofx.splitpane
 import tornadofx.style
 import tornadofx.vbox
 import tornadofx.vgrow
+import java.awt.Desktop
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.text.DateFormat
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -119,11 +129,11 @@ class MainView : View("Blit") {
         progressbar(work.progress)
     }
 
-    inner class Pane<T : Entry<T>> : VBox(), Navigator {
+    inner class Pane<T : Entry<T>> : VBox() {
         private val source = SimpleObjectProperty<Source<T>>().apply { onChange { it?.let { navigate(it.home) } } }
         private lateinit var _path: String
         private val name = SimpleStringProperty()
-        private val tree = Tree<T>(locale, iconManifest, _config, work, this)
+        private val tree = Tree<T>()
 
         init {
             hgrow = Priority.ALWAYS
@@ -161,7 +171,7 @@ class MainView : View("Blit") {
             add(tree)
         }
 
-        override fun navigate(path: String) {
+        fun navigate(path: String) {
             val normalizedPath = normalizePath(path)
 
             if (::_path.isInitialized && normalizedPath == _path) return
@@ -171,7 +181,6 @@ class MainView : View("Blit") {
                 work.launch(locale["main.navigator.task.navigate.name", path]) {
                     if (source.isValid(normalizedPath)) {
                         val item = source.get(normalizedPath).item
-
                         runLater {
                             name.value = null
                             tree.root = item
@@ -182,10 +191,151 @@ class MainView : View("Blit") {
             }
         }
 
-        override fun navigateRelative(path: String) = navigate(if (path.startsWith('/')) path else tree.root.value.toString() + "/$path")
+        fun navigateRelative(path: String) = navigate(if (path.startsWith('/')) path else tree.root.value.toString() + "/$path")
+
+        inner class Tree<T : Entry<T>>() : TreeTableView<Entry<T>>() {
+            init {
+                vgrow = Priority.ALWAYS
+                isShowRoot = false
+                selectionModel.selectionMode = SelectionMode.MULTIPLE
+
+                column(locale["main.tree.column.name.title"], Entry<T>::self) {
+                    tableColumnBaseSetWidth(this, 250.0)
+                    cellFormat {
+                        val name = it.name
+                        text = name
+                        graphic = if (it.directory) ImageView((iconManifest.folderIcons.firstOrNull { it.folderNames.contains(name) } ?: iconManifest.defaultFolderIcon).image) else {
+                            val extension = name.substringAfterLast('.', "")
+                            ImageView((iconManifest.fileIcons.firstOrNull { it.fileExtensions.contains(extension) || it.fileNames.contains(name) } ?: iconManifest.defaultFileIcon).image)
+                        }
+                    }
+                    setComparator { a, b -> a.name.compareTo(b.name) }
+                }
+                column(locale["main.tree.column.size.title"], Entry<T>::self) {
+                    tableColumnBaseSetWidth(this, 75.0)
+                    cellFormat { text = if (it.directory) "" else _config.dataSizeUnit.format(it.size) }
+                    setComparator { a, b -> a.size.compareTo(b.size) }
+                }
+                column(locale["main.tree.column.modified.title"], Entry<T>::modifyTime) {
+                    tableColumnBaseSetWidth(this, 125.0)
+                    cellFormat { text = dateFormat.format(it) }
+                }
+
+                setRowFactory {
+                    object : TreeTableRow<Entry<T>>() {
+                        init {
+                            setOnDragDetected {
+                                startDragAndDrop(TransferMode.MOVE).apply {
+                                    setContent {
+                                        work.runBlocking(locale["main.tree.task.download.name"]) {
+                                            suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
+                                                File(tmpdir, entry.name).mkdir()
+                                                entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
+                                            } else listOf(File(tmpdir, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
+
+                                            putFiles(selectionModel.selectedItems.flatMap { flatten(it.value) })
+                                        }
+                                    }
+                                }
+
+                                it.consume()
+                            }
+                            setOnDragOver {
+                                if (it.gestureSource != this && it.dragboard.hasFiles()) it.acceptTransferModes(*TransferMode.COPY_OR_MOVE)
+
+                                it.consume()
+                            }
+                            setOnDragDropped {
+                                it.isDropCompleted = true
+
+                                it.consume()
+                            }
+                        }
+                    }
+                }
+                setOnKeyPressed {
+                    when (it.code) {
+                        KeyCode.C -> if (it.isControlDown) Clipboard.getSystemClipboard().setContent {
+                            work.runBlocking(locale["main.tree.task.download.name"]) {
+                                suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
+                                    File(tmpdir, entry.name).mkdir()
+                                    entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
+                                } else listOf(File(tmpdir, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
+
+                                putFiles(selectionModel.selectedItems.flatMap { flatten(it.value) })
+
+                                it.consume()
+                            }
+                        }
+                        KeyCode.V -> if (it.isControlDown) with(Clipboard.getSystemClipboard()) {
+                            if (hasFiles()) {
+                                val entry = selectionModel.selectedItem.value
+                                if (!entry.directory) TODO()
+                                files.forEach { file -> work.launch(locale["main.tree.task.upload.name", file.name]) { FileInputStream(file).use { entry.transferFrom(file.name, it, file.length()) } } }
+                            }
+                        }
+                        KeyCode.DELETE -> selectionModel.selectedItems.forEach {
+                            val entry = it.value
+                            work.launch(locale["main.tree.task.delete.name", entry]) {
+                                entry.delete()
+                                runLater { populate(it.parent) }
+                            }
+                        }
+                    }
+                }
+
+                selectionModel.selectedItems.onChange {
+                    contextMenu = ContextMenu().apply {
+                        item(locale["main.tree.menu.open.name"]) {
+                            action {
+                                it.list.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.name) } ?: if (Desktop.isDesktopSupported()) {
+                                    it.list.forEach {
+                                        val entry = it.value
+                                        work.launch(locale["main.tree.task.download.name", entry]) { Desktop.getDesktop().open(File(tmpdir, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }) } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
+                                    }
+                                }
+                            }
+                        }
+                        separator()
+                        item(locale["main.tree.menu.delete.name"]) {
+                            action {
+                                it.list.forEach {
+                                    val entry = it.value
+                                    work.launch(locale["main.tree.task.delete.name", entry]) {
+                                        entry.delete()
+                                        runLater { populate(it.parent) }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            fun populate(item: TreeItem<Entry<T>>) {
+                work.launch(locale["main.tree.task.populate.name", item.value]) {
+                    val children = item.value!!.list()
+                    runLater {
+                        populateTree(item, { entry ->
+                            if (entry.directory) object : TreeItem<Entry<T>>(entry) {
+                                init {
+                                    expandedProperty().onChange { if (it) populate(this) }
+                                }
+
+                                override fun isLeaf() = false
+                            } else TreeItem(entry)
+                        }) { if (it.isExpanded) children else emptyList() }
+                    }
+                }
+            }
+        }
     }
 
     companion object {
+        private val tableColumnBaseSetWidth = TableColumnBase::class.java.getDeclaredMethod("setWidth", Double::class.java).apply { isAccessible = true }
+        private val dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, java.util.Locale.getDefault())
+        private val tmpdir = System.getProperty("java.io.tmpdir")
+
         private fun normalizePath(path: String): String {
             val normalizedPath = path.replace('\\', '/').replace("//", "/").replace("//", "/")
             return if (normalizedPath.length <= 1) normalizedPath else normalizedPath.removeSuffix("/")
