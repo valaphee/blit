@@ -18,7 +18,6 @@ package com.valaphee.blit.source.dav
 
 import com.valaphee.blit.source.Source
 import com.valaphee.blit.source.SourceUi
-import javafx.beans.property.SimpleBooleanProperty
 import javafx.event.EventTarget
 import javafx.scene.control.CheckBox
 import javafx.scene.control.TextField
@@ -27,6 +26,7 @@ import tornadofx.checkbox
 import tornadofx.field
 import tornadofx.passwordfield
 import tornadofx.textfield
+import tornadofx.toProperty
 
 /**
  * @author Kevin Ludwig
@@ -40,11 +40,9 @@ object DavSourceUi : SourceUi {
         listOf(
             field("Name") { textfield(source?.name ?: "") },
             field("Url") { textfield(davSource?.url ?: "") },
-            field("Auth") {
-                textfield(davSource?.username ?: "")
-                passwordfield(davSource?.password ?: "")
-            },
-            field("Nextcloud") { checkbox(property = SimpleBooleanProperty(davSource?.nextcloud ?: false)) },
+            field("Username") { textfield(davSource?.username ?: "") },
+            field("Password") { passwordfield(davSource?.password ?: "") },
+            field("Nextcloud") { checkbox(property = davSource?.nextcloud.toProperty()) },
         )
     }
 
@@ -52,7 +50,7 @@ object DavSourceUi : SourceUi {
         (fields[0].inputs[0] as TextField).text,
         (fields[1].inputs[0] as TextField).text,
         (fields[2].inputs[0] as TextField).text,
-        (fields[2].inputs[1] as TextField).text,
-        (fields[3].inputs[0] as CheckBox).isSelected,
+        (fields[3].inputs[0] as TextField).text,
+        (fields[4].inputs[0] as CheckBox).isSelected,
     )
 }

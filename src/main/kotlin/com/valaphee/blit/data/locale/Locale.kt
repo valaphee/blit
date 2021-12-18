@@ -42,6 +42,8 @@ class Locale(
         }).also { entryFormats[key] = it }).format(arguments)
     } ?: key
 
+    fun toJavaLocale(): java.util.Locale = java.util.Locale.forLanguageTag(key.replace('_', '-'))
+
     companion object {
         private val pattern = Pattern.compile("\\{(\\D*?)}")
 

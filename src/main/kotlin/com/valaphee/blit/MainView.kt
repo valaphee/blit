@@ -100,6 +100,7 @@ class MainView : View("Blit") {
             }
         }
     }
+    private val dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, locale.toJavaLocale())
 
     override val root = vbox {
         JMetro(this, Style.DARK)
@@ -357,7 +358,6 @@ class MainView : View("Blit") {
 
     companion object {
         private val tableColumnBaseSetWidth = TableColumnBase::class.java.getDeclaredMethod("setWidth", Double::class.java).apply { isAccessible = true }
-        private val dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, java.util.Locale.getDefault())
         private val tmpdir = System.getProperty("java.io.tmpdir")
 
         private fun normalizePath(path: String): String {

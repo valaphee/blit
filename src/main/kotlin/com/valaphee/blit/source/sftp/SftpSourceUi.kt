@@ -19,13 +19,20 @@ package com.valaphee.blit.source.sftp
 import com.valaphee.blit.source.Source
 import com.valaphee.blit.source.SourceUi
 import javafx.event.EventTarget
+import javafx.scene.control.CheckBox
 import javafx.scene.control.TextField
 import tornadofx.Field
+import tornadofx.action
+import tornadofx.button
+import tornadofx.checkbox
+import tornadofx.chooseFile
 import tornadofx.field
 import tornadofx.filterInput
 import tornadofx.isInt
 import tornadofx.passwordfield
 import tornadofx.textfield
+import tornadofx.toProperty
+import java.io.File
 
 /**
  * @author Kevin Ludwig
@@ -38,13 +45,22 @@ object SftpSourceUi : SourceUi {
         val sftpSource = source as? SftpSource
         listOf(
             field("Name") { textfield(source?.name ?: "") },
-            field("Address") {
-                textfield(sftpSource?.host ?: "")
-                textfield(sftpSource?.port?.toString() ?: "") { filterInput { it.controlNewText.isInt() } }
-            },
-            field("Auth") {
-                textfield(sftpSource?.username ?: "")
+            field("Host") { textfield(sftpSource?.host ?: "") },
+            field("Port") { textfield(sftpSource?.port?.toString() ?: "") { filterInput { it.controlNewText.isInt() } } },
+            field("Username") { textfield(sftpSource?.username ?: "") },
+            field("Password") {
+                checkbox(property = (sftpSource?.password != null).toProperty())
                 passwordfield(sftpSource?.password ?: "")
+            },
+            field("Private Key") {
+                checkbox(property = (sftpSource?.privateKey != null).toProperty())
+                val path = textfield(sftpSource?.privateKey ?: "")
+                button("...") {
+                    action {
+                        val parentPath = if (path.text.isEmpty()) null else File(path.text).parentFile
+                        chooseFile("Select Private Key", emptyArray(), if (parentPath?.isDirectory == true) parentPath else null).firstOrNull()?.let { path.text = it.absolutePath }
+                    }
+                }
             }
         )
     }
@@ -52,8 +68,9 @@ object SftpSourceUi : SourceUi {
     override fun getSource(fields: List<Field>) = SftpSource(
         (fields[0].inputs[0] as TextField).text,
         (fields[1].inputs[0] as TextField).text,
-        (fields[1].inputs[1] as TextField).text.toInt(),
-        (fields[2].inputs[0] as TextField).text,
-        (fields[2].inputs[1] as TextField).text
+        (fields[2].inputs[0] as TextField).text.toInt(),
+        (fields[3].inputs[0] as TextField).text,
+        if ((fields[4].inputs[0] as CheckBox).isSelected) (fields[4].inputs[1] as TextField).text else null,
+        if ((fields[5].inputs[0] as CheckBox).isSelected) (fields[5].inputs[1] as TextField).text else null
     )
 }

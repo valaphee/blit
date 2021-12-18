@@ -21,9 +21,12 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeName
 import com.valaphee.blit.source.AbstractSource
 import org.apache.sshd.client.SshClient
+import org.apache.sshd.client.session.ClientSession
+import org.apache.sshd.common.config.keys.loader.openssh.OpenSSHKeyPairResourceParser
 import org.apache.sshd.sftp.client.SftpClient
 import org.apache.sshd.sftp.client.impl.DefaultSftpClientFactory
 import org.apache.sshd.sftp.common.SftpException
+import java.nio.file.Paths
 
 /**
  * @author Kevin Ludwig
@@ -34,16 +37,19 @@ class SftpSource(
     @get:JsonProperty("host") val host: String,
     @get:JsonProperty("port") val port: Int,
     @get:JsonProperty("username") val username: String,
-    @get:JsonProperty("password") val password: String
+    @get:JsonProperty("password") val password: String?,
+    @get:JsonProperty("private_key") val privateKey: String?
 ) : AbstractSource<SftpEntry>(name) {
-    @get:JsonIgnore internal val sftpClient: SftpClient by lazy {
-        val sshSession = ssh.connect(username, host, port).verify(30000).session
-        sshSession.addPasswordIdentity(password)
-        sshSession.auth().verify(30000)
-        DefaultSftpClientFactory.INSTANCE.createSftpClient(sshSession)
+    @get:JsonIgnore private val sshSession: ClientSession by lazy {
+        val sshSession = ssh.connect(username, host, port).verify().session
+        password?.let { sshSession.addPasswordIdentity(it) }
+        privateKey?.let { OpenSSHKeyPairResourceParser.INSTANCE.loadKeyPairs(null, Paths.get(it), { _, _, _ -> TODO() }).firstOrNull()?.let { sshSession.addPublicKeyIdentity(it) } }
+        sshSession.auth().verify()
+        sshSession
     }
+    @get:JsonIgnore internal val sftpClient: SftpClient by lazy { DefaultSftpClientFactory.INSTANCE.createSftpClient(sshSession) }
 
-    override val home get() = "." // TODO: pwd
+    override val home: String get() = /*sshSession.executeRemoteCommand("pwd")*/"." // TODO: pwd
 
     override suspend fun isValid(path: String) = try {
         sftpClient.stat(path).isDirectory
