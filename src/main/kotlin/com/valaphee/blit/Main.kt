@@ -16,13 +16,11 @@
 
 package com.valaphee.blit
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.inject.AbstractModule
 import com.google.inject.Guice
 import com.google.inject.Provides
 import com.google.inject.Singleton
 import com.valaphee.blit.data.DataModule
-import com.valaphee.blit.data.config.Config
 import com.valaphee.blit.data.locale.Locale
 import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory
 import javafx.scene.image.Image
@@ -30,7 +28,6 @@ import tornadofx.App
 import tornadofx.DIContainer
 import tornadofx.FX
 import tornadofx.launch
-import java.io.File
 import kotlin.reflect.KClass
 
 /**
@@ -44,11 +41,8 @@ fun main(arguments: Array<String>) {
     val injector = Guice.createInjector(DataModule(), object : AbstractModule() {
         @Singleton
         @Provides
-        fun i18n(locales: Map<String, @JvmSuppressWildcards Locale>) = locales["en_us"]
+        fun locale(locales: Map<String, @JvmSuppressWildcards Locale>) = locales["en_us"]
     })
-
-    val configFile = File(File("data").also(File::mkdir), "config.json")
-    if (!configFile.exists()) injector.getInstance(ObjectMapper::class.java).writeValue(configFile, injector.getInstance(Config::class.java)) // TODO
 
     FX.dicontainer = object : DIContainer {
         override fun <T : Any> getInstance(type: KClass<T>) = injector.getInstance(type.java)

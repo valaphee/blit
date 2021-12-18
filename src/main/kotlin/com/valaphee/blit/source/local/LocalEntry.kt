@@ -17,6 +17,7 @@
 package com.valaphee.blit.source.local
 
 import com.valaphee.blit.source.AbstractEntry
+import com.valaphee.blit.source.transferToWithProgress
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -37,14 +38,16 @@ class LocalEntry(
     override suspend fun list() = path.listFiles()?.map { LocalEntry(it) } ?: emptyList()
 
     override suspend fun transferTo(stream: OutputStream) {
-        FileInputStream(path).use { it.transferTo(stream) }
+        FileInputStream(path).use { it.transferToWithProgress(stream, size) }
     }
 
     override suspend fun transferFrom(name: String, stream: InputStream, length: Long) {
-        FileOutputStream("$path/$name").use { stream.transferTo(it) }
+        FileOutputStream("$path/$name").use { stream.transferToWithProgress(it, size) }
     }
 
-    override suspend fun delete() = TODO()
+    override suspend fun delete() {
+        path.delete()
+    }
 
     override fun toString() = path.toString()
 }

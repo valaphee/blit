@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit.util
+package com.valaphee.blit
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder
 import javafx.beans.property.DoubleProperty
@@ -37,8 +37,8 @@ import kotlin.coroutines.CoroutineContext
 /**
  * @author Kevin Ludwig
  */
-class Work {
-    private val coroutineScope = CoroutineScope(Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), ThreadFactoryBuilder().setNameFormat("blit-%d").build()).asCoroutineDispatcher() + SupervisorJob())
+class Worker {
+    private val coroutineScope = CoroutineScope(Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), ThreadFactoryBuilder().setNameFormat("blit-%d").setDaemon(true).build()).asCoroutineDispatcher() + SupervisorJob())
     private val tasks = ConcurrentLinkedDeque<Task>()
 
     val name: StringProperty = SimpleStringProperty("")
@@ -71,5 +71,5 @@ class Work {
 }
 
 var CoroutineContext.progress: Double
-    get() = get(Work.Task)!!.progress.value
-    set(value) { get(Work.Task)!!.progress.value = value }
+    get() = get(Worker.Task)!!.progress.value
+    set(value) { get(Worker.Task)!!.progress.value = value }

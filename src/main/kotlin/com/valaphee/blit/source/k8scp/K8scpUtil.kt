@@ -28,7 +28,7 @@ private val spaces = "\\s+".toRegex()
 private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSSSSS Z")
 
 internal fun K8scpSource.stat(path: String): SftpClient.Attributes? {
-    val process = K8scpSource.exec.exec(namespace, pod, arrayOf("stat", "--format", "%A 0 %U %G %s %y %n", path), false)
+    val process = K8scpSource.copy.exec(namespace, pod, arrayOf("stat", "--format", "%A 0 %U %G %s %y %n", path), false)
     val attributes = BufferedReader(InputStreamReader(process.inputStream)).use { parseLsEntry(it.readText())?.second }
     process.waitFor()
     return attributes

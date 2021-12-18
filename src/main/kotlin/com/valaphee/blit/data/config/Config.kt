@@ -17,18 +17,11 @@
 package com.valaphee.blit.data.config
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonDeserializer
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.google.inject.Singleton
 import com.valaphee.blit.data.Data
 import com.valaphee.blit.data.DataType
 import com.valaphee.blit.source.Source
 import com.valaphee.blit.source.local.LocalSource
-import javafx.collections.FXCollections
-import javafx.collections.ObservableList
 import java.lang.Long.signum
 import java.text.StringCharacterIterator
 import kotlin.math.abs
@@ -39,8 +32,8 @@ import kotlin.math.abs
 @Singleton
 @DataType("config")
 class Config(
-    @get:JsonProperty("data_size_unit") var dataSizeUnit: DataSizeUnit = DataSizeUnit.IEC,
-    @get:JsonProperty("sources") @get:JsonDeserialize(using = SourceObservableListDeserializer::class) val sources: ObservableList<Source<*>> = FXCollections.observableArrayList(LocalSource("local"))
+    @get:JsonProperty("data_size_unit") val dataSizeUnit: DataSizeUnit = DataSizeUnit.IEC,
+    @get:JsonProperty("sources") val sources: List<Source<*>> = listOf(LocalSource("local"))
 ) : Data {
     enum class DataSizeUnit(
         val format: (Long) -> String
@@ -71,11 +64,5 @@ class Config(
                 String.format("%.1f %cB", sizeVar / 1000.0, suffix.current())
             }
         })
-    }
-
-    companion object {
-        class SourceObservableListDeserializer : JsonDeserializer<ObservableList<Source<*>>>() {
-            override fun deserialize(parser: JsonParser, context: DeserializationContext): ObservableList<Source<*>> = FXCollections.observableList(parser.readValueAs<List<Source<*>>>(object : TypeReference<List<Source<*>>>() {}))
-        }
     }
 }

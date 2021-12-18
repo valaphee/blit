@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit.util
+package com.valaphee.blit
 
 import com.sun.javafx.tk.TKStage
 import javafx.stage.Stage

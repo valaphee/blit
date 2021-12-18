@@ -17,26 +17,22 @@
 package com.valaphee.blit.data.config
 
 import com.valaphee.blit.data.locale.Locale
-import javafx.beans.property.SimpleObjectProperty
 import tornadofx.Fragment
 import tornadofx.combobox
 import tornadofx.field
 import tornadofx.fieldset
 import tornadofx.form
-import tornadofx.onChange
 
 /**
  * @author Kevin Ludwig
  */
 class ConfigViewGeneral : Fragment("General") {
     private val locale by di<Locale>()
-    private val _config by di<Config>()
-
-    private val dataSizeUnit = SimpleObjectProperty(_config.dataSizeUnit).apply { onChange { it?.let { _config.dataSizeUnit = it } } }
+    private val _config by di<ConfigModel>()
 
     override val root = form {
         fieldset {
-            field(locale["config.general.data_size_unit.text"]) { combobox(dataSizeUnit, values = Config.DataSizeUnit.values().toList()) }
+            field(locale["config.general.data_size_unit.text"]) { combobox(_config.dataSizeUnit, values = Config.DataSizeUnit.values().toList()) }
         }
     }
 }

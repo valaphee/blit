@@ -17,6 +17,7 @@
 package com.valaphee.blit.source.k8scp
 
 import com.valaphee.blit.source.AbstractEntry
+import com.valaphee.blit.source.transferToWithProgress
 import org.apache.sshd.sftp.client.SftpClient
 import java.io.BufferedReader
 import java.io.InputStream
@@ -37,19 +38,21 @@ class K8scpEntry(
     override val directory get() = attributes.isDirectory
 
     override suspend fun list() = if (directory) {
-        val process = K8scpSource.exec.exec(k8scpSource.namespace, k8scpSource.pod, arrayOf("ls", "-l", "--full-time", path), false)
+        val process = K8scpSource.copy.exec(k8scpSource.namespace, k8scpSource.pod, arrayOf("ls", "-l", "--full-time", path), false)
         val list = BufferedReader(InputStreamReader(process.inputStream)).use { it.readLines().mapNotNull { parseLsEntry(it)?.let { K8scpEntry(k8scpSource, "$path/${it.first}", it.second) } } }
         process.waitFor()
         list
     } else emptyList()
 
     override suspend fun transferTo(stream: OutputStream) {
-        K8scpSource.copy.copyFileFromPod(k8scpSource.namespace, k8scpSource.pod, toString()).use { it.transferTo(stream) }
+        K8scpSource.copy.copyFileFromPod(k8scpSource.namespace, k8scpSource.pod, toString()).use { it.transferToWithProgress(stream, size) }
     }
 
     override suspend fun transferFrom(name: String, stream: InputStream, length: Long) = TODO()
 
-    override suspend fun delete() = TODO()
+    override suspend fun delete() {
+        K8scpSource.copy.exec(k8scpSource.namespace, k8scpSource.pod, arrayOf("rm", "-rf", path), false).waitFor()
+    }
 
     override fun toString() = path
 }

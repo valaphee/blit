@@ -16,33 +16,35 @@
 
 package com.valaphee.blit
 
+import javafx.geometry.Pos
+import javafx.scene.image.Image
 import javafx.scene.text.TextAlignment
 import jfxtras.styles.jmetro.JMetro
 import jfxtras.styles.jmetro.JMetroStyleClass
 import jfxtras.styles.jmetro.Style
 import tornadofx.View
-import tornadofx.borderpane
-import tornadofx.center
+import tornadofx.hbox
+import tornadofx.imageview
 import tornadofx.label
 
 /**
  * @author Kevin Ludwig
  */
 class AboutView : View("About Blit") {
-    override val root = borderpane {
-        prefWidth = 300.0
-        prefHeight = 100.0
-
+    override val root = hbox {
         JMetro(this, Style.DARK)
         styleClass.add(JMetroStyleClass.BACKGROUND)
 
-        center {
-            label(
-                """
-                    Blit
-                    Copyright (c) 2021, Valaphee.
-                """.trimIndent()
-            ) { textAlignment = TextAlignment.CENTER }
-        }
+        prefWidth = 300.0
+        prefHeight = 100.0
+        alignment = Pos.CENTER
+
+        imageview(Image(AboutView::class.java.getResourceAsStream("/app.png")))
+        label(
+            """
+            Blit${AboutView::class.java.`package`.implementationVersion?.let { " $it" } ?: ""}
+            Copyright (c) 2021, Valaphee.
+        """.trimIndent()
+        ) { textAlignment = TextAlignment.CENTER }
     }
 }

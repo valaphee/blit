@@ -16,7 +16,6 @@
 
 package com.valaphee.blit.data.config
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.valaphee.blit.data.locale.Locale
 import javafx.scene.control.TabPane
 import javafx.scene.layout.Priority
@@ -28,19 +27,18 @@ import tornadofx.View
 import tornadofx.action
 import tornadofx.button
 import tornadofx.buttonbar
+import tornadofx.enableWhen
 import tornadofx.tab
 import tornadofx.tabpane
 import tornadofx.vbox
 import tornadofx.vgrow
-import java.io.File
 
 /**
  * @author Kevin Ludwig
  */
 class ConfigView : View("Configure Blit") {
     private val locale by di<Locale>()
-    private val _config by di<Config>()
-    private val objectMapper by di<ObjectMapper>()
+    private val configModel by di<ConfigModel>()
 
     override val root = vbox {
         JMetro(this, Style.DARK)
@@ -59,12 +57,20 @@ class ConfigView : View("Configure Blit") {
         buttonbar {
             button(locale["config.ok.text"]) {
                 action {
-                    objectMapper.writeValue(File(File("data").also(File::mkdir), "config.json"), _config)
+                    configModel.commit()
                     (scene.window as Stage).close()
                 }
             }
-            button(locale["config.cancel.text"]) { action { (scene.window as Stage).close() } }
-            button(locale["config.apply.text"]) { action { objectMapper.writeValue(File(File("data").also(File::mkdir), "config.json"), _config) } }
+            button(locale["config.cancel.text"]) {
+                action {
+                    configModel.rollback()
+                    (scene.window as Stage).close()
+                }
+            }
+            button(locale["config.apply.text"]) {
+                enableWhen(configModel.dirty)
+                action(configModel::commit)
+            }
         }
     }
 }

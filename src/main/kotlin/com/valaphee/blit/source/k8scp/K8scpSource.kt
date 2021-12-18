@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeName
 import com.valaphee.blit.source.AbstractSource
 import io.kubernetes.client.Copy
-import io.kubernetes.client.Exec
 import io.kubernetes.client.util.Config
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -35,7 +34,7 @@ class K8scpSource(
     @get:JsonProperty("pod") val pod: String
 ) : AbstractSource<K8scpEntry>(name) {
     override val home: String get() {
-        val process = exec.exec(namespace, pod, arrayOf("pwd", toString()), false)
+        val process = copy.exec(namespace, pod, arrayOf("pwd", toString()), false)
         val home = BufferedReader(InputStreamReader(process.inputStream)).use { it.readLine() }
         process.waitFor()
         return home
@@ -47,8 +46,6 @@ class K8scpSource(
 
     companion object {
         private val apiClient = Config.defaultClient()
-        internal val exec = Exec(apiClient)
         internal val copy = Copy(apiClient)
-
     }
 }

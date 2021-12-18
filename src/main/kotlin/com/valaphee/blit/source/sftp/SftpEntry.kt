@@ -17,6 +17,7 @@
 package com.valaphee.blit.source.sftp
 
 import com.valaphee.blit.source.AbstractEntry
+import com.valaphee.blit.source.transferToWithProgress
 import org.apache.sshd.sftp.client.SftpClient
 import java.io.InputStream
 import java.io.OutputStream
@@ -44,12 +45,14 @@ class SftpEntry(
     } else emptyList()
 
     override suspend fun transferTo(stream: OutputStream) {
-        sftpSource.sftpClient.read(toString()).use { it.transferTo(stream) }
+        sftpSource.sftpClient.read(toString()).use { it.transferToWithProgress(stream, size) }
     }
 
     override suspend fun transferFrom(name: String, stream: InputStream, length: Long) = TODO()
 
-    override suspend fun delete() = TODO()
+    override suspend fun delete() {
+        sftpSource.sftpClient.remove(path)
+    }
 
     override fun toString() = path
 }

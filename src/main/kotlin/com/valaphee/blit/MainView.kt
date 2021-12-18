@@ -16,15 +16,12 @@
 
 package com.valaphee.blit
 
-import com.valaphee.blit.data.config.Config
+import com.valaphee.blit.data.config.ConfigModel
 import com.valaphee.blit.data.config.ConfigView
 import com.valaphee.blit.data.locale.Locale
 import com.valaphee.blit.data.manifest.IconManifest
 import com.valaphee.blit.source.Entry
 import com.valaphee.blit.source.Source
-import com.valaphee.blit.util.Work
-import com.valaphee.blit.util.comExecutor
-import com.valaphee.blit.util.hWnd
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.ObservableList
@@ -87,9 +84,9 @@ import java.util.concurrent.CompletableFuture
 class MainView : View("Blit") {
     private val locale by di<Locale>()
     private val iconManifest by di<IconManifest>()
-    private val _config by di<Config>()
+    private val _config by di<ConfigModel>()
 
-    private val work = Work().apply {
+    private val worker = Worker().apply {
         val version = System.getProperty("os.version").toFloatOrNull()
         if (System.getProperty("os.name").startsWith("Windows") && version != null && version >= 6.1f) {
             val iTaskbarList3 = CompletableFuture.supplyAsync({ COMRuntime.newInstance(ITaskbarList3::class.java) }, comExecutor).join()
@@ -125,8 +122,8 @@ class MainView : View("Blit") {
             @Suppress("UPPER_BOUND_VIOLATED_WARNING") add(Pane<Entry<*>>())
             @Suppress("UPPER_BOUND_VIOLATED_WARNING") add(Pane<Entry<*>>())
         }
-        label(work.name)
-        progressbar(work.progress)
+        label(worker.name)
+        progressbar(worker.progress)
     }
 
     inner class Pane<T : Entry<T>> : VBox() {
@@ -152,7 +149,7 @@ class MainView : View("Blit") {
                     left = BreadCrumbBar<String>().apply {
                         style(true) { paddingTop = 2.0 }
 
-                        tree.rootProperty().onChange { it?.let { selectedCrumb = BreadCrumbBar.buildTreeModel(*normalizePath(it.value.toString()).split('/').toTypedArray()) } }
+                        tree.rootProperty().onChange { it?.let { selectedCrumb = if (it.value.toString() == "/") BreadCrumbBar.buildTreeModel("/") else BreadCrumbBar.buildTreeModel(*normalizePath(it.value.toString()).split('/').toTypedArray().apply { if (this[0].isEmpty()) this[0] = "/" }) } }
                         selectedCrumbProperty().onChange {
                             val path = StringBuilder()
                             var item = it
@@ -171,14 +168,14 @@ class MainView : View("Blit") {
             add(tree)
         }
 
-        fun navigate(path: String) {
+        private fun navigate(path: String) {
             val normalizedPath = normalizePath(path)
 
             if (::_path.isInitialized && normalizedPath == _path) return
             _path = normalizedPath
 
             source.value?.let { source ->
-                work.launch(locale["main.navigator.task.navigate.name", path]) {
+                worker.launch(locale["main.navigator.task.navigate.name", normalizedPath]) {
                     if (source.isValid(normalizedPath)) {
                         val item = source.get(normalizedPath).item
                         runLater {
@@ -193,7 +190,7 @@ class MainView : View("Blit") {
 
         fun navigateRelative(path: String) = navigate(if (path.startsWith('/')) path else tree.root.value.toString() + "/$path")
 
-        inner class Tree<T : Entry<T>>() : TreeTableView<Entry<T>>() {
+        inner class Tree<T : Entry<T>> : TreeTableView<Entry<T>>() {
             init {
                 vgrow = Priority.ALWAYS
                 isShowRoot = false
@@ -213,7 +210,7 @@ class MainView : View("Blit") {
                 }
                 column(locale["main.tree.column.size.title"], Entry<T>::self) {
                     tableColumnBaseSetWidth(this, 75.0)
-                    cellFormat { text = if (it.directory) "" else _config.dataSizeUnit.format(it.size) }
+                    cellFormat { text = if (it.directory) "" else _config.dataSizeUnit.value.format(it.size) }
                     setComparator { a, b -> a.size.compareTo(b.size) }
                 }
                 column(locale["main.tree.column.modified.title"], Entry<T>::modifyTime) {
@@ -227,7 +224,7 @@ class MainView : View("Blit") {
                             setOnDragDetected {
                                 startDragAndDrop(TransferMode.MOVE).apply {
                                     setContent {
-                                        work.runBlocking(locale["main.tree.task.download.name"]) {
+                                        worker.runBlocking(locale["main.tree.task.download.name"]) {
                                             suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
                                                 File(tmpdir, entry.name).mkdir()
                                                 entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
@@ -256,7 +253,7 @@ class MainView : View("Blit") {
                 setOnKeyPressed {
                     when (it.code) {
                         KeyCode.C -> if (it.isControlDown) Clipboard.getSystemClipboard().setContent {
-                            work.runBlocking(locale["main.tree.task.download.name"]) {
+                            worker.runBlocking(locale["main.tree.task.download.name"]) {
                                 suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
                                     File(tmpdir, entry.name).mkdir()
                                     entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
@@ -271,12 +268,12 @@ class MainView : View("Blit") {
                             if (hasFiles()) {
                                 val entry = selectionModel.selectedItem.value
                                 if (!entry.directory) TODO()
-                                files.forEach { file -> work.launch(locale["main.tree.task.upload.name", file.name]) { FileInputStream(file).use { entry.transferFrom(file.name, it, file.length()) } } }
+                                files.forEach { file -> worker.launch(locale["main.tree.task.upload.name", file.name]) { FileInputStream(file).use { entry.transferFrom(file.name, it, file.length()) } } }
                             }
                         }
                         KeyCode.DELETE -> selectionModel.selectedItems.forEach {
                             val entry = it.value
-                            work.launch(locale["main.tree.task.delete.name", entry]) {
+                            worker.launch(locale["main.tree.task.delete.name", entry]) {
                                 entry.delete()
                                 runLater { populate(it.parent) }
                             }
@@ -291,7 +288,7 @@ class MainView : View("Blit") {
                                 it.list.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.name) } ?: if (Desktop.isDesktopSupported()) {
                                     it.list.forEach {
                                         val entry = it.value
-                                        work.launch(locale["main.tree.task.download.name", entry]) { Desktop.getDesktop().open(File(tmpdir, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }) } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
+                                        worker.launch(locale["main.tree.task.download.name", entry]) { Desktop.getDesktop().open(File(tmpdir, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }) } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
                                     }
                                 }
                             }
@@ -301,7 +298,7 @@ class MainView : View("Blit") {
                             action {
                                 it.list.forEach {
                                     val entry = it.value
-                                    work.launch(locale["main.tree.task.delete.name", entry]) {
+                                    worker.launch(locale["main.tree.task.delete.name", entry]) {
                                         entry.delete()
                                         runLater { populate(it.parent) }
                                     }
@@ -313,7 +310,7 @@ class MainView : View("Blit") {
             }
 
             fun populate(item: TreeItem<Entry<T>>) {
-                work.launch(locale["main.tree.task.populate.name", item.value]) {
+                worker.launch(locale["main.tree.task.populate.name", item.value]) {
                     val children = item.value!!.list()
                     runLater {
                         populateTree(item, { entry ->

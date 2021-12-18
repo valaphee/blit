@@ -48,7 +48,7 @@ import tornadofx.vgrow
  */
 class ConfigViewSources : Fragment("Sources") {
     private val locale by di<Locale>()
-    private val _config by di<Config>()
+    private val _config by di<ConfigModel>()
 
     private val source = SimpleObjectProperty<Source<*>>().apply {
         onChange {

@@ -50,13 +50,15 @@ class DataModule(
         ClassGraph().acceptPaths("data").scan().use {
             val (keyed, other) = (it.allResources.map { it.url } + path.walk().filter { it.isFile }.map { it.toURI().toURL() })
                 .mapNotNull {
-                    when (it.file.substring(it.file.lastIndexOf('.') + 1)) {
-                        "json" -> {
-                            @Suppress("UNCHECKED_CAST")
-                            objectMapper.readValue<Data>(it)
+                    try {
+                        when (it.file.substring(it.file.lastIndexOf('.') + 1)) {
+                            "json" -> {
+                                @Suppress("UNCHECKED_CAST")
+                                objectMapper.readValue<Data>(it)
+                            }
+                            else -> null
                         }
-                        else -> null
-                    }
+                    } catch (_: Throwable) {}
                 }
                 .partition { it is KeyedData }
             keyed.filterIsInstance<KeyedData>()

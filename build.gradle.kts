@@ -69,7 +69,15 @@ tasks {
 
     withType<Test> { useJUnitPlatform() }
 
-    shadowJar { archiveName = "blit.jar" }
+    jar {
+        manifest {
+            attributes(
+                "Implementation-Title" to "Blit",
+                "Implementation-Version" to project.version,
+                "Implementation-Vendor" to "Valaphee"
+            )
+        }
+    }
 }
 
 application { mainClass.set("com.valaphee.blit.MainKt") }
@@ -78,14 +86,11 @@ javafx { modules("javafx.controls", "javafx.graphics") }
 
 launch4j {
     mainClassName = "com.valaphee.blit.MainKt"
-    jarTask = tasks.shadowJar.get()
     icon = "${projectDir}/app.ico"
     copyright = "Copyright (c) 2021, Valaphee"
     jvmOptions = setOf("--add-opens=java.base/java.nio=ALL-UNNAMED", "--add-opens java.base/jdk.internal.misc=ALL-UNNAMED", "-Dio.netty.tryReflectionSetAccessible=true")
     companyName = "Valaphee"
     productName = "Blit"
-    /*splashFileName = "${projectDir}/splash.bmp"*/
-    copyConfigurable = emptyArray<Any>()
 }
 
 signing { useGpgCmd() }
