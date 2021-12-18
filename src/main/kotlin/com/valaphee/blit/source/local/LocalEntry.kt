@@ -31,8 +31,8 @@ class LocalEntry(
     private val path: File
 ) : AbstractEntry<LocalEntry>() {
     override val name: String get() = path.name
-    override val size get() = path.length()
-    override val modifyTime get() = path.lastModified()
+    override val size = path.length()
+    override val modifyTime = path.lastModified()
     override val directory get() = path.isDirectory
 
     override suspend fun list() = path.listFiles()?.map { LocalEntry(it) } ?: emptyList()

@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.inject.Inject
 import javafx.beans.property.SimpleListProperty
 import tornadofx.ItemViewModel
-import tornadofx.asObservable
+import tornadofx.toObservable
 import tornadofx.toProperty
 import java.io.File
 
@@ -33,7 +33,7 @@ class ConfigModel @Inject constructor(
     private val objectMapper by di<ObjectMapper>()
 
     val dataSizeUnit = bind { config.dataSizeUnit.toProperty() }
-    val sources = bind { SimpleListProperty(config.sources.asObservable()) }
+    val sources = bind { SimpleListProperty(config.sources.toObservable()) }
 
     override fun onCommit() {
         objectMapper.writeValue(File(File("data").also(File::mkdir), "config.json"), Config(dataSizeUnit.value, sources.value))
