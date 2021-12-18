@@ -18,6 +18,7 @@ package com.valaphee.blit.data.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.inject.Inject
+import com.google.inject.Singleton
 import javafx.beans.property.SimpleListProperty
 import tornadofx.ItemViewModel
 import tornadofx.toObservable
@@ -27,15 +28,17 @@ import java.io.File
 /**
  * @author Kevin Ludwig
  */
+@Singleton
 class ConfigModel @Inject constructor(
     config: Config
 ) : ItemViewModel<Config>(config) {
     private val objectMapper by di<ObjectMapper>()
 
+    val locale = bind { config.locale.toProperty() }
     val dataSizeUnit = bind { config.dataSizeUnit.toProperty() }
     val sources = bind { SimpleListProperty(config.sources.toObservable()) }
 
     override fun onCommit() {
-        objectMapper.writeValue(File(File("data").also(File::mkdir), "config.json"), Config(dataSizeUnit.value, sources.value))
+        objectMapper.writeValue(File(File("data").also(File::mkdir), "config.json"), Config(locale.value, dataSizeUnit.value, sources.value))
     }
 }

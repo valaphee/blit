@@ -32,6 +32,7 @@ import kotlin.math.abs
 @Singleton
 @DataType("config")
 class Config(
+    @get:JsonProperty("locale") val locale: String? = null,
     @get:JsonProperty("data_size_unit") val dataSizeUnit: DataSizeUnit = DataSizeUnit.IEC,
     @get:JsonProperty("sources") val sources: List<Source<*>> = listOf(LocalSource("local"))
 ) : Data {

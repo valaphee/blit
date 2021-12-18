@@ -48,7 +48,7 @@ import tornadofx.vgrow
  */
 class ConfigViewSources : Fragment("Sources") {
     private val locale by di<Locale>()
-    private val _config by di<ConfigModel>()
+    private val configModel by di<ConfigModel>()
 
     private val source = SimpleObjectProperty<Source<*>>().apply {
         onChange {
@@ -63,7 +63,7 @@ class ConfigViewSources : Fragment("Sources") {
 
     override val root = hbox {
         vbox {
-            val sources = listview(_config.sources) {
+            val sources = listview(configModel.sources) {
                 bindSelected(source)
 
                 vgrow = Priority.ALWAYS
@@ -81,16 +81,16 @@ class ConfigViewSources : Fragment("Sources") {
                 button(locale["config.sources.save.text"]) {
                     action {
                         val source = sourceUis[type.value]!!.getSource(fields)!!
-                        if (sources.selectionModel.selectedIndex != -1) _config.sources[sources.selectionModel.selectedIndex] = source
+                        if (sources.selectionModel.selectedIndex != -1) configModel.sources[sources.selectionModel.selectedIndex] = source
                         else {
-                            _config.sources.add(source)
+                            configModel.sources.add(source)
                             sources.selectionModel.select(source)
                         }
                     }
                 }
                 button(locale["config.sources.delete.text"]) {
                     action {
-                        _config.sources.remove(source.value)
+                        configModel.sources.remove(source.value)
                         sources.selectionModel.selectFirst()
                     }
                 }

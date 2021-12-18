@@ -21,6 +21,7 @@ import com.google.inject.Guice
 import com.google.inject.Provides
 import com.google.inject.Singleton
 import com.valaphee.blit.data.DataModule
+import com.valaphee.blit.data.config.Config
 import com.valaphee.blit.data.locale.Locale
 import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory
 import javafx.scene.image.Image
@@ -41,7 +42,7 @@ fun main(arguments: Array<String>) {
     val injector = Guice.createInjector(DataModule(), object : AbstractModule() {
         @Singleton
         @Provides
-        fun locale(locales: Map<String, @JvmSuppressWildcards Locale>) = locales["en_us"]
+        fun locale(config: Config, locales: Map<String, @JvmSuppressWildcards Locale>) = config.locale?.let { locales[it] ?: locales["en_us"] } ?: locales["en_us"]
     })
 
     FX.dicontainer = object : DIContainer {

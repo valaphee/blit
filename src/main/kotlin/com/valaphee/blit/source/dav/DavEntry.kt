@@ -97,6 +97,13 @@ class DavEntry(
         } else davSource.httpClient.put<Unit>("${davSource._url}/$path/$name") { body = InputStreamContent(stream, length) } // TODO: set progress
     }
 
+    override suspend fun rename(name: String) {
+        davSource.httpClient.request<Unit>("${davSource._url}/$path") {
+            method = httpMethodMove
+            headers { this["Destination"] = "${davSource._url}/${path.substringBeforeLast('/', "")}/$name" }
+        }
+    }
+
     override suspend fun delete() {
         davSource.httpClient.delete<Unit>("${davSource._url}/$path")
     }

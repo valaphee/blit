@@ -1,0 +1,62 @@
+{
+  "locale": {
+    "key": "de_de",
+    "entries": {
+      "name": "Deutsch (Deutschland)",
+      "main": {
+        "menu": {
+          "file": {
+            "name": "Datei",
+            "sources.name": "Quellen",
+            "exit.name": "Beenden"
+          },
+          "help": {
+            "name": "Hilfe",
+            "about.name": "Über"
+          }
+        },
+        "navigator": {
+          "go.text": "Los",
+          "task.navigate.name": "Navigiere zu {0}"
+        },
+        "tree": {
+          "column": {
+            "name.title": "Name",
+            "size.title": "Größe",
+            "modified.title": "Änderungsdatum"
+          },
+          "menu": {
+            "open.name": "Öffnen",
+            "rename.name": "Umbenennen",
+            "delete.name": "Löschen"
+          },
+          "task": {
+            "populate.name": "Erweitere {0}",
+            "download.name": "Lade {0} herunter",
+            "upload.name": "Lade {0} hoch",
+            "rename.name": "Nenne {0} um zu {1}",
+            "delete.name": "Lösche {0}"
+          }
+        }
+      },
+      "rename": {
+        "ok.text": "Ok",
+        "cancel.text": "Abbrechen"
+      },
+      "config": {
+        "general": {
+          "locale.text": "Sprache",
+          "data_size_unit.text": "Datengrößeneinheit"
+        },
+        "sources": {
+          "new.text": "Neu",
+          "save.text": "Speichern",
+          "delete.text": "Löschen"
+        },
+        "ok.text": "Ok",
+        "cancel.text": "Abbrechen",
+        "apply.text": "Übernehmen"
+      }
+    }
+  }
+}

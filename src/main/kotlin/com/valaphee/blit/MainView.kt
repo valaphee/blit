@@ -84,7 +84,7 @@ import java.util.concurrent.CompletableFuture
 class MainView : View("Blit") {
     private val locale by di<Locale>()
     private val iconManifest by di<IconManifest>()
-    private val _config by di<ConfigModel>()
+    private val configModel by di<ConfigModel>()
 
     private val worker = Worker().apply {
         val version = System.getProperty("os.version").toFloatOrNull()
@@ -138,7 +138,7 @@ class MainView : View("Blit") {
             hbox {
                 combobox(source) {
                     @Suppress("UNCHECKED_CAST")
-                    items = _config.sources as ObservableList<Source<T>>
+                    items = configModel.sources as ObservableList<Source<T>>
                 }
                 add(CustomTextField().apply {
                     bind(name)
@@ -210,7 +210,7 @@ class MainView : View("Blit") {
                 }
                 column(locale["main.tree.column.size.title"], Entry<T>::self) {
                     tableColumnBaseSetWidth(this, 75.0)
-                    cellFormat { text = if (it.directory) "" else _config.dataSizeUnit.value.format(it.size) }
+                    cellFormat { text = if (it.directory) "" else configModel.dataSizeUnit.value.format(it.size) }
                     setComparator { a, b -> a.size.compareTo(b.size) }
                 }
                 column(locale["main.tree.column.modified.title"], Entry<T>::modifyTime) {
@@ -250,6 +250,48 @@ class MainView : View("Blit") {
                         }
                     }
                 }
+
+
+                selectionModel.selectedItems.onChange {
+                    contextMenu = ContextMenu().apply {
+                        item(locale["main.tree.menu.open.name"]) {
+                            action {
+                                it.list.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.name) } ?: if (Desktop.isDesktopSupported()) {
+                                    it.list.forEach {
+                                        val entry = it.value
+                                        worker.launch(locale["main.tree.task.download.name", entry]) { Desktop.getDesktop().open(File(tmpdir, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }) } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
+                                    }
+                                }
+                            }
+                        }
+                        separator()
+                        item(locale["main.tree.menu.rename.name"]) {
+                            action {
+                                it.list.forEach {
+                                    val entry = it.value
+                                    RenameView(entry.name) { name ->
+                                        worker.launch(locale["main.tree.task.rename.name", entry, name]) {
+                                            entry.rename(name)
+                                            runLater { populate(it.parent) }
+                                        }
+                                    }.openModal(resizable = false)
+                                }
+                            }
+                        }
+                        item(locale["main.tree.menu.delete.name"]) {
+                            action {
+                                it.list.forEach {
+                                    val entry = it.value
+                                    worker.launch(locale["main.tree.task.delete.name", entry]) {
+                                        entry.delete()
+                                        runLater { populate(it.parent) }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 setOnKeyPressed {
                     when (it.code) {
                         KeyCode.C -> if (it.isControlDown) Clipboard.getSystemClipboard().setContent {
@@ -265,10 +307,15 @@ class MainView : View("Blit") {
                             }
                         }
                         KeyCode.V -> if (it.isControlDown) with(Clipboard.getSystemClipboard()) {
-                            if (hasFiles()) {
-                                val entry = selectionModel.selectedItem.value
+                            if (hasFiles()) selectionModel.selectedItem?.let {
+                                val entry = it.value
                                 if (!entry.directory) TODO()
-                                files.forEach { file -> worker.launch(locale["main.tree.task.upload.name", file.name]) { FileInputStream(file).use { entry.transferFrom(file.name, it, file.length()) } } }
+                                files.forEach { file ->
+                                    worker.launch(locale["main.tree.task.upload.name", file.name]) {
+                                        FileInputStream(file).use { entry.transferFrom(file.name, it, file.length()) }
+                                        runLater { populate(it.parent) }
+                                    }
+                                }
                             }
                         }
                         KeyCode.DELETE -> selectionModel.selectedItems.forEach {
@@ -278,33 +325,13 @@ class MainView : View("Blit") {
                                 runLater { populate(it.parent) }
                             }
                         }
+                        KeyCode.F5 -> populate(root)
                     }
                 }
-
-                selectionModel.selectedItems.onChange {
-                    contextMenu = ContextMenu().apply {
-                        item(locale["main.tree.menu.open.name"]) {
-                            action {
-                                it.list.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.name) } ?: if (Desktop.isDesktopSupported()) {
-                                    it.list.forEach {
-                                        val entry = it.value
-                                        worker.launch(locale["main.tree.task.download.name", entry]) { Desktop.getDesktop().open(File(tmpdir, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }) } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
-                                    }
-                                }
-                            }
-                        }
-                        separator()
-                        item(locale["main.tree.menu.delete.name"]) {
-                            action {
-                                it.list.forEach {
-                                    val entry = it.value
-                                    worker.launch(locale["main.tree.task.delete.name", entry]) {
-                                        entry.delete()
-                                        runLater { populate(it.parent) }
-                                    }
-                                }
-                            }
-                        }
+                setOnMousePressed {
+                    if (it.isPrimaryButtonDown && it.clickCount == 2) selectionModel.selectedItem?.let {
+                        val entry = it.value
+                        worker.launch(locale["main.tree.task.download.name", entry]) { Desktop.getDesktop().open(File(tmpdir, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }) } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
                     }
                 }
             }

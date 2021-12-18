@@ -1,1 +1,4391 @@
-{"icon_manifest":{"default_file_icon":{"name":"file"},"file_icons":[{"name":"html","file_extensions":["htm","xhtml","html_vm","asp"]},{"name":"pug","file_extensions":["jade","pug"],"file_names":[".pug-lintrc",".pug-lintrc.js",".pug-lintrc.json"]},{"name":"markdown","file_extensions":["md","markdown","rst"]},{"name":"blink","file_extensions":["blink"]},{"name":"css","file_extensions":["css"]},{"name":"sass","file_extensions":["scss","sass"]},{"name":"less","file_extensions":["less"]},{"name":"json","file_extensions":["json","tsbuildinfo","json5","jsonl","ndjson"],"file_names":[".jscsrc",".jshintrc","composer.lock",".jsbeautifyrc",".esformatter","cdp.pid",".lintstagedrc"]},{"name":"jinja","file_extensions":["jinja","jinja2","j2","jinja-html"]},{"name":"proto","file_extensions":["proto"]},{"name":"sublime","file_extensions":["sublime-project","sublime-workspace"]},{"name":"twine","file_extensions":["tw","twee"]},{"name":"yaml","file_extensions":["yml","yaml","yml.dist","yaml.dist","YAML-tmLanguage"]},{"name":"xml","file_extensions":["xml","plist","xsd","dtd","xsl","xslt","resx","iml","xquery","tmLanguage","manifest","project","xml.dist","xml.dist.sample","dmn"],"file_names":[".htaccess"]},{"name":"image","file_extensions":["png","jpeg","jpg","gif","ico","tif","tiff","psd","psb","ami","apx","bmp","bpg","brk","cur","dds","dng","exr","fpx","gbr","img","jbig2","jb2","jng","jxr","pgf","pic","raw","webp","eps","afphoto","ase","aseprite","clip","cpt","heif","heic","kra","mdp","ora","pdn","reb","sai","tga","xcf","jfif","ppm","pbm","pgm","pnm"]},{"name":"javascript","file_extensions":["esx","mjs"]},{"name":"react","file_extensions":["jsx"]},{"name":"react_ts","file_extensions":["tsx"]},{"name":"settings","file_extensions":["ini","dlc","dll","config","conf","properties","prop","settings","option","props","toml","prefs","sln.dotsettings","sln.dotsettings.user","cfg"],"file_names":[".jshintignore",".buildignore",".mrconfig",".yardopts","manifest.mf",".clang-format",".clang-tidy"]},{"name":"typescript-def","file_extensions":["d.ts"]},{"name":"markojs","file_extensions":["marko"]},{"name":"astro","file_extensions":["astro"]},{"name":"pdf","file_extensions":["pdf"]},{"name":"table","file_extensions":["xlsx","xls","csv","tsv"]},{"name":"vscode","file_extensions":["vscodeignore","vsixmanifest","vsix","code-workplace"]},{"name":"visualstudio","file_extensions":["csproj","ruleset","sln","suo","vb","vbs","vcxitems","vcxitems.filters","vcxproj","vcxproj.filters"]},{"name":"database","file_extensions":["pdb","sql","pks","pkb","accdb","mdb","sqlite","sqlite3","pgsql","postgres","psql","db","db3"]},{"name":"kusto","file_extensions":["kql"]},{"name":"csharp","file_extensions":["cs","csx"]},{"name":"qsharp","file_extensions":["qs"]},{"name":"zip","file_extensions":["zip","tar","gz","xz","br","bzip2","gzip","brotli","7z","rar","tgz"]},{"name":"vala","file_extensions":["vala"]},{"name":"zig","file_extensions":["zig"]},{"name":"exe","file_extensions":["exe","msi"]},{"name":"hex","file_extensions":["dat","bin","hex"]},{"name":"java","file_extensions":["java","jsp"]},{"name":"jar","file_extensions":["jar"]},{"name":"javaclass","file_extensions":["class"]},{"name":"c","file_extensions":["c","i","mi"]},{"name":"h","file_extensions":["h"]},{"name":"cpp","file_extensions":["cc","cpp","cxx","c++","cp","mm","mii","ii"]},{"name":"hpp","file_extensions":["hh","hpp","hxx","h++","hp","tcc","inl"]},{"name":"go","file_extensions":["go"]},{"name":"go-mod","file_names":["go.mod","go.sum"]},{"name":"python","file_extensions":["py"]},{"name":"python-misc","file_extensions":["pyc","whl"],"file_names":["requirements.txt","pipfile",".python-version","manifest.in","pylintrc",".pylintrc"]},{"name":"url","file_extensions":["url"]},{"name":"console","file_extensions":["sh","ksh","csh","tcsh","zsh","bash","bat","cmd","awk","fish","exp"],"file_names":["pre-commit","pre-push","post-merge"]},{"name":"powershell","file_extensions":["ps1","psm1","psd1","ps1xml","psc1","pssc"]},{"name":"gradle","file_extensions":["gradle"],"file_names":["gradle.properties","gradlew","gradle-wrapper.properties"]},{"name":"word","file_extensions":["doc","docx","rtf"]},{"name":"certificate","file_extensions":["cer","cert","crt"],"file_names":["copying","copying.md","copying.txt","copyright","copyright.txt","copyright.md","license","license.md","license.txt","licence","licence.md","licence.txt"]},{"name":"key","file_extensions":["pub","key","pem","asc","gpg","passwd"],"file_names":[".htpasswd"]},{"name":"font","file_extensions":["woff","woff2","ttf","eot","suit","otf","bmap","fnt","odttf","ttc","font","fonts","sui","ntf","mrf"]},{"name":"lib","file_extensions":["lib","bib"]},{"name":"ruby","file_extensions":["rb","erb"]},{"name":"gemfile","file_names":["gemfile"]},{"name":"rubocop","file_names":[".rubocop.yml",".rubocop-todo.yml",".rubocop_todo.yml"]},{"name":"fsharp","file_extensions":["fs","fsx","fsi","fsproj"]},{"name":"swift","file_extensions":["swift"]},{"name":"arduino","file_extensions":["ino"]},{"name":"docker","file_extensions":["dockerignore","dockerfile"],"file_names":["dockerfile","dockerfile.prod","dockerfile.production","dockerfile.alpha","dockerfile.beta","dockerfile.stage","dockerfile.staging","dockerfile.dev","dockerfile.development","dockerfile.local","dockerfile.test","dockerfile.testing","dockerfile.ci","dockerfile.web","dockerfile.worker","docker-compose.yml","docker-compose.override.yml","docker-compose.prod.yml","docker-compose.production.yml","docker-compose.alpha.yml","docker-compose.beta.yml","docker-compose.stage.yml","docker-compose.staging.yml","docker-compose.dev.yml","docker-compose.development.yml","docker-compose.local.yml","docker-compose.test.yml","docker-compose.testing.yml","docker-compose.ci.yml","docker-compose.web.yml","docker-compose.worker.yml","docker-compose.yaml","docker-compose.override.yaml","docker-compose.prod.yaml","docker-compose.production.yaml","docker-compose.alpha.yaml","docker-compose.beta.yaml","docker-compose.stage.yaml","docker-compose.staging.yaml","docker-compose.dev.yaml","docker-compose.development.yaml","docker-compose.local.yaml","docker-compose.test.yaml","docker-compose.testing.yaml","docker-compose.ci.yaml","docker-compose.web.yaml","docker-compose.worker.yaml"]},{"name":"tex","file_extensions":["tex","sty","dtx","ltx"]},{"name":"powerpoint","file_extensions":["pptx","ppt","pptm","potx","potm","ppsx","ppsm","pps","ppam","ppa"]},{"name":"video","file_extensions":["webm","mkv","flv","vob","ogv","ogg","gifv","avi","mov","qt","wmv","yuv","rm","rmvb","mp4","m4v","mpg","mp2","mpeg","mpe","mpv","m2v"]},{"name":"virtual","file_extensions":["vdi","vbox","vbox-prev"]},{"name":"email","file_extensions":["ics"],"file_names":[".mailmap"]},{"name":"audio","file_extensions":["mp3","flac","m4a","wma","aiff","wav"]},{"name":"coffee","file_extensions":["coffee","cson","iced"]},{"name":"document","file_extensions":["txt"]},{"name":"graphql","file_extensions":["graphql","gql"],"file_names":[".graphqlconfig",".graphqlrc",".graphqlrc.json",".graphqlrc.js",".graphqlrc.ts",".graphqlrc.toml",".graphqlrc.yaml",".graphqlrc.yml","graphql.config.json","graphql.config.js","graphql.config.ts","graphql.config.toml","graphql.config.yaml","graphql.config.yml"]},{"name":"rust","file_extensions":["rs"]},{"name":"raml","file_extensions":["raml"]},{"name":"xaml","file_extensions":["xaml"]},{"name":"haskell","file_extensions":["hs"]},{"name":"kotlin","file_extensions":["kt","kts"]},{"name":"git","file_extensions":["patch"],"file_names":[".gitignore",".gitignore_global",".gitconfig",".gitattributes",".gitmodules",".gitkeep",".gitinclude","git-history"]},{"name":"lua","file_extensions":["lua"],"file_names":[".luacheckrc"]},{"name":"clojure","file_extensions":["clj","cljs","cljc"]},{"name":"groovy","file_extensions":["groovy"]},{"name":"r","file_extensions":["r","rmd"],"file_names":[".Rhistory"]},{"name":"dart","file_extensions":["dart"],"file_names":[".pubignore"]},{"name":"actionscript","file_extensions":["as"]},{"name":"mxml","file_extensions":["mxml"]},{"name":"autohotkey","file_extensions":["ahk"]},{"name":"flash","file_extensions":["swf"]},{"name":"swc","file_extensions":["swc"]},{"name":"cmake","file_extensions":["cmake"],"file_names":["cmakelists.txt","cmakecache.txt"]},{"name":"assembly","file_extensions":["asm","a51","inc","nasm","s","ms","agc","ags","aea","argus","mitigus","binsource"]},{"name":"vue","file_extensions":["vue"]},{"name":"vue-config","file_names":["vue.config.js","vue.config.ts","vetur.config.js","vetur.config.ts"]},{"name":"nuxt","file_names":["nuxt.config.js","nuxt.config.ts"]},{"name":"ocaml","file_extensions":["ml","mli","cmx"]},{"name":"odin","file_extensions":["odin"]},{"name":"javascript-map","file_extensions":["js.map","mjs.map","cjs.map"]},{"name":"css-map","file_extensions":["css.map"]},{"name":"lock","file_extensions":["lock"],"file_names":["security.md","security.txt","security"]},{"name":"handlebars","file_extensions":["hbs","mustache"]},{"name":"perl","file_extensions":["pm","raku"]},{"name":"haxe","file_extensions":["hx"]},{"name":"test-ts","file_extensions":["spec.ts","e2e-spec.ts","test.ts","ts.snap"]},{"name":"test-jsx","file_extensions":["spec.tsx","test.tsx","tsx.snap","spec.jsx","test.jsx","jsx.snap"]},{"name":"test-js","file_extensions":["spec.js","spec.cjs","spec.mjs","e2e-spec.js","e2e-spec.cjs","e2e-spec.mjs","test.js","test.cjs","test.mjs","js.snap"]},{"name":"puppet","file_extensions":["pp"]},{"name":"elixir","file_extensions":["ex","exs","eex","leex","heex"]},{"name":"livescript","file_extensions":["ls"]},{"name":"erlang","file_extensions":["erl"]},{"name":"twig","file_extensions":["twig"]},{"name":"julia","file_extensions":["jl"]},{"name":"elm","file_extensions":["elm"]},{"name":"purescript","file_extensions":["pure","purs"]},{"name":"smarty","file_extensions":["tpl"]},{"name":"stylus","file_extensions":["styl"]},{"name":"reason","file_extensions":["re","rei"]},{"name":"bucklescript","file_extensions":["cmj"]},{"name":"merlin","file_extensions":["merlin"]},{"name":"verilog","file_extensions":["vhd","sv","svh"]},{"name":"mathematica","file_extensions":["nb"]},{"name":"wolframlanguage","file_extensions":["wl","wls"]},{"name":"nunjucks","file_extensions":["njk","nunjucks"]},{"name":"robot","file_extensions":["robot"]},{"name":"solidity","file_extensions":["sol"]},{"name":"autoit","file_extensions":["au3"]},{"name":"haml","file_extensions":["haml"]},{"name":"yang","file_extensions":["yang"]},{"name":"mjml","file_extensions":["mjml"],"file_names":[".mjmlconfig"]},{"name":"vercel","file_names":["vercel.json",".vercelignore","now.json",".nowignore"]},{"name":"next","file_names":["next.config.js","next.config.ts"]},{"name":"terraform","file_extensions":["tf","tf.json","tfvars","tfstate"]},{"name":"laravel","file_extensions":["blade.php","inky.php"],"file_names":["artisan"]},{"name":"applescript","file_extensions":["applescript","ipa"]},{"name":"cake","file_extensions":["cake"]},{"name":"cucumber","file_extensions":["feature"]},{"name":"nim","file_extensions":["nim","nimble"]},{"name":"apiblueprint","file_extensions":["apib","apiblueprint"]},{"name":"riot","file_extensions":["riot","tag"]},{"name":"vfl","file_extensions":["vfl"],"file_names":[".vfl"]},{"name":"kl","file_extensions":["kl"],"file_names":[".kl"]},{"name":"postcss","file_extensions":["pcss","sss"],"file_names":["postcss.config.js","postcss.config.cjs",".postcssrc.js",".postcssrc",".postcssrc.json",".postcssrc.yml"]},{"name":"posthtml","file_names":["posthtml.config.js",".posthtmlrc.js",".posthtmlrc",".posthtmlrc.json",".posthtmlrc.yml"]},{"name":"todo","file_extensions":["todo"]},{"name":"coldfusion","file_extensions":["cfml","cfc","lucee","cfm"]},{"name":"cabal","file_extensions":["cabal"],"file_names":["cabal.project","cabal.project.freeze","cabal.project.local"]},{"name":"nix","file_extensions":["nix"]},{"name":"slim","file_extensions":["slim"]},{"name":"http","file_extensions":["http","rest"],"file_names":["CNAME"]},{"name":"restql","file_extensions":["rql","restql"]},{"name":"kivy","file_extensions":["kv"]},{"name":"graphcool","file_extensions":["graphcool"],"file_names":["project.graphcool"]},{"name":"sbt","file_extensions":["sbt"]},{"name":"webpack","file_names":["webpack.js","webpack.cjs","webpack.ts","webpack.base.js","webpack.base.cjs","webpack.base.ts","webpack.config.js","webpack.config.cjs","webpack.config.ts","webpack.common.js","webpack.common.cjs","webpack.common.ts","webpack.config.common.js","webpack.config.common.cjs","webpack.config.common.ts","webpack.config.common.babel.js","webpack.config.common.babel.ts","webpack.dev.js","webpack.dev.cjs","webpack.dev.ts","webpack.development.js","webpack.development.cjs","webpack.development.ts","webpack.config.dev.js","webpack.config.dev.cjs","webpack.config.dev.ts","webpack.config.dev.babel.js","webpack.config.dev.babel.ts","webpack.mix.js","webpack.mix.cjs","webpack.prod.js","webpack.prod.cjs","webpack.prod.config.js","webpack.prod.config.cjs","webpack.prod.ts","webpack.production.js","webpack.production.cjs","webpack.production.ts","webpack.server.js","webpack.server.cjs","webpack.server.ts","webpack.client.js","webpack.client.cjs","webpack.client.ts","webpack.config.server.js","webpack.config.server.cjs","webpack.config.server.ts","webpack.config.client.js","webpack.config.client.cjs","webpack.config.client.ts","webpack.config.production.babel.js","webpack.config.production.babel.ts","webpack.config.prod.babel.js","webpack.config.prod.babel.cjs","webpack.config.prod.babel.ts","webpack.config.prod.js","webpack.config.prod.cjs","webpack.config.prod.ts","webpack.config.production.js","webpack.config.production.cjs","webpack.config.production.ts","webpack.config.staging.js","webpack.config.staging.cjs","webpack.config.staging.ts","webpack.config.babel.js","webpack.config.babel.ts","webpack.config.base.babel.js","webpack.config.base.babel.ts","webpack.config.base.js","webpack.config.base.cjs","webpack.config.base.ts","webpack.config.staging.babel.js","webpack.config.staging.babel.ts","webpack.config.coffee","webpack.config.test.js","webpack.config.test.cjs","webpack.config.test.ts","webpack.config.vendor.js","webpack.config.vendor.cjs","webpack.config.vendor.ts","webpack.config.vendor.production.js","webpack.config.vendor.production.cjs","webpack.config.vendor.production.ts","webpack.test.js","webpack.test.cjs","webpack.test.ts","webpack.dist.js","webpack.dist.cjs","webpack.dist.ts","webpackfile.js","webpackfile.cjs","webpackfile.ts"]},{"name":"ionic","file_names":["ionic.config.json",".io-config.json"]},{"name":"gulp","file_names":["gulpfile.js","gulpfile.mjs","gulpfile.ts","gulpfile.babel.js"]},{"name":"nodejs","file_names":["package.json","package-lock.json",".nvmrc",".esmrc",".node-version"]},{"name":"npm","file_names":[".npmignore",".npmrc"]},{"name":"yarn","file_names":[".yarnrc","yarn.lock",".yarnclean",".yarn-integrity","yarn-error.log",".yarnrc.yml",".yarnrc.yaml"]},{"name":"android","file_names":["androidmanifest.xml"],"file_extensions":["apk","smali","dex"]},{"name":"tune","file_extensions":["env"],"file_names":[".env.defaults",".env.example",".env.sample",".env.template",".env.schema",".env.local",".env.dev",".env.development",".env.qa",".env.dist",".env.prod",".env.production",".env.stage",".env.staging",".env.preview",".env.test",".env.testing",".env.development.local",".env.qa.local",".env.production.local",".env.staging.local",".env.test.local"]},{"name":"babel","file_names":[".babelrc",".babelrc.cjs",".babelrc.js",".babelrc.mjs",".babelrc.json","babel.config.cjs","babel.config.js","babel.config.mjs","babel.config.json","babel-transform.js",".babel-plugin-macrosrc",".babel-plugin-macrosrc.json",".babel-plugin-macrosrc.yaml",".babel-plugin-macrosrc.yml",".babel-plugin-macrosrc.js","babel-plugin-macros.config.js"]},{"name":"contributing","file_names":["contributing.md"]},{"name":"readme","file_names":["readme.md","readme.txt","readme"]},{"name":"changelog","file_names":["changelog","changelog.md","changelog.txt","changes","changes.md","changes.txt"]},{"name":"credits","file_names":["credits","credits.txt","credits.md"]},{"name":"authors","file_names":["authors","authors.md","authors.txt"]},{"name":"flow","file_names":[".flowconfig"]},{"name":"favicon","file_names":["favicon.ico"]},{"name":"karma","file_names":["karma.conf.js","karma.conf.ts","karma.conf.coffee","karma.config.js","karma.config.ts","karma-main.js","karma-main.ts"]},{"name":"bithound","file_names":[".bithoundrc"]},{"name":"svgo","file_names":["svgo.config.js"]},{"name":"appveyor","file_names":[".appveyor.yml","appveyor.yml"]},{"name":"travis","file_names":[".travis.yml"]},{"name":"codecov","file_names":[".codecov.yml","codecov.yml"]},{"name":"protractor","file_names":["protractor.conf.js","protractor.conf.ts","protractor.conf.coffee","protractor.config.js","protractor.config.ts"]},{"name":"fusebox","file_names":["fuse.js"]},{"name":"heroku","file_names":["procfile","procfile.windows"]},{"name":"editorconfig","file_names":[".editorconfig"]},{"name":"gitlab","file_extensions":["gitlab-ci.yml"]},{"name":"bower","file_names":[".bowerrc","bower.json"]},{"name":"eslint","file_names":[".eslintrc.js",".eslintrc.cjs",".eslintrc.yaml",".eslintrc.yml",".eslintrc.json",".eslintrc-md.js",".eslintrc-jsdoc.js",".eslintrc",".eslintignore",".eslintcache"]},{"name":"conduct","file_names":["code_of_conduct.md","code_of_conduct.txt"]},{"name":"watchman","file_names":[".watchmanconfig"]},{"name":"aurelia","file_names":["aurelia.json"]},{"name":"mocha","file_names":["mocha.opts",".mocharc.yml",".mocharc.yaml",".mocharc.js",".mocharc.json",".mocharc.jsonc"]},{"name":"jenkins","file_names":["jenkinsfile"],"file_extensions":["jenkinsfile","jenkins"]},{"name":"firebase","file_names":["firebase.json",".firebaserc","firestore.rules","firestore.indexes.json"]},{"name":"rollup","file_names":["rollup.config.js","rollup.config.ts","rollup-config.js","rollup-config.ts","rollup.config.common.js","rollup.config.common.ts","rollup.config.base.js","rollup.config.base.ts","rollup.config.prod.js","rollup.config.prod.ts","rollup.config.dev.js","rollup.config.dev.ts","rollup.config.prod.vendor.js","rollup.config.prod.vendor.ts"]},{"name":"hack","file_names":[".hhconfig"]},{"name":"stylelint","file_names":[".stylelintrc","stylelint.config.js","stylelint.config.cjs",".stylelintrc.json",".stylelintrc.yaml",".stylelintrc.yml",".stylelintrc.js",".stylelintrc.cjs",".stylelintignore"]},{"name":"code-climate","file_names":[".codeclimate.yml"]},{"name":"prettier","file_names":[".prettierrc","prettier.config.js","prettier.config.cjs",".prettierrc.js",".prettierrc.cjs",".prettierrc.json",".prettierrc.json5",".prettierrc.yaml",".prettierrc.yml",".prettierignore",".prettierrc.toml"]},{"name":"renovate","file_names":[".renovaterc",".renovaterc.json","renovate.json","renovate.json5"]},{"name":"apollo","file_names":["apollo.config.js"]},{"name":"nodemon","file_names":["nodemon.json","nodemon-debug.json"]},{"name":"webhint","file_names":[".hintrc"]},{"name":"browserlist","file_names":["browserslist",".browserslistrc"]},{"name":"crystal","file_extensions":["cr","ecr"]},{"name":"snyk","file_names":[".snyk"]},{"name":"drone","file_extensions":["drone.yml"],"file_names":[".drone.yml"]},{"name":"cuda","file_extensions":["cu","cuh"]},{"name":"log","file_extensions":["log"]},{"name":"dotjs","file_extensions":["def","dot","jst"]},{"name":"ejs","file_extensions":["ejs"]},{"name":"sequelize","file_names":[".sequelizerc"]},{"name":"gatsby","file_names":["gatsby.config.js","gatsby-config.js","gatsby-node.js","gatsby-browser.js","gatsby-ssr.js"]},{"name":"wakatime","file_names":[".wakatime-project"],"file_extensions":[".wakatime-project"]},{"name":"circleci","file_names":["circle.yml"]},{"name":"cloudfoundry","file_names":[".cfignore"]},{"name":"grunt","file_names":["gruntfile.js","gruntfile.ts","gruntfile.coffee","gruntfile.babel.js","gruntfile.babel.ts","gruntfile.babel.coffee"]},{"name":"jest","file_names":["jest.config.js","jest.config.ts","jest.config.cjs","jest.config.mjs","jest.config.json","jest.e2e.config.js","jest.e2e.config.ts","jest.e2e.config.cjs","jest.e2e.config.mjs","jest.e2e.config.json","jest.e2e.json","jest-unit.config.js","jest-e2e.config.js","jest-e2e.config.ts","jest-e2e.config.cjs","jest-e2e.config.mjs","jest-e2e.config.json","jest-e2e.json","jest-github-actions-reporter.js","jest.setup.js","jest.setup.ts","jest.json",".jestrc",".jestrc.js",".jestrc.json","jest.teardown.js"]},{"name":"processing","file_extensions":["pde"]},{"name":"storybook","file_extensions":["stories.js","stories.jsx","stories.mdx","story.js","story.jsx","stories.ts","stories.tsx","story.ts","story.tsx","stories.svelte","story.mdx"]},{"name":"wepy","file_extensions":["wpy"]},{"name":"fastlane","file_names":["fastfile","appfile"]},{"name":"hcl","file_extensions":["hcl"]},{"name":"helm","file_names":[".helmignore"]},{"name":"san","file_extensions":["san"]},{"name":"wallaby","file_names":["wallaby.js","wallaby.conf.js"]},{"name":"django","file_extensions":["djt"]},{"name":"stencil","file_names":["stencil.config.js","stencil.config.ts"]},{"name":"red","file_extensions":["red"]},{"name":"makefile","file_names":["makefile"]},{"name":"foxpro","file_extensions":["fxp","prg"]},{"name":"i18n","file_extensions":["pot","po","mo"]},{"name":"webassembly","file_extensions":["wat","wasm"]},{"name":"semantic-release","file_names":[".releaserc",".releaserc.yaml",".releaserc.yml",".releaserc.json",".releaserc.js","release.config.js"]},{"name":"bitbucket","file_names":["bitbucket-pipelines.yaml","bitbucket-pipelines.yml"]},{"name":"jupyter","file_extensions":["ipynb"]},{"name":"d","file_extensions":["d"]},{"name":"mdx","file_extensions":["mdx"]},{"name":"ballerina","file_extensions":["bal","balx"]},{"name":"racket","file_extensions":["rkt"]},{"name":"bazel","file_extensions":["bzl","bazel"],"file_names":[".bazelignore",".bazelrc",".bazelversion"]},{"name":"mint","file_extensions":["mint"]},{"name":"velocity","file_extensions":["vm","fhtml","vtl"]},{"name":"godot","file_extensions":["gd"]},{"name":"godot-assets","file_extensions":["godot","tres","tscn"]},{"name":"azure-pipelines","file_names":["azure-pipelines.yml","azure-pipelines.yaml"],"file_extensions":["azure-pipelines.yml","azure-pipelines.yaml"]},{"name":"azure","file_extensions":["azcli"]},{"name":"vagrant","file_names":["vagrantfile"],"file_extensions":["vagrantfile"]},{"name":"prisma","file_names":["prisma.yml"],"file_extensions":["prisma"]},{"name":"razor","file_extensions":["cshtml","vbhtml"]},{"name":"abc","file_extensions":["abc"]},{"name":"asciidoc","file_extensions":["ad","adoc","asciidoc"]},{"name":"istanbul","file_names":[".nycrc",".nycrc.json"]},{"name":"edge","file_extensions":["edge"]},{"name":"scheme","file_extensions":["ss","scm"]},{"name":"lisp","file_extensions":["lisp","lsp","cl","fast"]},{"name":"tailwindcss","file_names":["tailwind.js","tailwind.ts","tailwind.config.js","tailwind.config.ts","tailwind.config.cjs"]},{"name":"3d","file_extensions":["stl","obj","ac","blend","mesh","mqo","pmd","pmx","skp","vac","vdp","vox"]},{"name":"buildkite","file_names":["buildkite.yml","buildkite.yaml"]},{"name":"netlify","file_names":["netlify.json","netlify.yml","netlify.yaml","netlify.toml"]},{"name":"svg","file_extensions":["svg"]},{"name":"svelte","file_extensions":["svelte"],"file_names":["svelte.config.js","svelte.config.cjs"]},{"name":"vim","file_extensions":["vimrc","gvimrc","exrc","vim","viminfo"]},{"name":"nest","file_names":["nest-cli.json",".nest-cli.json","nestconfig.json",".nestconfig.json"]},{"name":"moonscript","file_extensions":["moon"]},{"name":"percy","file_names":[".percy.yml"]},{"name":"gitpod","file_names":[".gitpod.yml"]},{"name":"advpl_prw","file_extensions":["prw","prx"]},{"name":"advpl_ptm","file_extensions":["ptm"]},{"name":"advpl_tlpp","file_extensions":["tlpp"]},{"name":"advpl_include","file_extensions":["ch"]},{"name":"codeowners","file_names":["codeowners"]},{"name":"gcp","file_names":[".gcloudignore"]},{"name":"disc","file_extensions":["iso"]},{"name":"fortran","file_extensions":["f","f77","f90","f95","f03","f08"]},{"name":"tcl","file_extensions":["tcl"]},{"name":"liquid","file_extensions":["liquid"]},{"name":"prolog","file_extensions":["p","pro","pl"]},{"name":"husky","file_names":[".huskyrc","husky.config.js",".huskyrc.json",".huskyrc.js",".huskyrc.yaml",".huskyrc.yml"]},{"name":"coconut","file_extensions":["coco"]},{"name":"tilt","file_names":["tiltfile"]},{"name":"capacitor","file_names":["capacitor.config.json"]},{"name":"sketch","file_extensions":["sketch"]},{"name":"pawn","file_extensions":["pwn","amx"]},{"name":"adonis","file_names":[".adonisrc.json","ace"]},{"name":"forth","file_extensions":["4th","fth","frt"]},{"name":"uml","file_extensions":["iuml","pu","puml","plantuml","wsd"]},{"name":"meson","file_names":["meson.build","meson_options.txt"],"file_extensions":["wrap"]},{"name":"commitlint","file_names":[".commitlintrc",".commitlintrc.js","commitlint.config.js",".commitlintrc.json",".commitlint.yaml",".commitlint.yml",".commitlintrc.yaml",".commitlintrc.yml","commitlint.config.cjs","commitlint.config.ts",".commitlintrc.ts",".commitlintrc.cjs"]},{"name":"buck","file_names":[".buckconfig"]},{"name":"dhall","file_extensions":["dhall","dhallb"]},{"name":"sml","file_extensions":["sml","mlton","mlb","sig","fun","cm","lex","use","grm"]},{"name":"nrwl","file_names":["nx.json",".nxignore"]},{"name":"opam","file_extensions":["opam"]},{"name":"dune","file_names":["dune","dune-project","dune-workspace","dune-workspace.dev"]},{"name":"imba","file_extensions":["imba"]},{"name":"drawio","file_extensions":["drawio","dio"]},{"name":"pascal","file_extensions":["pas"]},{"name":"shaderlab","file_extensions":["unity"]},{"name":"roadmap","file_names":["roadmap.md","roadmap.txt","timeline.md","timeline.txt","milestones.md","milestones.txt"]},{"name":"sas","file_extensions":["sas","sas7bdat","sashdat","astore","ast","sast"]},{"name":"nuget","file_names":["nuget.config",".nuspec","nuget.exe"],"file_extensions":["nupkg"]},{"name":"command","file_extensions":["command"]},{"name":"stryker","file_names":["stryker.conf.js","stryker.conf.json"]},{"name":"denizenscript","file_extensions":["dsc"]},{"name":"modernizr","file_names":[".modernizrrc",".modernizrrc.js",".modernizrrc.json"]},{"name":"slug","file_names":[".slugignore"]},{"name":"search","file_extensions":["code-search"]},{"name":"stitches","file_names":["stitches.config.js","stitches.config.ts"]},{"name":"nginx","file_names":["nginx.conf"]},{"name":"minecraft","file_extensions":["mcfunction","mcmeta","mcr","mca","mcgame","mclevel","mcworld","mine","mus"]},{"name":"replit","file_names":[".replit"]},{"name":"rescript","file_extensions":["res","resi"]},{"name":"snowpack","file_names":["snowpack.config.cjs","snowpack.config.js","snowpack.config.mjs","snowpack.deps.json","snowpack.config.ts","snowpack.config.json"]},{"name":"brainfuck","file_extensions":["b","bf"]},{"name":"bicep","file_extensions":["bicep"]},{"name":"cobol","file_extensions":["cob","cbl"]},{"name":"grain","file_extensions":["gr"]},{"name":"lolcode","file_extensions":["lol"]},{"name":"idris","file_extensions":["idr","ibc"]},{"name":"quasar","file_names":["quasar.conf.js"]},{"name":"dependabot","file_names":["dependabot.yml"]},{"name":"pipeline","file_extensions":["pipeline"]},{"name":"vite","file_names":["vite.config.js","vite.config.mjs","vite.config.cjs","vite.config.ts"]},{"name":"opa","file_extensions":["rego"]},{"name":"lerna","file_names":["lerna.json"]},{"name":"windicss","file_names":["windi.config.js","windi.config.ts","windi.config.cjs","windi.config.json"],"file_extensions":["windi"]},{"name":"textlint","file_names":[".textlintrc"]},{"name":"scala","file_extensions":["scala","sc"]},{"name":"lilypond","file_extensions":["ly"]},{"name":"vlang","file_extensions":["v"],"file_names":["vpkg.json","v.mod"]},{"name":"chess","file_extensions":["pgn","fen"]},{"name":"gemini","file_extensions":["gmi","gemini"]},{"name":"sentry","file_names":[".sentryclirc"]},{"name":"phpunit","file_names":[".phpunit.result.cache",".phpunit-watcher.yml","phpunit.xml","phpunit.xml.dist","phpunit-watcher.yml","phpunit-watcher.yml.dist"]},{"name":"php-cs-fixer","file_names":[".php_cs",".php_cs.dist",".php_cs.php",".php_cs.dist.php",".php-cs-fixer.php",".php-cs-fixer.dist.php"]},{"name":"robots","file_names":["robots.txt"]},{"name":"tsconfig","file_names":["tsconfig.json","tsconfig.app.json","tsconfig.editor.json","tsconfig.spec.json","tsconfig.base.json","tsconfig.build.json","tsconfig.eslint.json","tsconfig.lib.json"],"file_extensions":["tsconfig.json"]},{"name":"tauri","file_names":["tauri.config.json","tauri.linux.conf.json","tauri.windows.conf.json","tauri.macos.conf.json"],"file_extensions":["tauri"]},{"name":"jsconfig","file_names":["jsconfig.json"],"file_extensions":["jsconfig.json"]},{"name":"maven","file_names":["maven.config","jvm.config"]},{"name":"ada","file_extensions":["ada","adb","ads","ali"]},{"name":"ember","file_names":[".ember-cli",".ember-cli.js","ember-cli-builds.js"]},{"name":"horusec","file_names":["horusec-config.json"],"file_extensions":["horusec-config.json"]},{"name":"coala","file_extensions":["coarc","coafile"]},{"name":"dinophp","file_extensions":["bubble","html.bubble","php.bubble"]},{"name":"teal","file_extensions":["tl"]},{"name":"template","file_extensions":["template"]},{"name":"astyle","file_names":[".astylerc"]},{"name":"lighthouse","file_names":[".lighthouserc.js","lighthouserc.js",".lighthouserc.json","lighthouserc.json",".lighthouserc.yml","lighthouserc.yml",".lighthouserc.yaml","lighthouserc.yaml"]},{"name":"svgr","file_names":[".svgrrc","svgr.config.js",".svgrrc.js",".svgrrc.yaml",".svgrrc.yml",".svgrrc.json"]},{"name":"rome","file_names":["rome.json"]},{"name":"cypress","file_names":["cypress.json","cypress.env.json"]},{"name":"ndst","file_extensions":["ndst.yml","ndst.yaml","ndst.json"]}],"default_folder_icon":{"name":"folder"},"folder_icons":[{"name":"folder-src","folder_names":["src","source","sources","code"]},{"name":"folder-dist","folder_names":["dist","out","build","release","bin"]},{"name":"folder-css","folder_names":["css","stylesheet","stylesheets","style","styles"]},{"name":"folder-sass","folder_names":["sass","_sass","scss","_scss"]},{"name":"folder-images","folder_names":["images","image","img","icons","icon","ico","screenshot","screenshots","picture","pictures"]},{"name":"folder-scripts","folder_names":["script","scripts"]},{"name":"folder-node","folder_names":["node_modules"]},{"name":"folder-javascript","folder_names":["js","javascript","javascripts"]},{"name":"folder-json","folder_names":["json"]},{"name":"folder-font","folder_names":["font","fonts"]},{"name":"folder-bower","folder_names":["bower_components"]},{"name":"folder-test","folder_names":["test","tests","testing","__tests__","__snapshots__","__mocks__","__test__","spec","specs"]},{"name":"folder-jinja","folder_names":["jinja","jinja2","j2"]},{"name":"folder-markdown","folder_names":["markdown","md"]},{"name":"folder-php","folder_names":["php"]},{"name":"folder-phpmailer","folder_names":["phpmailer"]},{"name":"folder-sublime","folder_names":["sublime"]},{"name":"folder-docs","folder_names":["doc","docs","document","documents","documentation","post","posts","article","articles"]},{"name":"folder-git","folder_names":[".git","patches","githooks",".githooks","submodules",".submodules"]},{"name":"folder-github","folder_names":[".github"]},{"name":"folder-gitlab","folder_names":[".gitlab"]},{"name":"folder-vscode","folder_names":[".vscode",".vscode-test"]},{"name":"folder-views","folder_names":["view","views","screen","screens","page","pages","html"]},{"name":"folder-vue","folder_names":["vue"]},{"name":"folder-vuepress","folder_names":[".vuepress"]},{"name":"folder-expo","folder_names":[".expo",".expo-shared"]},{"name":"folder-config","folder_names":["config","configs","configuration","configurations","setting",".setting","settings",".settings","META-INF"]},{"name":"folder-i18n","folder_names":["i18n","internationalization","lang","language","languages","locale","locales","l10n","localization","translation","translate","translations",".tx"]},{"name":"folder-components","folder_names":["components","widget","widgets"]},{"name":"folder-aurelia","folder_names":["aurelia_project"]},{"name":"folder-resource","folder_names":["resource","resources","res","asset","assets","static","report","reports"]},{"name":"folder-lib","folder_names":["lib","libs","library","libraries","vendor","vendors","third-party"]},{"name":"folder-theme","folder_names":["themes","theme","color","colors","design","designs"]},{"name":"folder-webpack","folder_names":["webpack",".webpack"]},{"name":"folder-global","folder_names":["global"]},{"name":"folder-public","folder_names":["public","www","wwwroot","web","website"]},{"name":"folder-include","folder_names":["include","includes","_includes","inc"]},{"name":"folder-docker","folder_names":["docker","dockerfiles",".docker"]},{"name":"folder-database","folder_names":["db","database","databases","sql","data","_data"]},{"name":"folder-log","folder_names":["log","logs"]},{"name":"folder-temp","folder_names":["temp",".temp","tmp",".tmp","cached","cache",".cache"]},{"name":"folder-aws","folder_names":["aws",".aws"]},{"name":"folder-audio","folder_names":["audio","audios","music","musics","sound","sounds"]},{"name":"folder-video","folder_names":["video","videos","movie","movies"]},{"name":"folder-kubernetes","folder_names":["kubernetes","k8s"]},{"name":"folder-import","folder_names":["import","imports","imported"]},{"name":"folder-export","folder_names":["export","exports","exported"]},{"name":"folder-wakatime","folder_names":["wakatime"]},{"name":"folder-circleci","folder_names":[".circleci"]},{"name":"folder-wordpress","folder_names":[".wordpress-org","wp-content"]},{"name":"folder-gradle","folder_names":["gradle",".gradle"]},{"name":"folder-coverage","folder_names":["coverage",".nyc-output",".nyc_output","e2e","it","integration-test","integration-tests"]},{"name":"folder-class","folder_names":["class","classes","model","models","schemas","schema"]},{"name":"folder-other","folder_names":["other","others","misc","miscellaneous","extra","extras"]},{"name":"folder-typescript","folder_names":["typescript","ts","typings","@types","types"]},{"name":"folder-graphql","folder_names":["graphql","gql"]},{"name":"folder-routes","folder_names":["routes","router","routers"]},{"name":"folder-ci","folder_names":[".ci","ci"]},{"name":"folder-benchmark","folder_names":["benchmark","benchmarks","performance","measure","measures","measurement"]},{"name":"folder-messages","folder_names":["messages","messaging","forum","chat","chats","conversation","conversations"]},{"name":"folder-less","folder_names":["less"]},{"name":"folder-gulp","folder_names":["gulp"]},{"name":"folder-python","folder_names":["python","__pycache__",".pytest_cache"]},{"name":"folder-debug","folder_names":["debug","debugging"]},{"name":"folder-fastlane","folder_names":["fastlane"]},{"name":"folder-plugin","folder_names":["plugin","plugins","_plugins","extension","extensions","addon","addons","module","modules"]},{"name":"folder-middleware","folder_names":["middleware","middlewares"]},{"name":"folder-controller","folder_names":["controller","controllers","service","services","provider","providers","handler","handlers"]},{"name":"folder-ansible","folder_names":["ansible"]},{"name":"folder-server","folder_names":["server","servers","backend"]},{"name":"folder-client","folder_names":["client","clients","frontend","pwa"]},{"name":"folder-tasks","folder_names":["tasks","tickets"]},{"name":"folder-android","folder_names":["android"]},{"name":"folder-ios","folder_names":["ios"]},{"name":"folder-upload","folder_names":["uploads","upload"]},{"name":"folder-download","folder_names":["downloads","download"]},{"name":"folder-tools","folder_names":["tools"]},{"name":"folder-helper","folder_names":["helpers","helper"]},{"name":"folder-serverless","folder_names":[".serverless","serverless"]},{"name":"folder-api","folder_names":["api","apis","restapi"]},{"name":"folder-app","folder_names":["app","apps"]},{"name":"folder-apollo","folder_names":["apollo","apollo-client","apollo-cache","apollo-config"]},{"name":"folder-archive","folder_names":["archive","archives","archival","backup","backups","back-up","back-ups"]},{"name":"folder-batch","folder_names":["batch","batchs","batches"]},{"name":"folder-cluster","folder_names":["cluster","clusters"]},{"name":"folder-command","folder_names":["command","commands","cli","clis"]},{"name":"folder-constant","folder_names":["constant","constants"]},{"name":"folder-container","folder_names":["container","containers",".devcontainer"]},{"name":"folder-content","folder_names":["content","contents"]},{"name":"folder-context","folder_names":["context","contexts"]},{"name":"folder-core","folder_names":["core"]},{"name":"folder-delta","folder_names":["delta","deltas","changes"]},{"name":"folder-dump","folder_names":["dump","dumps"]},{"name":"folder-examples","folder_names":["demo","demos","example","examples","sample","samples","sample-data"]},{"name":"folder-environment","folder_names":[".env",".environment","env","envs","environment","environments",".venv"]},{"name":"folder-functions","folder_names":["function","functions","lambda","lambdas","logic","math","calc","calculation","calculations"]},{"name":"folder-generator","folder_names":["generator","generators","generated","cfn-gen","gen","gens","auto"]},{"name":"folder-hook","folder_names":["hook","hooks","trigger","triggers"]},{"name":"folder-job","folder_names":["job","jobs"]},{"name":"folder-keys","folder_names":["keys","key","token","tokens"]},{"name":"folder-layout","folder_names":["layout","layouts"]},{"name":"folder-mail","folder_names":["mail","mails","email","emails","smtp"]},{"name":"folder-mappings","folder_names":["mappings","mapping"]},{"name":"folder-meta","folder_names":["meta"]},{"name":"folder-packages","folder_names":["package","packages","pkg"]},{"name":"folder-shared","folder_names":["shared","common"]},{"name":"folder-stack","folder_names":["stack","stacks"]},{"name":"folder-template","folder_names":["template","templates"]},{"name":"folder-utils","folder_names":["util","utils","utility","utilities"]},{"name":"folder-private","folder_names":["private",".private"]},{"name":"folder-error","folder_names":["error","errors","err"]},{"name":"folder-event","folder_names":["event","events"]},{"name":"folder-secure","folder_names":["auth","authentication","secure","security","cert","certs","certificate","certificates","ssl"]},{"name":"folder-custom","folder_names":["custom","customs"]},{"name":"folder-mock","folder_names":["mock","mocks","draft","drafts","concept","concepts","sketch","sketches"]},{"name":"folder-syntax","folder_names":["syntax","syntaxes","spellcheck"]},{"name":"folder-vm","folder_names":["vm","vms"]},{"name":"folder-stylus","folder_names":["stylus"]},{"name":"folder-flow","folder_names":["flow-typed"]},{"name":"folder-rules","folder_names":["rule","rules","validation","validations","validator","validators"]},{"name":"folder-review","folder_names":["review","reviews","revisal","revisals","reviewed"]},{"name":"folder-animation","folder_names":["animation","animations","animated"]},{"name":"folder-guard","folder_names":["guard","guards"]},{"name":"folder-prisma","folder_names":["prisma"]},{"name":"folder-pipe","folder_names":["pipe","pipes"]},{"name":"folder-svg","folder_names":["svg","svgs"]},{"name":"folder-terraform","folder_names":["terraform",".terraform"]},{"name":"folder-mobile","folder_names":["mobile","mobiles","portable","portability"]},{"name":"folder-stencil","folder_names":[".stencil"]},{"name":"folder-firebase","folder_names":[".firebase"]},{"name":"folder-svelte","folder_names":["svelte"]},{"name":"folder-update","folder_names":["update","updates","upgrade","upgrades"]},{"name":"folder-intellij","folder_names":[".idea"]},{"name":"folder-azure-pipelines","folder_names":[".azure-pipelines",".azure-pipelines-ci"]},{"name":"folder-mjml","folder_names":["mjml"]},{"name":"folder-admin","folder_names":["admin"]},{"name":"folder-scala","folder_names":["scala"]},{"name":"folder-connection","folder_names":["connection","connections"]},{"name":"folder-quasar","folder_names":[".quasar"]},{"name":"folder-cobol","folder_names":["cobol"]},{"name":"folder-yarn","folder_names":["yarn",".yarn"]},{"name":"folder-husky","folder_names":["husky",".husky"]},{"name":"folder-storybook","folder_names":[".storybook","storybook","stories","__stories__"]},{"name":"folder-base","folder_names":["base",".base"]},{"name":"folder-cart","folder_names":["cart","shopping-cart","shopping","shop"]},{"name":"folder-home","folder_names":["home",".home","start",".start"]},{"name":"folder-project","folder_names":["project","projects",".project",".projects"]},{"name":"folder-interface","folder_names":["interface","interfaces"]},{"name":"folder-contract","folder_names":["pact","pacts","contract",".contract","contracts","contract-testing","contract-test","contract-tests"]},{"name":"folder-queue","folder_names":["queue","queues","bull","mq"]},{"name":"folder-vercel","folder_names":["vercel",".vercel","now",".now"]},{"name":"folder-cypress","folder_names":["cypress",".cypress"]},{"name":"folder-java","folder_names":["java"]},{"name":"folder-resolver","folder_names":["resolver","resolvers"]},{"name":"folder-angular","folder_names":[".angular"]}]}}
+{
+  "icon_manifest": {
+    "default_file_icon": {
+      "name": "file"
+    },
+    "file_icons": [
+      {
+        "name": "html",
+        "file_extensions": [
+          "htm",
+          "xhtml",
+          "html_vm",
+          "asp"
+        ]
+      },
+      {
+        "name": "pug",
+        "file_extensions": [
+          "jade",
+          "pug"
+        ],
+        "file_names": [
+          ".pug-lintrc",
+          ".pug-lintrc.js",
+          ".pug-lintrc.json"
+        ]
+      },
+      {
+        "name": "markdown",
+        "file_extensions": [
+          "md",
+          "markdown",
+          "rst"
+        ]
+      },
+      {
+        "name": "blink",
+        "file_extensions": [
+          "blink"
+        ]
+      },
+      {
+        "name": "css",
+        "file_extensions": [
+          "css"
+        ]
+      },
+      {
+        "name": "sass",
+        "file_extensions": [
+          "scss",
+          "sass"
+        ]
+      },
+      {
+        "name": "less",
+        "file_extensions": [
+          "less"
+        ]
+      },
+      {
+        "name": "json",
+        "file_extensions": [
+          "json",
+          "tsbuildinfo",
+          "json5",
+          "jsonl",
+          "ndjson"
+        ],
+        "file_names": [
+          ".jscsrc",
+          ".jshintrc",
+          "composer.lock",
+          ".jsbeautifyrc",
+          ".esformatter",
+          "cdp.pid",
+          ".lintstagedrc"
+        ]
+      },
+      {
+        "name": "jinja",
+        "file_extensions": [
+          "jinja",
+          "jinja2",
+          "j2",
+          "jinja-html"
+        ]
+      },
+      {
+        "name": "proto",
+        "file_extensions": [
+          "proto"
+        ]
+      },
+      {
+        "name": "sublime",
+        "file_extensions": [
+          "sublime-project",
+          "sublime-workspace"
+        ]
+      },
+      {
+        "name": "twine",
+        "file_extensions": [
+          "tw",
+          "twee"
+        ]
+      },
+      {
+        "name": "yaml",
+        "file_extensions": [
+          "yml",
+          "yaml",
+          "yml.dist",
+          "yaml.dist",
+          "YAML-tmLanguage"
+        ]
+      },
+      {
+        "name": "xml",
+        "file_extensions": [
+          "xml",
+          "plist",
+          "xsd",
+          "dtd",
+          "xsl",
+          "xslt",
+          "resx",
+          "iml",
+          "xquery",
+          "tmLanguage",
+          "manifest",
+          "project",
+          "xml.dist",
+          "xml.dist.sample",
+          "dmn"
+        ],
+        "file_names": [
+          ".htaccess"
+        ]
+      },
+      {
+        "name": "image",
+        "file_extensions": [
+          "png",
+          "jpeg",
+          "jpg",
+          "gif",
+          "ico",
+          "tif",
+          "tiff",
+          "psd",
+          "psb",
+          "ami",
+          "apx",
+          "bmp",
+          "bpg",
+          "brk",
+          "cur",
+          "dds",
+          "dng",
+          "exr",
+          "fpx",
+          "gbr",
+          "img",
+          "jbig2",
+          "jb2",
+          "jng",
+          "jxr",
+          "pgf",
+          "pic",
+          "raw",
+          "webp",
+          "eps",
+          "afphoto",
+          "ase",
+          "aseprite",
+          "clip",
+          "cpt",
+          "heif",
+          "heic",
+          "kra",
+          "mdp",
+          "ora",
+          "pdn",
+          "reb",
+          "sai",
+          "tga",
+          "xcf",
+          "jfif",
+          "ppm",
+          "pbm",
+          "pgm",
+          "pnm"
+        ]
+      },
+      {
+        "name": "javascript",
+        "file_extensions": [
+          "esx",
+          "mjs"
+        ]
+      },
+      {
+        "name": "react",
+        "file_extensions": [
+          "jsx"
+        ]
+      },
+      {
+        "name": "react_ts",
+        "file_extensions": [
+          "tsx"
+        ]
+      },
+      {
+        "name": "settings",
+        "file_extensions": [
+          "ini",
+          "dlc",
+          "dll",
+          "config",
+          "conf",
+          "properties",
+          "prop",
+          "settings",
+          "option",
+          "props",
+          "toml",
+          "prefs",
+          "sln.dotsettings",
+          "sln.dotsettings.user",
+          "cfg"
+        ],
+        "file_names": [
+          ".jshintignore",
+          ".buildignore",
+          ".mrconfig",
+          ".yardopts",
+          "manifest.mf",
+          ".clang-format",
+          ".clang-tidy"
+        ]
+      },
+      {
+        "name": "typescript-def",
+        "file_extensions": [
+          "d.ts"
+        ]
+      },
+      {
+        "name": "markojs",
+        "file_extensions": [
+          "marko"
+        ]
+      },
+      {
+        "name": "astro",
+        "file_extensions": [
+          "astro"
+        ]
+      },
+      {
+        "name": "pdf",
+        "file_extensions": [
+          "pdf"
+        ]
+      },
+      {
+        "name": "table",
+        "file_extensions": [
+          "xlsx",
+          "xls",
+          "csv",
+          "tsv"
+        ]
+      },
+      {
+        "name": "vscode",
+        "file_extensions": [
+          "vscodeignore",
+          "vsixmanifest",
+          "vsix",
+          "code-workplace"
+        ]
+      },
+      {
+        "name": "visualstudio",
+        "file_extensions": [
+          "csproj",
+          "ruleset",
+          "sln",
+          "suo",
+          "vb",
+          "vbs",
+          "vcxitems",
+          "vcxitems.filters",
+          "vcxproj",
+          "vcxproj.filters"
+        ]
+      },
+      {
+        "name": "database",
+        "file_extensions": [
+          "pdb",
+          "sql",
+          "pks",
+          "pkb",
+          "accdb",
+          "mdb",
+          "sqlite",
+          "sqlite3",
+          "pgsql",
+          "postgres",
+          "psql",
+          "db",
+          "db3"
+        ]
+      },
+      {
+        "name": "kusto",
+        "file_extensions": [
+          "kql"
+        ]
+      },
+      {
+        "name": "csharp",
+        "file_extensions": [
+          "cs",
+          "csx"
+        ]
+      },
+      {
+        "name": "qsharp",
+        "file_extensions": [
+          "qs"
+        ]
+      },
+      {
+        "name": "zip",
+        "file_extensions": [
+          "zip",
+          "tar",
+          "gz",
+          "xz",
+          "br",
+          "bzip2",
+          "gzip",
+          "brotli",
+          "7z",
+          "rar",
+          "tgz"
+        ]
+      },
+      {
+        "name": "vala",
+        "file_extensions": [
+          "vala"
+        ]
+      },
+      {
+        "name": "zig",
+        "file_extensions": [
+          "zig"
+        ]
+      },
+      {
+        "name": "exe",
+        "file_extensions": [
+          "exe",
+          "msi"
+        ]
+      },
+      {
+        "name": "hex",
+        "file_extensions": [
+          "dat",
+          "bin",
+          "hex"
+        ]
+      },
+      {
+        "name": "java",
+        "file_extensions": [
+          "java",
+          "jsp"
+        ]
+      },
+      {
+        "name": "jar",
+        "file_extensions": [
+          "jar"
+        ]
+      },
+      {
+        "name": "javaclass",
+        "file_extensions": [
+          "class"
+        ]
+      },
+      {
+        "name": "c",
+        "file_extensions": [
+          "c",
+          "i",
+          "mi"
+        ]
+      },
+      {
+        "name": "h",
+        "file_extensions": [
+          "h"
+        ]
+      },
+      {
+        "name": "cpp",
+        "file_extensions": [
+          "cc",
+          "cpp",
+          "cxx",
+          "c++",
+          "cp",
+          "mm",
+          "mii",
+          "ii"
+        ]
+      },
+      {
+        "name": "hpp",
+        "file_extensions": [
+          "hh",
+          "hpp",
+          "hxx",
+          "h++",
+          "hp",
+          "tcc",
+          "inl"
+        ]
+      },
+      {
+        "name": "go",
+        "file_extensions": [
+          "go"
+        ]
+      },
+      {
+        "name": "go-mod",
+        "file_names": [
+          "go.mod",
+          "go.sum"
+        ]
+      },
+      {
+        "name": "python",
+        "file_extensions": [
+          "py"
+        ]
+      },
+      {
+        "name": "python-misc",
+        "file_extensions": [
+          "pyc",
+          "whl"
+        ],
+        "file_names": [
+          "requirements.txt",
+          "pipfile",
+          ".python-version",
+          "manifest.in",
+          "pylintrc",
+          ".pylintrc"
+        ]
+      },
+      {
+        "name": "url",
+        "file_extensions": [
+          "url"
+        ]
+      },
+      {
+        "name": "console",
+        "file_extensions": [
+          "sh",
+          "ksh",
+          "csh",
+          "tcsh",
+          "zsh",
+          "bash",
+          "bat",
+          "cmd",
+          "awk",
+          "fish",
+          "exp"
+        ],
+        "file_names": [
+          "pre-commit",
+          "pre-push",
+          "post-merge"
+        ]
+      },
+      {
+        "name": "powershell",
+        "file_extensions": [
+          "ps1",
+          "psm1",
+          "psd1",
+          "ps1xml",
+          "psc1",
+          "pssc"
+        ]
+      },
+      {
+        "name": "gradle",
+        "file_extensions": [
+          "gradle"
+        ],
+        "file_names": [
+          "gradle.properties",
+          "gradlew",
+          "gradle-wrapper.properties"
+        ]
+      },
+      {
+        "name": "word",
+        "file_extensions": [
+          "doc",
+          "docx",
+          "rtf"
+        ]
+      },
+      {
+        "name": "certificate",
+        "file_extensions": [
+          "cer",
+          "cert",
+          "crt"
+        ],
+        "file_names": [
+          "copying",
+          "copying.md",
+          "copying.txt",
+          "copyright",
+          "copyright.txt",
+          "copyright.md",
+          "license",
+          "license.md",
+          "license.txt",
+          "licence",
+          "licence.md",
+          "licence.txt"
+        ]
+      },
+      {
+        "name": "key",
+        "file_extensions": [
+          "pub",
+          "key",
+          "pem",
+          "asc",
+          "gpg",
+          "passwd"
+        ],
+        "file_names": [
+          ".htpasswd"
+        ]
+      },
+      {
+        "name": "font",
+        "file_extensions": [
+          "woff",
+          "woff2",
+          "ttf",
+          "eot",
+          "suit",
+          "otf",
+          "bmap",
+          "fnt",
+          "odttf",
+          "ttc",
+          "font",
+          "fonts",
+          "sui",
+          "ntf",
+          "mrf"
+        ]
+      },
+      {
+        "name": "lib",
+        "file_extensions": [
+          "lib",
+          "bib"
+        ]
+      },
+      {
+        "name": "ruby",
+        "file_extensions": [
+          "rb",
+          "erb"
+        ]
+      },
+      {
+        "name": "gemfile",
+        "file_names": [
+          "gemfile"
+        ]
+      },
+      {
+        "name": "rubocop",
+        "file_names": [
+          ".rubocop.yml",
+          ".rubocop-todo.yml",
+          ".rubocop_todo.yml"
+        ]
+      },
+      {
+        "name": "fsharp",
+        "file_extensions": [
+          "fs",
+          "fsx",
+          "fsi",
+          "fsproj"
+        ]
+      },
+      {
+        "name": "swift",
+        "file_extensions": [
+          "swift"
+        ]
+      },
+      {
+        "name": "arduino",
+        "file_extensions": [
+          "ino"
+        ]
+      },
+      {
+        "name": "docker",
+        "file_extensions": [
+          "dockerignore",
+          "dockerfile"
+        ],
+        "file_names": [
+          "dockerfile",
+          "dockerfile.prod",
+          "dockerfile.production",
+          "dockerfile.alpha",
+          "dockerfile.beta",
+          "dockerfile.stage",
+          "dockerfile.staging",
+          "dockerfile.dev",
+          "dockerfile.development",
+          "dockerfile.local",
+          "dockerfile.test",
+          "dockerfile.testing",
+          "dockerfile.ci",
+          "dockerfile.web",
+          "dockerfile.worker",
+          "docker-compose.yml",
+          "docker-compose.override.yml",
+          "docker-compose.prod.yml",
+          "docker-compose.production.yml",
+          "docker-compose.alpha.yml",
+          "docker-compose.beta.yml",
+          "docker-compose.stage.yml",
+          "docker-compose.staging.yml",
+          "docker-compose.dev.yml",
+          "docker-compose.development.yml",
+          "docker-compose.local.yml",
+          "docker-compose.test.yml",
+          "docker-compose.testing.yml",
+          "docker-compose.ci.yml",
+          "docker-compose.web.yml",
+          "docker-compose.worker.yml",
+          "docker-compose.yaml",
+          "docker-compose.override.yaml",
+          "docker-compose.prod.yaml",
+          "docker-compose.production.yaml",
+          "docker-compose.alpha.yaml",
+          "docker-compose.beta.yaml",
+          "docker-compose.stage.yaml",
+          "docker-compose.staging.yaml",
+          "docker-compose.dev.yaml",
+          "docker-compose.development.yaml",
+          "docker-compose.local.yaml",
+          "docker-compose.test.yaml",
+          "docker-compose.testing.yaml",
+          "docker-compose.ci.yaml",
+          "docker-compose.web.yaml",
+          "docker-compose.worker.yaml"
+        ]
+      },
+      {
+        "name": "tex",
+        "file_extensions": [
+          "tex",
+          "sty",
+          "dtx",
+          "ltx"
+        ]
+      },
+      {
+        "name": "powerpoint",
+        "file_extensions": [
+          "pptx",
+          "ppt",
+          "pptm",
+          "potx",
+          "potm",
+          "ppsx",
+          "ppsm",
+          "pps",
+          "ppam",
+          "ppa"
+        ]
+      },
+      {
+        "name": "video",
+        "file_extensions": [
+          "webm",
+          "mkv",
+          "flv",
+          "vob",
+          "ogv",
+          "ogg",
+          "gifv",
+          "avi",
+          "mov",
+          "qt",
+          "wmv",
+          "yuv",
+          "rm",
+          "rmvb",
+          "mp4",
+          "m4v",
+          "mpg",
+          "mp2",
+          "mpeg",
+          "mpe",
+          "mpv",
+          "m2v"
+        ]
+      },
+      {
+        "name": "virtual",
+        "file_extensions": [
+          "vdi",
+          "vbox",
+          "vbox-prev"
+        ]
+      },
+      {
+        "name": "email",
+        "file_extensions": [
+          "ics"
+        ],
+        "file_names": [
+          ".mailmap"
+        ]
+      },
+      {
+        "name": "audio",
+        "file_extensions": [
+          "mp3",
+          "flac",
+          "m4a",
+          "wma",
+          "aiff",
+          "wav"
+        ]
+      },
+      {
+        "name": "coffee",
+        "file_extensions": [
+          "coffee",
+          "cson",
+          "iced"
+        ]
+      },
+      {
+        "name": "document",
+        "file_extensions": [
+          "txt"
+        ]
+      },
+      {
+        "name": "graphql",
+        "file_extensions": [
+          "graphql",
+          "gql"
+        ],
+        "file_names": [
+          ".graphqlconfig",
+          ".graphqlrc",
+          ".graphqlrc.json",
+          ".graphqlrc.js",
+          ".graphqlrc.ts",
+          ".graphqlrc.toml",
+          ".graphqlrc.yaml",
+          ".graphqlrc.yml",
+          "graphql.config.json",
+          "graphql.config.js",
+          "graphql.config.ts",
+          "graphql.config.toml",
+          "graphql.config.yaml",
+          "graphql.config.yml"
+        ]
+      },
+      {
+        "name": "rust",
+        "file_extensions": [
+          "rs"
+        ]
+      },
+      {
+        "name": "raml",
+        "file_extensions": [
+          "raml"
+        ]
+      },
+      {
+        "name": "xaml",
+        "file_extensions": [
+          "xaml"
+        ]
+      },
+      {
+        "name": "haskell",
+        "file_extensions": [
+          "hs"
+        ]
+      },
+      {
+        "name": "kotlin",
+        "file_extensions": [
+          "kt",
+          "kts"
+        ]
+      },
+      {
+        "name": "git",
+        "file_extensions": [
+          "patch"
+        ],
+        "file_names": [
+          ".gitignore",
+          ".gitignore_global",
+          ".gitconfig",
+          ".gitattributes",
+          ".gitmodules",
+          ".gitkeep",
+          ".gitinclude",
+          "git-history"
+        ]
+      },
+      {
+        "name": "lua",
+        "file_extensions": [
+          "lua"
+        ],
+        "file_names": [
+          ".luacheckrc"
+        ]
+      },
+      {
+        "name": "clojure",
+        "file_extensions": [
+          "clj",
+          "cljs",
+          "cljc"
+        ]
+      },
+      {
+        "name": "groovy",
+        "file_extensions": [
+          "groovy"
+        ]
+      },
+      {
+        "name": "r",
+        "file_extensions": [
+          "r",
+          "rmd"
+        ],
+        "file_names": [
+          ".Rhistory"
+        ]
+      },
+      {
+        "name": "dart",
+        "file_extensions": [
+          "dart"
+        ],
+        "file_names": [
+          ".pubignore"
+        ]
+      },
+      {
+        "name": "actionscript",
+        "file_extensions": [
+          "as"
+        ]
+      },
+      {
+        "name": "mxml",
+        "file_extensions": [
+          "mxml"
+        ]
+      },
+      {
+        "name": "autohotkey",
+        "file_extensions": [
+          "ahk"
+        ]
+      },
+      {
+        "name": "flash",
+        "file_extensions": [
+          "swf"
+        ]
+      },
+      {
+        "name": "swc",
+        "file_extensions": [
+          "swc"
+        ]
+      },
+      {
+        "name": "cmake",
+        "file_extensions": [
+          "cmake"
+        ],
+        "file_names": [
+          "cmakelists.txt",
+          "cmakecache.txt"
+        ]
+      },
+      {
+        "name": "assembly",
+        "file_extensions": [
+          "asm",
+          "a51",
+          "inc",
+          "nasm",
+          "s",
+          "ms",
+          "agc",
+          "ags",
+          "aea",
+          "argus",
+          "mitigus",
+          "binsource"
+        ]
+      },
+      {
+        "name": "vue",
+        "file_extensions": [
+          "vue"
+        ]
+      },
+      {
+        "name": "vue-config",
+        "file_names": [
+          "vue.config.js",
+          "vue.config.ts",
+          "vetur.config.js",
+          "vetur.config.ts"
+        ]
+      },
+      {
+        "name": "nuxt",
+        "file_names": [
+          "nuxt.config.js",
+          "nuxt.config.ts"
+        ]
+      },
+      {
+        "name": "ocaml",
+        "file_extensions": [
+          "ml",
+          "mli",
+          "cmx"
+        ]
+      },
+      {
+        "name": "odin",
+        "file_extensions": [
+          "odin"
+        ]
+      },
+      {
+        "name": "javascript-map",
+        "file_extensions": [
+          "js.map",
+          "mjs.map",
+          "cjs.map"
+        ]
+      },
+      {
+        "name": "css-map",
+        "file_extensions": [
+          "css.map"
+        ]
+      },
+      {
+        "name": "lock",
+        "file_extensions": [
+          "lock"
+        ],
+        "file_names": [
+          "security.md",
+          "security.txt",
+          "security"
+        ]
+      },
+      {
+        "name": "handlebars",
+        "file_extensions": [
+          "hbs",
+          "mustache"
+        ]
+      },
+      {
+        "name": "perl",
+        "file_extensions": [
+          "pm",
+          "raku"
+        ]
+      },
+      {
+        "name": "haxe",
+        "file_extensions": [
+          "hx"
+        ]
+      },
+      {
+        "name": "test-ts",
+        "file_extensions": [
+          "spec.ts",
+          "e2e-spec.ts",
+          "test.ts",
+          "ts.snap"
+        ]
+      },
+      {
+        "name": "test-jsx",
+        "file_extensions": [
+          "spec.tsx",
+          "test.tsx",
+          "tsx.snap",
+          "spec.jsx",
+          "test.jsx",
+          "jsx.snap"
+        ]
+      },
+      {
+        "name": "test-js",
+        "file_extensions": [
+          "spec.js",
+          "spec.cjs",
+          "spec.mjs",
+          "e2e-spec.js",
+          "e2e-spec.cjs",
+          "e2e-spec.mjs",
+          "test.js",
+          "test.cjs",
+          "test.mjs",
+          "js.snap"
+        ]
+      },
+      {
+        "name": "puppet",
+        "file_extensions": [
+          "pp"
+        ]
+      },
+      {
+        "name": "elixir",
+        "file_extensions": [
+          "ex",
+          "exs",
+          "eex",
+          "leex",
+          "heex"
+        ]
+      },
+      {
+        "name": "livescript",
+        "file_extensions": [
+          "ls"
+        ]
+      },
+      {
+        "name": "erlang",
+        "file_extensions": [
+          "erl"
+        ]
+      },
+      {
+        "name": "twig",
+        "file_extensions": [
+          "twig"
+        ]
+      },
+      {
+        "name": "julia",
+        "file_extensions": [
+          "jl"
+        ]
+      },
+      {
+        "name": "elm",
+        "file_extensions": [
+          "elm"
+        ]
+      },
+      {
+        "name": "purescript",
+        "file_extensions": [
+          "pure",
+          "purs"
+        ]
+      },
+      {
+        "name": "smarty",
+        "file_extensions": [
+          "tpl"
+        ]
+      },
+      {
+        "name": "stylus",
+        "file_extensions": [
+          "styl"
+        ]
+      },
+      {
+        "name": "reason",
+        "file_extensions": [
+          "re",
+          "rei"
+        ]
+      },
+      {
+        "name": "bucklescript",
+        "file_extensions": [
+          "cmj"
+        ]
+      },
+      {
+        "name": "merlin",
+        "file_extensions": [
+          "merlin"
+        ]
+      },
+      {
+        "name": "verilog",
+        "file_extensions": [
+          "vhd",
+          "sv",
+          "svh"
+        ]
+      },
+      {
+        "name": "mathematica",
+        "file_extensions": [
+          "nb"
+        ]
+      },
+      {
+        "name": "wolframlanguage",
+        "file_extensions": [
+          "wl",
+          "wls"
+        ]
+      },
+      {
+        "name": "nunjucks",
+        "file_extensions": [
+          "njk",
+          "nunjucks"
+        ]
+      },
+      {
+        "name": "robot",
+        "file_extensions": [
+          "robot"
+        ]
+      },
+      {
+        "name": "solidity",
+        "file_extensions": [
+          "sol"
+        ]
+      },
+      {
+        "name": "autoit",
+        "file_extensions": [
+          "au3"
+        ]
+      },
+      {
+        "name": "haml",
+        "file_extensions": [
+          "haml"
+        ]
+      },
+      {
+        "name": "yang",
+        "file_extensions": [
+          "yang"
+        ]
+      },
+      {
+        "name": "mjml",
+        "file_extensions": [
+          "mjml"
+        ],
+        "file_names": [
+          ".mjmlconfig"
+        ]
+      },
+      {
+        "name": "vercel",
+        "file_names": [
+          "vercel.json",
+          ".vercelignore",
+          "now.json",
+          ".nowignore"
+        ]
+      },
+      {
+        "name": "next",
+        "file_names": [
+          "next.config.js",
+          "next.config.ts"
+        ]
+      },
+      {
+        "name": "terraform",
+        "file_extensions": [
+          "tf",
+          "tf.json",
+          "tfvars",
+          "tfstate"
+        ]
+      },
+      {
+        "name": "laravel",
+        "file_extensions": [
+          "blade.php",
+          "inky.php"
+        ],
+        "file_names": [
+          "artisan"
+        ]
+      },
+      {
+        "name": "applescript",
+        "file_extensions": [
+          "applescript",
+          "ipa"
+        ]
+      },
+      {
+        "name": "cake",
+        "file_extensions": [
+          "cake"
+        ]
+      },
+      {
+        "name": "cucumber",
+        "file_extensions": [
+          "feature"
+        ]
+      },
+      {
+        "name": "nim",
+        "file_extensions": [
+          "nim",
+          "nimble"
+        ]
+      },
+      {
+        "name": "apiblueprint",
+        "file_extensions": [
+          "apib",
+          "apiblueprint"
+        ]
+      },
+      {
+        "name": "riot",
+        "file_extensions": [
+          "riot",
+          "tag"
+        ]
+      },
+      {
+        "name": "vfl",
+        "file_extensions": [
+          "vfl"
+        ],
+        "file_names": [
+          ".vfl"
+        ]
+      },
+      {
+        "name": "kl",
+        "file_extensions": [
+          "kl"
+        ],
+        "file_names": [
+          ".kl"
+        ]
+      },
+      {
+        "name": "postcss",
+        "file_extensions": [
+          "pcss",
+          "sss"
+        ],
+        "file_names": [
+          "postcss.config.js",
+          "postcss.config.cjs",
+          ".postcssrc.js",
+          ".postcssrc",
+          ".postcssrc.json",
+          ".postcssrc.yml"
+        ]
+      },
+      {
+        "name": "posthtml",
+        "file_names": [
+          "posthtml.config.js",
+          ".posthtmlrc.js",
+          ".posthtmlrc",
+          ".posthtmlrc.json",
+          ".posthtmlrc.yml"
+        ]
+      },
+      {
+        "name": "todo",
+        "file_extensions": [
+          "todo"
+        ]
+      },
+      {
+        "name": "coldfusion",
+        "file_extensions": [
+          "cfml",
+          "cfc",
+          "lucee",
+          "cfm"
+        ]
+      },
+      {
+        "name": "cabal",
+        "file_extensions": [
+          "cabal"
+        ],
+        "file_names": [
+          "cabal.project",
+          "cabal.project.freeze",
+          "cabal.project.local"
+        ]
+      },
+      {
+        "name": "nix",
+        "file_extensions": [
+          "nix"
+        ]
+      },
+      {
+        "name": "slim",
+        "file_extensions": [
+          "slim"
+        ]
+      },
+      {
+        "name": "http",
+        "file_extensions": [
+          "http",
+          "rest"
+        ],
+        "file_names": [
+          "CNAME"
+        ]
+      },
+      {
+        "name": "restql",
+        "file_extensions": [
+          "rql",
+          "restql"
+        ]
+      },
+      {
+        "name": "kivy",
+        "file_extensions": [
+          "kv"
+        ]
+      },
+      {
+        "name": "graphcool",
+        "file_extensions": [
+          "graphcool"
+        ],
+        "file_names": [
+          "project.graphcool"
+        ]
+      },
+      {
+        "name": "sbt",
+        "file_extensions": [
+          "sbt"
+        ]
+      },
+      {
+        "name": "webpack",
+        "file_names": [
+          "webpack.js",
+          "webpack.cjs",
+          "webpack.ts",
+          "webpack.base.js",
+          "webpack.base.cjs",
+          "webpack.base.ts",
+          "webpack.config.js",
+          "webpack.config.cjs",
+          "webpack.config.ts",
+          "webpack.common.js",
+          "webpack.common.cjs",
+          "webpack.common.ts",
+          "webpack.config.common.js",
+          "webpack.config.common.cjs",
+          "webpack.config.common.ts",
+          "webpack.config.common.babel.js",
+          "webpack.config.common.babel.ts",
+          "webpack.dev.js",
+          "webpack.dev.cjs",
+          "webpack.dev.ts",
+          "webpack.development.js",
+          "webpack.development.cjs",
+          "webpack.development.ts",
+          "webpack.config.dev.js",
+          "webpack.config.dev.cjs",
+          "webpack.config.dev.ts",
+          "webpack.config.dev.babel.js",
+          "webpack.config.dev.babel.ts",
+          "webpack.mix.js",
+          "webpack.mix.cjs",
+          "webpack.prod.js",
+          "webpack.prod.cjs",
+          "webpack.prod.config.js",
+          "webpack.prod.config.cjs",
+          "webpack.prod.ts",
+          "webpack.production.js",
+          "webpack.production.cjs",
+          "webpack.production.ts",
+          "webpack.server.js",
+          "webpack.server.cjs",
+          "webpack.server.ts",
+          "webpack.client.js",
+          "webpack.client.cjs",
+          "webpack.client.ts",
+          "webpack.config.server.js",
+          "webpack.config.server.cjs",
+          "webpack.config.server.ts",
+          "webpack.config.client.js",
+          "webpack.config.client.cjs",
+          "webpack.config.client.ts",
+          "webpack.config.production.babel.js",
+          "webpack.config.production.babel.ts",
+          "webpack.config.prod.babel.js",
+          "webpack.config.prod.babel.cjs",
+          "webpack.config.prod.babel.ts",
+          "webpack.config.prod.js",
+          "webpack.config.prod.cjs",
+          "webpack.config.prod.ts",
+          "webpack.config.production.js",
+          "webpack.config.production.cjs",
+          "webpack.config.production.ts",
+          "webpack.config.staging.js",
+          "webpack.config.staging.cjs",
+          "webpack.config.staging.ts",
+          "webpack.config.babel.js",
+          "webpack.config.babel.ts",
+          "webpack.config.base.babel.js",
+          "webpack.config.base.babel.ts",
+          "webpack.config.base.js",
+          "webpack.config.base.cjs",
+          "webpack.config.base.ts",
+          "webpack.config.staging.babel.js",
+          "webpack.config.staging.babel.ts",
+          "webpack.config.coffee",
+          "webpack.config.test.js",
+          "webpack.config.test.cjs",
+          "webpack.config.test.ts",
+          "webpack.config.vendor.js",
+          "webpack.config.vendor.cjs",
+          "webpack.config.vendor.ts",
+          "webpack.config.vendor.production.js",
+          "webpack.config.vendor.production.cjs",
+          "webpack.config.vendor.production.ts",
+          "webpack.test.js",
+          "webpack.test.cjs",
+          "webpack.test.ts",
+          "webpack.dist.js",
+          "webpack.dist.cjs",
+          "webpack.dist.ts",
+          "webpackfile.js",
+          "webpackfile.cjs",
+          "webpackfile.ts"
+        ]
+      },
+      {
+        "name": "ionic",
+        "file_names": [
+          "ionic.config.json",
+          ".io-config.json"
+        ]
+      },
+      {
+        "name": "gulp",
+        "file_names": [
+          "gulpfile.js",
+          "gulpfile.mjs",
+          "gulpfile.ts",
+          "gulpfile.babel.js"
+        ]
+      },
+      {
+        "name": "nodejs",
+        "file_names": [
+          "package.json",
+          "package-lock.json",
+          ".nvmrc",
+          ".esmrc",
+          ".node-version"
+        ]
+      },
+      {
+        "name": "npm",
+        "file_names": [
+          ".npmignore",
+          ".npmrc"
+        ]
+      },
+      {
+        "name": "yarn",
+        "file_names": [
+          ".yarnrc",
+          "yarn.lock",
+          ".yarnclean",
+          ".yarn-integrity",
+          "yarn-error.log",
+          ".yarnrc.yml",
+          ".yarnrc.yaml"
+        ]
+      },
+      {
+        "name": "android",
+        "file_names": [
+          "androidmanifest.xml"
+        ],
+        "file_extensions": [
+          "apk",
+          "smali",
+          "dex"
+        ]
+      },
+      {
+        "name": "tune",
+        "file_extensions": [
+          "env"
+        ],
+        "file_names": [
+          ".env.defaults",
+          ".env.example",
+          ".env.sample",
+          ".env.template",
+          ".env.schema",
+          ".env.local",
+          ".env.dev",
+          ".env.development",
+          ".env.qa",
+          ".env.dist",
+          ".env.prod",
+          ".env.production",
+          ".env.stage",
+          ".env.staging",
+          ".env.preview",
+          ".env.test",
+          ".env.testing",
+          ".env.development.local",
+          ".env.qa.local",
+          ".env.production.local",
+          ".env.staging.local",
+          ".env.test.local"
+        ]
+      },
+      {
+        "name": "babel",
+        "file_names": [
+          ".babelrc",
+          ".babelrc.cjs",
+          ".babelrc.js",
+          ".babelrc.mjs",
+          ".babelrc.json",
+          "babel.config.cjs",
+          "babel.config.js",
+          "babel.config.mjs",
+          "babel.config.json",
+          "babel-transform.js",
+          ".babel-plugin-macrosrc",
+          ".babel-plugin-macrosrc.json",
+          ".babel-plugin-macrosrc.yaml",
+          ".babel-plugin-macrosrc.yml",
+          ".babel-plugin-macrosrc.js",
+          "babel-plugin-macros.config.js"
+        ]
+      },
+      {
+        "name": "contributing",
+        "file_names": [
+          "contributing.md"
+        ]
+      },
+      {
+        "name": "readme",
+        "file_names": [
+          "readme.md",
+          "readme.txt",
+          "readme"
+        ]
+      },
+      {
+        "name": "changelog",
+        "file_names": [
+          "changelog",
+          "changelog.md",
+          "changelog.txt",
+          "changes",
+          "changes.md",
+          "changes.txt"
+        ]
+      },
+      {
+        "name": "credits",
+        "file_names": [
+          "credits",
+          "credits.txt",
+          "credits.md"
+        ]
+      },
+      {
+        "name": "authors",
+        "file_names": [
+          "authors",
+          "authors.md",
+          "authors.txt"
+        ]
+      },
+      {
+        "name": "flow",
+        "file_names": [
+          ".flowconfig"
+        ]
+      },
+      {
+        "name": "favicon",
+        "file_names": [
+          "favicon.ico"
+        ]
+      },
+      {
+        "name": "karma",
+        "file_names": [
+          "karma.conf.js",
+          "karma.conf.ts",
+          "karma.conf.coffee",
+          "karma.config.js",
+          "karma.config.ts",
+          "karma-main.js",
+          "karma-main.ts"
+        ]
+      },
+      {
+        "name": "bithound",
+        "file_names": [
+          ".bithoundrc"
+        ]
+      },
+      {
+        "name": "svgo",
+        "file_names": [
+          "svgo.config.js"
+        ]
+      },
+      {
+        "name": "appveyor",
+        "file_names": [
+          ".appveyor.yml",
+          "appveyor.yml"
+        ]
+      },
+      {
+        "name": "travis",
+        "file_names": [
+          ".travis.yml"
+        ]
+      },
+      {
+        "name": "codecov",
+        "file_names": [
+          ".codecov.yml",
+          "codecov.yml"
+        ]
+      },
+      {
+        "name": "protractor",
+        "file_names": [
+          "protractor.conf.js",
+          "protractor.conf.ts",
+          "protractor.conf.coffee",
+          "protractor.config.js",
+          "protractor.config.ts"
+        ]
+      },
+      {
+        "name": "fusebox",
+        "file_names": [
+          "fuse.js"
+        ]
+      },
+      {
+        "name": "heroku",
+        "file_names": [
+          "procfile",
+          "procfile.windows"
+        ]
+      },
+      {
+        "name": "editorconfig",
+        "file_names": [
+          ".editorconfig"
+        ]
+      },
+      {
+        "name": "gitlab",
+        "file_extensions": [
+          "gitlab-ci.yml"
+        ]
+      },
+      {
+        "name": "bower",
+        "file_names": [
+          ".bowerrc",
+          "bower.json"
+        ]
+      },
+      {
+        "name": "eslint",
+        "file_names": [
+          ".eslintrc.js",
+          ".eslintrc.cjs",
+          ".eslintrc.yaml",
+          ".eslintrc.yml",
+          ".eslintrc.json",
+          ".eslintrc-md.js",
+          ".eslintrc-jsdoc.js",
+          ".eslintrc",
+          ".eslintignore",
+          ".eslintcache"
+        ]
+      },
+      {
+        "name": "conduct",
+        "file_names": [
+          "code_of_conduct.md",
+          "code_of_conduct.txt"
+        ]
+      },
+      {
+        "name": "watchman",
+        "file_names": [
+          ".watchmanconfig"
+        ]
+      },
+      {
+        "name": "aurelia",
+        "file_names": [
+          "aurelia.json"
+        ]
+      },
+      {
+        "name": "mocha",
+        "file_names": [
+          "mocha.opts",
+          ".mocharc.yml",
+          ".mocharc.yaml",
+          ".mocharc.js",
+          ".mocharc.json",
+          ".mocharc.jsonc"
+        ]
+      },
+      {
+        "name": "jenkins",
+        "file_names": [
+          "jenkinsfile"
+        ],
+        "file_extensions": [
+          "jenkinsfile",
+          "jenkins"
+        ]
+      },
+      {
+        "name": "firebase",
+        "file_names": [
+          "firebase.json",
+          ".firebaserc",
+          "firestore.rules",
+          "firestore.indexes.json"
+        ]
+      },
+      {
+        "name": "rollup",
+        "file_names": [
+          "rollup.config.js",
+          "rollup.config.ts",
+          "rollup-config.js",
+          "rollup-config.ts",
+          "rollup.config.common.js",
+          "rollup.config.common.ts",
+          "rollup.config.base.js",
+          "rollup.config.base.ts",
+          "rollup.config.prod.js",
+          "rollup.config.prod.ts",
+          "rollup.config.dev.js",
+          "rollup.config.dev.ts",
+          "rollup.config.prod.vendor.js",
+          "rollup.config.prod.vendor.ts"
+        ]
+      },
+      {
+        "name": "hack",
+        "file_names": [
+          ".hhconfig"
+        ]
+      },
+      {
+        "name": "stylelint",
+        "file_names": [
+          ".stylelintrc",
+          "stylelint.config.js",
+          "stylelint.config.cjs",
+          ".stylelintrc.json",
+          ".stylelintrc.yaml",
+          ".stylelintrc.yml",
+          ".stylelintrc.js",
+          ".stylelintrc.cjs",
+          ".stylelintignore"
+        ]
+      },
+      {
+        "name": "code-climate",
+        "file_names": [
+          ".codeclimate.yml"
+        ]
+      },
+      {
+        "name": "prettier",
+        "file_names": [
+          ".prettierrc",
+          "prettier.config.js",
+          "prettier.config.cjs",
+          ".prettierrc.js",
+          ".prettierrc.cjs",
+          ".prettierrc.json",
+          ".prettierrc.json5",
+          ".prettierrc.yaml",
+          ".prettierrc.yml",
+          ".prettierignore",
+          ".prettierrc.toml"
+        ]
+      },
+      {
+        "name": "renovate",
+        "file_names": [
+          ".renovaterc",
+          ".renovaterc.json",
+          "renovate.json",
+          "renovate.json5"
+        ]
+      },
+      {
+        "name": "apollo",
+        "file_names": [
+          "apollo.config.js"
+        ]
+      },
+      {
+        "name": "nodemon",
+        "file_names": [
+          "nodemon.json",
+          "nodemon-debug.json"
+        ]
+      },
+      {
+        "name": "webhint",
+        "file_names": [
+          ".hintrc"
+        ]
+      },
+      {
+        "name": "browserlist",
+        "file_names": [
+          "browserslist",
+          ".browserslistrc"
+        ]
+      },
+      {
+        "name": "crystal",
+        "file_extensions": [
+          "cr",
+          "ecr"
+        ]
+      },
+      {
+        "name": "snyk",
+        "file_names": [
+          ".snyk"
+        ]
+      },
+      {
+        "name": "drone",
+        "file_extensions": [
+          "drone.yml"
+        ],
+        "file_names": [
+          ".drone.yml"
+        ]
+      },
+      {
+        "name": "cuda",
+        "file_extensions": [
+          "cu",
+          "cuh"
+        ]
+      },
+      {
+        "name": "log",
+        "file_extensions": [
+          "log"
+        ]
+      },
+      {
+        "name": "dotjs",
+        "file_extensions": [
+          "def",
+          "dot",
+          "jst"
+        ]
+      },
+      {
+        "name": "ejs",
+        "file_extensions": [
+          "ejs"
+        ]
+      },
+      {
+        "name": "sequelize",
+        "file_names": [
+          ".sequelizerc"
+        ]
+      },
+      {
+        "name": "gatsby",
+        "file_names": [
+          "gatsby.config.js",
+          "gatsby-config.js",
+          "gatsby-node.js",
+          "gatsby-browser.js",
+          "gatsby-ssr.js"
+        ]
+      },
+      {
+        "name": "wakatime",
+        "file_names": [
+          ".wakatime-project"
+        ],
+        "file_extensions": [
+          ".wakatime-project"
+        ]
+      },
+      {
+        "name": "circleci",
+        "file_names": [
+          "circle.yml"
+        ]
+      },
+      {
+        "name": "cloudfoundry",
+        "file_names": [
+          ".cfignore"
+        ]
+      },
+      {
+        "name": "grunt",
+        "file_names": [
+          "gruntfile.js",
+          "gruntfile.ts",
+          "gruntfile.coffee",
+          "gruntfile.babel.js",
+          "gruntfile.babel.ts",
+          "gruntfile.babel.coffee"
+        ]
+      },
+      {
+        "name": "jest",
+        "file_names": [
+          "jest.config.js",
+          "jest.config.ts",
+          "jest.config.cjs",
+          "jest.config.mjs",
+          "jest.config.json",
+          "jest.e2e.config.js",
+          "jest.e2e.config.ts",
+          "jest.e2e.config.cjs",
+          "jest.e2e.config.mjs",
+          "jest.e2e.config.json",
+          "jest.e2e.json",
+          "jest-unit.config.js",
+          "jest-e2e.config.js",
+          "jest-e2e.config.ts",
+          "jest-e2e.config.cjs",
+          "jest-e2e.config.mjs",
+          "jest-e2e.config.json",
+          "jest-e2e.json",
+          "jest-github-actions-reporter.js",
+          "jest.setup.js",
+          "jest.setup.ts",
+          "jest.json",
+          ".jestrc",
+          ".jestrc.js",
+          ".jestrc.json",
+          "jest.teardown.js"
+        ]
+      },
+      {
+        "name": "processing",
+        "file_extensions": [
+          "pde"
+        ]
+      },
+      {
+        "name": "storybook",
+        "file_extensions": [
+          "stories.js",
+          "stories.jsx",
+          "stories.mdx",
+          "story.js",
+          "story.jsx",
+          "stories.ts",
+          "stories.tsx",
+          "story.ts",
+          "story.tsx",
+          "stories.svelte",
+          "story.mdx"
+        ]
+      },
+      {
+        "name": "wepy",
+        "file_extensions": [
+          "wpy"
+        ]
+      },
+      {
+        "name": "fastlane",
+        "file_names": [
+          "fastfile",
+          "appfile"
+        ]
+      },
+      {
+        "name": "hcl",
+        "file_extensions": [
+          "hcl"
+        ]
+      },
+      {
+        "name": "helm",
+        "file_names": [
+          ".helmignore"
+        ]
+      },
+      {
+        "name": "san",
+        "file_extensions": [
+          "san"
+        ]
+      },
+      {
+        "name": "wallaby",
+        "file_names": [
+          "wallaby.js",
+          "wallaby.conf.js"
+        ]
+      },
+      {
+        "name": "django",
+        "file_extensions": [
+          "djt"
+        ]
+      },
+      {
+        "name": "stencil",
+        "file_names": [
+          "stencil.config.js",
+          "stencil.config.ts"
+        ]
+      },
+      {
+        "name": "red",
+        "file_extensions": [
+          "red"
+        ]
+      },
+      {
+        "name": "makefile",
+        "file_names": [
+          "makefile"
+        ]
+      },
+      {
+        "name": "foxpro",
+        "file_extensions": [
+          "fxp",
+          "prg"
+        ]
+      },
+      {
+        "name": "i18n",
+        "file_extensions": [
+          "pot",
+          "po",
+          "mo"
+        ]
+      },
+      {
+        "name": "webassembly",
+        "file_extensions": [
+          "wat",
+          "wasm"
+        ]
+      },
+      {
+        "name": "semantic-release",
+        "file_names": [
+          ".releaserc",
+          ".releaserc.yaml",
+          ".releaserc.yml",
+          ".releaserc.json",
+          ".releaserc.js",
+          "release.config.js"
+        ]
+      },
+      {
+        "name": "bitbucket",
+        "file_names": [
+          "bitbucket-pipelines.yaml",
+          "bitbucket-pipelines.yml"
+        ]
+      },
+      {
+        "name": "jupyter",
+        "file_extensions": [
+          "ipynb"
+        ]
+      },
+      {
+        "name": "d",
+        "file_extensions": [
+          "d"
+        ]
+      },
+      {
+        "name": "mdx",
+        "file_extensions": [
+          "mdx"
+        ]
+      },
+      {
+        "name": "ballerina",
+        "file_extensions": [
+          "bal",
+          "balx"
+        ]
+      },
+      {
+        "name": "racket",
+        "file_extensions": [
+          "rkt"
+        ]
+      },
+      {
+        "name": "bazel",
+        "file_extensions": [
+          "bzl",
+          "bazel"
+        ],
+        "file_names": [
+          ".bazelignore",
+          ".bazelrc",
+          ".bazelversion"
+        ]
+      },
+      {
+        "name": "mint",
+        "file_extensions": [
+          "mint"
+        ]
+      },
+      {
+        "name": "velocity",
+        "file_extensions": [
+          "vm",
+          "fhtml",
+          "vtl"
+        ]
+      },
+      {
+        "name": "godot",
+        "file_extensions": [
+          "gd"
+        ]
+      },
+      {
+        "name": "godot-assets",
+        "file_extensions": [
+          "godot",
+          "tres",
+          "tscn"
+        ]
+      },
+      {
+        "name": "azure-pipelines",
+        "file_names": [
+          "azure-pipelines.yml",
+          "azure-pipelines.yaml"
+        ],
+        "file_extensions": [
+          "azure-pipelines.yml",
+          "azure-pipelines.yaml"
+        ]
+      },
+      {
+        "name": "azure",
+        "file_extensions": [
+          "azcli"
+        ]
+      },
+      {
+        "name": "vagrant",
+        "file_names": [
+          "vagrantfile"
+        ],
+        "file_extensions": [
+          "vagrantfile"
+        ]
+      },
+      {
+        "name": "prisma",
+        "file_names": [
+          "prisma.yml"
+        ],
+        "file_extensions": [
+          "prisma"
+        ]
+      },
+      {
+        "name": "razor",
+        "file_extensions": [
+          "cshtml",
+          "vbhtml"
+        ]
+      },
+      {
+        "name": "abc",
+        "file_extensions": [
+          "abc"
+        ]
+      },
+      {
+        "name": "asciidoc",
+        "file_extensions": [
+          "ad",
+          "adoc",
+          "asciidoc"
+        ]
+      },
+      {
+        "name": "istanbul",
+        "file_names": [
+          ".nycrc",
+          ".nycrc.json"
+        ]
+      },
+      {
+        "name": "edge",
+        "file_extensions": [
+          "edge"
+        ]
+      },
+      {
+        "name": "scheme",
+        "file_extensions": [
+          "ss",
+          "scm"
+        ]
+      },
+      {
+        "name": "lisp",
+        "file_extensions": [
+          "lisp",
+          "lsp",
+          "cl",
+          "fast"
+        ]
+      },
+      {
+        "name": "tailwindcss",
+        "file_names": [
+          "tailwind.js",
+          "tailwind.ts",
+          "tailwind.config.js",
+          "tailwind.config.ts",
+          "tailwind.config.cjs"
+        ]
+      },
+      {
+        "name": "3d",
+        "file_extensions": [
+          "stl",
+          "obj",
+          "ac",
+          "blend",
+          "mesh",
+          "mqo",
+          "pmd",
+          "pmx",
+          "skp",
+          "vac",
+          "vdp",
+          "vox"
+        ]
+      },
+      {
+        "name": "buildkite",
+        "file_names": [
+          "buildkite.yml",
+          "buildkite.yaml"
+        ]
+      },
+      {
+        "name": "netlify",
+        "file_names": [
+          "netlify.json",
+          "netlify.yml",
+          "netlify.yaml",
+          "netlify.toml"
+        ]
+      },
+      {
+        "name": "svg",
+        "file_extensions": [
+          "svg"
+        ]
+      },
+      {
+        "name": "svelte",
+        "file_extensions": [
+          "svelte"
+        ],
+        "file_names": [
+          "svelte.config.js",
+          "svelte.config.cjs"
+        ]
+      },
+      {
+        "name": "vim",
+        "file_extensions": [
+          "vimrc",
+          "gvimrc",
+          "exrc",
+          "vim",
+          "viminfo"
+        ]
+      },
+      {
+        "name": "nest",
+        "file_names": [
+          "nest-cli.json",
+          ".nest-cli.json",
+          "nestconfig.json",
+          ".nestconfig.json"
+        ]
+      },
+      {
+        "name": "moonscript",
+        "file_extensions": [
+          "moon"
+        ]
+      },
+      {
+        "name": "percy",
+        "file_names": [
+          ".percy.yml"
+        ]
+      },
+      {
+        "name": "gitpod",
+        "file_names": [
+          ".gitpod.yml"
+        ]
+      },
+      {
+        "name": "advpl_prw",
+        "file_extensions": [
+          "prw",
+          "prx"
+        ]
+      },
+      {
+        "name": "advpl_ptm",
+        "file_extensions": [
+          "ptm"
+        ]
+      },
+      {
+        "name": "advpl_tlpp",
+        "file_extensions": [
+          "tlpp"
+        ]
+      },
+      {
+        "name": "advpl_include",
+        "file_extensions": [
+          "ch"
+        ]
+      },
+      {
+        "name": "codeowners",
+        "file_names": [
+          "codeowners"
+        ]
+      },
+      {
+        "name": "gcp",
+        "file_names": [
+          ".gcloudignore"
+        ]
+      },
+      {
+        "name": "disc",
+        "file_extensions": [
+          "iso"
+        ]
+      },
+      {
+        "name": "fortran",
+        "file_extensions": [
+          "f",
+          "f77",
+          "f90",
+          "f95",
+          "f03",
+          "f08"
+        ]
+      },
+      {
+        "name": "tcl",
+        "file_extensions": [
+          "tcl"
+        ]
+      },
+      {
+        "name": "liquid",
+        "file_extensions": [
+          "liquid"
+        ]
+      },
+      {
+        "name": "prolog",
+        "file_extensions": [
+          "p",
+          "pro",
+          "pl"
+        ]
+      },
+      {
+        "name": "husky",
+        "file_names": [
+          ".huskyrc",
+          "husky.config.js",
+          ".huskyrc.json",
+          ".huskyrc.js",
+          ".huskyrc.yaml",
+          ".huskyrc.yml"
+        ]
+      },
+      {
+        "name": "coconut",
+        "file_extensions": [
+          "coco"
+        ]
+      },
+      {
+        "name": "tilt",
+        "file_names": [
+          "tiltfile"
+        ]
+      },
+      {
+        "name": "capacitor",
+        "file_names": [
+          "capacitor.config.json"
+        ]
+      },
+      {
+        "name": "sketch",
+        "file_extensions": [
+          "sketch"
+        ]
+      },
+      {
+        "name": "pawn",
+        "file_extensions": [
+          "pwn",
+          "amx"
+        ]
+      },
+      {
+        "name": "adonis",
+        "file_names": [
+          ".adonisrc.json",
+          "ace"
+        ]
+      },
+      {
+        "name": "forth",
+        "file_extensions": [
+          "4th",
+          "fth",
+          "frt"
+        ]
+      },
+      {
+        "name": "uml",
+        "file_extensions": [
+          "iuml",
+          "pu",
+          "puml",
+          "plantuml",
+          "wsd"
+        ]
+      },
+      {
+        "name": "meson",
+        "file_names": [
+          "meson.build",
+          "meson_options.txt"
+        ],
+        "file_extensions": [
+          "wrap"
+        ]
+      },
+      {
+        "name": "commitlint",
+        "file_names": [
+          ".commitlintrc",
+          ".commitlintrc.js",
+          "commitlint.config.js",
+          ".commitlintrc.json",
+          ".commitlint.yaml",
+          ".commitlint.yml",
+          ".commitlintrc.yaml",
+          ".commitlintrc.yml",
+          "commitlint.config.cjs",
+          "commitlint.config.ts",
+          ".commitlintrc.ts",
+          ".commitlintrc.cjs"
+        ]
+      },
+      {
+        "name": "buck",
+        "file_names": [
+          ".buckconfig"
+        ]
+      },
+      {
+        "name": "dhall",
+        "file_extensions": [
+          "dhall",
+          "dhallb"
+        ]
+      },
+      {
+        "name": "sml",
+        "file_extensions": [
+          "sml",
+          "mlton",
+          "mlb",
+          "sig",
+          "fun",
+          "cm",
+          "lex",
+          "use",
+          "grm"
+        ]
+      },
+      {
+        "name": "nrwl",
+        "file_names": [
+          "nx.json",
+          ".nxignore"
+        ]
+      },
+      {
+        "name": "opam",
+        "file_extensions": [
+          "opam"
+        ]
+      },
+      {
+        "name": "dune",
+        "file_names": [
+          "dune",
+          "dune-project",
+          "dune-workspace",
+          "dune-workspace.dev"
+        ]
+      },
+      {
+        "name": "imba",
+        "file_extensions": [
+          "imba"
+        ]
+      },
+      {
+        "name": "drawio",
+        "file_extensions": [
+          "drawio",
+          "dio"
+        ]
+      },
+      {
+        "name": "pascal",
+        "file_extensions": [
+          "pas"
+        ]
+      },
+      {
+        "name": "shaderlab",
+        "file_extensions": [
+          "unity"
+        ]
+      },
+      {
+        "name": "roadmap",
+        "file_names": [
+          "roadmap.md",
+          "roadmap.txt",
+          "timeline.md",
+          "timeline.txt",
+          "milestones.md",
+          "milestones.txt"
+        ]
+      },
+      {
+        "name": "sas",
+        "file_extensions": [
+          "sas",
+          "sas7bdat",
+          "sashdat",
+          "astore",
+          "ast",
+          "sast"
+        ]
+      },
+      {
+        "name": "nuget",
+        "file_names": [
+          "nuget.config",
+          ".nuspec",
+          "nuget.exe"
+        ],
+        "file_extensions": [
+          "nupkg"
+        ]
+      },
+      {
+        "name": "command",
+        "file_extensions": [
+          "command"
+        ]
+      },
+      {
+        "name": "stryker",
+        "file_names": [
+          "stryker.conf.js",
+          "stryker.conf.json"
+        ]
+      },
+      {
+        "name": "denizenscript",
+        "file_extensions": [
+          "dsc"
+        ]
+      },
+      {
+        "name": "modernizr",
+        "file_names": [
+          ".modernizrrc",
+          ".modernizrrc.js",
+          ".modernizrrc.json"
+        ]
+      },
+      {
+        "name": "slug",
+        "file_names": [
+          ".slugignore"
+        ]
+      },
+      {
+        "name": "search",
+        "file_extensions": [
+          "code-search"
+        ]
+      },
+      {
+        "name": "stitches",
+        "file_names": [
+          "stitches.config.js",
+          "stitches.config.ts"
+        ]
+      },
+      {
+        "name": "nginx",
+        "file_names": [
+          "nginx.conf"
+        ]
+      },
+      {
+        "name": "minecraft",
+        "file_extensions": [
+          "mcfunction",
+          "mcmeta",
+          "mcr",
+          "mca",
+          "mcgame",
+          "mclevel",
+          "mcworld",
+          "mine",
+          "mus"
+        ]
+      },
+      {
+        "name": "replit",
+        "file_names": [
+          ".replit"
+        ]
+      },
+      {
+        "name": "rescript",
+        "file_extensions": [
+          "res",
+          "resi"
+        ]
+      },
+      {
+        "name": "snowpack",
+        "file_names": [
+          "snowpack.config.cjs",
+          "snowpack.config.js",
+          "snowpack.config.mjs",
+          "snowpack.deps.json",
+          "snowpack.config.ts",
+          "snowpack.config.json"
+        ]
+      },
+      {
+        "name": "brainfuck",
+        "file_extensions": [
+          "b",
+          "bf"
+        ]
+      },
+      {
+        "name": "bicep",
+        "file_extensions": [
+          "bicep"
+        ]
+      },
+      {
+        "name": "cobol",
+        "file_extensions": [
+          "cob",
+          "cbl"
+        ]
+      },
+      {
+        "name": "grain",
+        "file_extensions": [
+          "gr"
+        ]
+      },
+      {
+        "name": "lolcode",
+        "file_extensions": [
+          "lol"
+        ]
+      },
+      {
+        "name": "idris",
+        "file_extensions": [
+          "idr",
+          "ibc"
+        ]
+      },
+      {
+        "name": "quasar",
+        "file_names": [
+          "quasar.conf.js"
+        ]
+      },
+      {
+        "name": "dependabot",
+        "file_names": [
+          "dependabot.yml"
+        ]
+      },
+      {
+        "name": "pipeline",
+        "file_extensions": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "vite",
+        "file_names": [
+          "vite.config.js",
+          "vite.config.mjs",
+          "vite.config.cjs",
+          "vite.config.ts"
+        ]
+      },
+      {
+        "name": "opa",
+        "file_extensions": [
+          "rego"
+        ]
+      },
+      {
+        "name": "lerna",
+        "file_names": [
+          "lerna.json"
+        ]
+      },
+      {
+        "name": "windicss",
+        "file_names": [
+          "windi.config.js",
+          "windi.config.ts",
+          "windi.config.cjs",
+          "windi.config.json"
+        ],
+        "file_extensions": [
+          "windi"
+        ]
+      },
+      {
+        "name": "textlint",
+        "file_names": [
+          ".textlintrc"
+        ]
+      },
+      {
+        "name": "scala",
+        "file_extensions": [
+          "scala",
+          "sc"
+        ]
+      },
+      {
+        "name": "lilypond",
+        "file_extensions": [
+          "ly"
+        ]
+      },
+      {
+        "name": "vlang",
+        "file_extensions": [
+          "v"
+        ],
+        "file_names": [
+          "vpkg.json",
+          "v.mod"
+        ]
+      },
+      {
+        "name": "chess",
+        "file_extensions": [
+          "pgn",
+          "fen"
+        ]
+      },
+      {
+        "name": "gemini",
+        "file_extensions": [
+          "gmi",
+          "gemini"
+        ]
+      },
+      {
+        "name": "sentry",
+        "file_names": [
+          ".sentryclirc"
+        ]
+      },
+      {
+        "name": "phpunit",
+        "file_names": [
+          ".phpunit.result.cache",
+          ".phpunit-watcher.yml",
+          "phpunit.xml",
+          "phpunit.xml.dist",
+          "phpunit-watcher.yml",
+          "phpunit-watcher.yml.dist"
+        ]
+      },
+      {
+        "name": "php-cs-fixer",
+        "file_names": [
+          ".php_cs",
+          ".php_cs.dist",
+          ".php_cs.php",
+          ".php_cs.dist.php",
+          ".php-cs-fixer.php",
+          ".php-cs-fixer.dist.php"
+        ]
+      },
+      {
+        "name": "robots",
+        "file_names": [
+          "robots.txt"
+        ]
+      },
+      {
+        "name": "tsconfig",
+        "file_names": [
+          "tsconfig.json",
+          "tsconfig.app.json",
+          "tsconfig.editor.json",
+          "tsconfig.spec.json",
+          "tsconfig.base.json",
+          "tsconfig.build.json",
+          "tsconfig.eslint.json",
+          "tsconfig.lib.json"
+        ],
+        "file_extensions": [
+          "tsconfig.json"
+        ]
+      },
+      {
+        "name": "tauri",
+        "file_names": [
+          "tauri.config.json",
+          "tauri.linux.conf.json",
+          "tauri.windows.conf.json",
+          "tauri.macos.conf.json"
+        ],
+        "file_extensions": [
+          "tauri"
+        ]
+      },
+      {
+        "name": "jsconfig",
+        "file_names": [
+          "jsconfig.json"
+        ],
+        "file_extensions": [
+          "jsconfig.json"
+        ]
+      },
+      {
+        "name": "maven",
+        "file_names": [
+          "maven.config",
+          "jvm.config"
+        ]
+      },
+      {
+        "name": "ada",
+        "file_extensions": [
+          "ada",
+          "adb",
+          "ads",
+          "ali"
+        ]
+      },
+      {
+        "name": "ember",
+        "file_names": [
+          ".ember-cli",
+          ".ember-cli.js",
+          "ember-cli-builds.js"
+        ]
+      },
+      {
+        "name": "horusec",
+        "file_names": [
+          "horusec-config.json"
+        ],
+        "file_extensions": [
+          "horusec-config.json"
+        ]
+      },
+      {
+        "name": "coala",
+        "file_extensions": [
+          "coarc",
+          "coafile"
+        ]
+      },
+      {
+        "name": "dinophp",
+        "file_extensions": [
+          "bubble",
+          "html.bubble",
+          "php.bubble"
+        ]
+      },
+      {
+        "name": "teal",
+        "file_extensions": [
+          "tl"
+        ]
+      },
+      {
+        "name": "template",
+        "file_extensions": [
+          "template"
+        ]
+      },
+      {
+        "name": "astyle",
+        "file_names": [
+          ".astylerc"
+        ]
+      },
+      {
+        "name": "lighthouse",
+        "file_names": [
+          ".lighthouserc.js",
+          "lighthouserc.js",
+          ".lighthouserc.json",
+          "lighthouserc.json",
+          ".lighthouserc.yml",
+          "lighthouserc.yml",
+          ".lighthouserc.yaml",
+          "lighthouserc.yaml"
+        ]
+      },
+      {
+        "name": "svgr",
+        "file_names": [
+          ".svgrrc",
+          "svgr.config.js",
+          ".svgrrc.js",
+          ".svgrrc.yaml",
+          ".svgrrc.yml",
+          ".svgrrc.json"
+        ]
+      },
+      {
+        "name": "rome",
+        "file_names": [
+          "rome.json"
+        ]
+      },
+      {
+        "name": "cypress",
+        "file_names": [
+          "cypress.json",
+          "cypress.env.json"
+        ]
+      },
+      {
+        "name": "ndst",
+        "file_extensions": [
+          "ndst.yml",
+          "ndst.yaml",
+          "ndst.json"
+        ]
+      }
+    ],
+    "default_folder_icon": {
+      "name": "folder"
+    },
+    "folder_icons": [
+      {
+        "name": "folder-src",
+        "folder_names": [
+          "src",
+          "source",
+          "sources",
+          "code"
+        ]
+      },
+      {
+        "name": "folder-dist",
+        "folder_names": [
+          "dist",
+          "out",
+          "build",
+          "release",
+          "bin"
+        ]
+      },
+      {
+        "name": "folder-css",
+        "folder_names": [
+          "css",
+          "stylesheet",
+          "stylesheets",
+          "style",
+          "styles"
+        ]
+      },
+      {
+        "name": "folder-sass",
+        "folder_names": [
+          "sass",
+          "_sass",
+          "scss",
+          "_scss"
+        ]
+      },
+      {
+        "name": "folder-images",
+        "folder_names": [
+          "images",
+          "image",
+          "img",
+          "icons",
+          "icon",
+          "ico",
+          "screenshot",
+          "screenshots",
+          "picture",
+          "pictures"
+        ]
+      },
+      {
+        "name": "folder-scripts",
+        "folder_names": [
+          "script",
+          "scripts"
+        ]
+      },
+      {
+        "name": "folder-node",
+        "folder_names": [
+          "node_modules"
+        ]
+      },
+      {
+        "name": "folder-javascript",
+        "folder_names": [
+          "js",
+          "javascript",
+          "javascripts"
+        ]
+      },
+      {
+        "name": "folder-json",
+        "folder_names": [
+          "json"
+        ]
+      },
+      {
+        "name": "folder-font",
+        "folder_names": [
+          "font",
+          "fonts"
+        ]
+      },
+      {
+        "name": "folder-bower",
+        "folder_names": [
+          "bower_components"
+        ]
+      },
+      {
+        "name": "folder-test",
+        "folder_names": [
+          "test",
+          "tests",
+          "testing",
+          "__tests__",
+          "__snapshots__",
+          "__mocks__",
+          "__test__",
+          "spec",
+          "specs"
+        ]
+      },
+      {
+        "name": "folder-jinja",
+        "folder_names": [
+          "jinja",
+          "jinja2",
+          "j2"
+        ]
+      },
+      {
+        "name": "folder-markdown",
+        "folder_names": [
+          "markdown",
+          "md"
+        ]
+      },
+      {
+        "name": "folder-php",
+        "folder_names": [
+          "php"
+        ]
+      },
+      {
+        "name": "folder-phpmailer",
+        "folder_names": [
+          "phpmailer"
+        ]
+      },
+      {
+        "name": "folder-sublime",
+        "folder_names": [
+          "sublime"
+        ]
+      },
+      {
+        "name": "folder-docs",
+        "folder_names": [
+          "doc",
+          "docs",
+          "document",
+          "documents",
+          "documentation",
+          "post",
+          "posts",
+          "article",
+          "articles"
+        ]
+      },
+      {
+        "name": "folder-git",
+        "folder_names": [
+          ".git",
+          "patches",
+          "githooks",
+          ".githooks",
+          "submodules",
+          ".submodules"
+        ]
+      },
+      {
+        "name": "folder-github",
+        "folder_names": [
+          ".github"
+        ]
+      },
+      {
+        "name": "folder-gitlab",
+        "folder_names": [
+          ".gitlab"
+        ]
+      },
+      {
+        "name": "folder-vscode",
+        "folder_names": [
+          ".vscode",
+          ".vscode-test"
+        ]
+      },
+      {
+        "name": "folder-views",
+        "folder_names": [
+          "view",
+          "views",
+          "screen",
+          "screens",
+          "page",
+          "pages",
+          "html"
+        ]
+      },
+      {
+        "name": "folder-vue",
+        "folder_names": [
+          "vue"
+        ]
+      },
+      {
+        "name": "folder-vuepress",
+        "folder_names": [
+          ".vuepress"
+        ]
+      },
+      {
+        "name": "folder-expo",
+        "folder_names": [
+          ".expo",
+          ".expo-shared"
+        ]
+      },
+      {
+        "name": "folder-config",
+        "folder_names": [
+          "config",
+          "configs",
+          "configuration",
+          "configurations",
+          "setting",
+          ".setting",
+          "settings",
+          ".settings",
+          "META-INF"
+        ]
+      },
+      {
+        "name": "folder-i18n",
+        "folder_names": [
+          "i18n",
+          "internationalization",
+          "lang",
+          "language",
+          "languages",
+          "locale",
+          "locales",
+          "l10n",
+          "localization",
+          "translation",
+          "translate",
+          "translations",
+          ".tx"
+        ]
+      },
+      {
+        "name": "folder-components",
+        "folder_names": [
+          "components",
+          "widget",
+          "widgets"
+        ]
+      },
+      {
+        "name": "folder-aurelia",
+        "folder_names": [
+          "aurelia_project"
+        ]
+      },
+      {
+        "name": "folder-resource",
+        "folder_names": [
+          "resource",
+          "resources",
+          "res",
+          "asset",
+          "assets",
+          "static",
+          "report",
+          "reports"
+        ]
+      },
+      {
+        "name": "folder-lib",
+        "folder_names": [
+          "lib",
+          "libs",
+          "library",
+          "libraries",
+          "vendor",
+          "vendors",
+          "third-party"
+        ]
+      },
+      {
+        "name": "folder-theme",
+        "folder_names": [
+          "themes",
+          "theme",
+          "color",
+          "colors",
+          "design",
+          "designs"
+        ]
+      },
+      {
+        "name": "folder-webpack",
+        "folder_names": [
+          "webpack",
+          ".webpack"
+        ]
+      },
+      {
+        "name": "folder-global",
+        "folder_names": [
+          "global"
+        ]
+      },
+      {
+        "name": "folder-public",
+        "folder_names": [
+          "public",
+          "www",
+          "wwwroot",
+          "web",
+          "website"
+        ]
+      },
+      {
+        "name": "folder-include",
+        "folder_names": [
+          "include",
+          "includes",
+          "_includes",
+          "inc"
+        ]
+      },
+      {
+        "name": "folder-docker",
+        "folder_names": [
+          "docker",
+          "dockerfiles",
+          ".docker"
+        ]
+      },
+      {
+        "name": "folder-database",
+        "folder_names": [
+          "db",
+          "database",
+          "databases",
+          "sql",
+          "data",
+          "_data"
+        ]
+      },
+      {
+        "name": "folder-log",
+        "folder_names": [
+          "log",
+          "logs"
+        ]
+      },
+      {
+        "name": "folder-temp",
+        "folder_names": [
+          "temp",
+          ".temp",
+          "tmp",
+          ".tmp",
+          "cached",
+          "cache",
+          ".cache"
+        ]
+      },
+      {
+        "name": "folder-aws",
+        "folder_names": [
+          "aws",
+          ".aws"
+        ]
+      },
+      {
+        "name": "folder-audio",
+        "folder_names": [
+          "audio",
+          "audios",
+          "music",
+          "musics",
+          "sound",
+          "sounds"
+        ]
+      },
+      {
+        "name": "folder-video",
+        "folder_names": [
+          "video",
+          "videos",
+          "movie",
+          "movies"
+        ]
+      },
+      {
+        "name": "folder-kubernetes",
+        "folder_names": [
+          "kubernetes",
+          "k8s"
+        ]
+      },
+      {
+        "name": "folder-import",
+        "folder_names": [
+          "import",
+          "imports",
+          "imported"
+        ]
+      },
+      {
+        "name": "folder-export",
+        "folder_names": [
+          "export",
+          "exports",
+          "exported"
+        ]
+      },
+      {
+        "name": "folder-wakatime",
+        "folder_names": [
+          "wakatime"
+        ]
+      },
+      {
+        "name": "folder-circleci",
+        "folder_names": [
+          ".circleci"
+        ]
+      },
+      {
+        "name": "folder-wordpress",
+        "folder_names": [
+          ".wordpress-org",
+          "wp-content"
+        ]
+      },
+      {
+        "name": "folder-gradle",
+        "folder_names": [
+          "gradle",
+          ".gradle"
+        ]
+      },
+      {
+        "name": "folder-coverage",
+        "folder_names": [
+          "coverage",
+          ".nyc-output",
+          ".nyc_output",
+          "e2e",
+          "it",
+          "integration-test",
+          "integration-tests"
+        ]
+      },
+      {
+        "name": "folder-class",
+        "folder_names": [
+          "class",
+          "classes",
+          "model",
+          "models",
+          "schemas",
+          "schema"
+        ]
+      },
+      {
+        "name": "folder-other",
+        "folder_names": [
+          "other",
+          "others",
+          "misc",
+          "miscellaneous",
+          "extra",
+          "extras"
+        ]
+      },
+      {
+        "name": "folder-typescript",
+        "folder_names": [
+          "typescript",
+          "ts",
+          "typings",
+          "@types",
+          "types"
+        ]
+      },
+      {
+        "name": "folder-graphql",
+        "folder_names": [
+          "graphql",
+          "gql"
+        ]
+      },
+      {
+        "name": "folder-routes",
+        "folder_names": [
+          "routes",
+          "router",
+          "routers"
+        ]
+      },
+      {
+        "name": "folder-ci",
+        "folder_names": [
+          ".ci",
+          "ci"
+        ]
+      },
+      {
+        "name": "folder-benchmark",
+        "folder_names": [
+          "benchmark",
+          "benchmarks",
+          "performance",
+          "measure",
+          "measures",
+          "measurement"
+        ]
+      },
+      {
+        "name": "folder-messages",
+        "folder_names": [
+          "messages",
+          "messaging",
+          "forum",
+          "chat",
+          "chats",
+          "conversation",
+          "conversations"
+        ]
+      },
+      {
+        "name": "folder-less",
+        "folder_names": [
+          "less"
+        ]
+      },
+      {
+        "name": "folder-gulp",
+        "folder_names": [
+          "gulp"
+        ]
+      },
+      {
+        "name": "folder-python",
+        "folder_names": [
+          "python",
+          "__pycache__",
+          ".pytest_cache"
+        ]
+      },
+      {
+        "name": "folder-debug",
+        "folder_names": [
+          "debug",
+          "debugging"
+        ]
+      },
+      {
+        "name": "folder-fastlane",
+        "folder_names": [
+          "fastlane"
+        ]
+      },
+      {
+        "name": "folder-plugin",
+        "folder_names": [
+          "plugin",
+          "plugins",
+          "_plugins",
+          "extension",
+          "extensions",
+          "addon",
+          "addons",
+          "module",
+          "modules"
+        ]
+      },
+      {
+        "name": "folder-middleware",
+        "folder_names": [
+          "middleware",
+          "middlewares"
+        ]
+      },
+      {
+        "name": "folder-controller",
+        "folder_names": [
+          "controller",
+          "controllers",
+          "service",
+          "services",
+          "provider",
+          "providers",
+          "handler",
+          "handlers"
+        ]
+      },
+      {
+        "name": "folder-ansible",
+        "folder_names": [
+          "ansible"
+        ]
+      },
+      {
+        "name": "folder-server",
+        "folder_names": [
+          "server",
+          "servers",
+          "backend"
+        ]
+      },
+      {
+        "name": "folder-client",
+        "folder_names": [
+          "client",
+          "clients",
+          "frontend",
+          "pwa"
+        ]
+      },
+      {
+        "name": "folder-tasks",
+        "folder_names": [
+          "tasks",
+          "tickets"
+        ]
+      },
+      {
+        "name": "folder-android",
+        "folder_names": [
+          "android"
+        ]
+      },
+      {
+        "name": "folder-ios",
+        "folder_names": [
+          "ios"
+        ]
+      },
+      {
+        "name": "folder-upload",
+        "folder_names": [
+          "uploads",
+          "upload"
+        ]
+      },
+      {
+        "name": "folder-download",
+        "folder_names": [
+          "downloads",
+          "download"
+        ]
+      },
+      {
+        "name": "folder-tools",
+        "folder_names": [
+          "tools"
+        ]
+      },
+      {
+        "name": "folder-helper",
+        "folder_names": [
+          "helpers",
+          "helper"
+        ]
+      },
+      {
+        "name": "folder-serverless",
+        "folder_names": [
+          ".serverless",
+          "serverless"
+        ]
+      },
+      {
+        "name": "folder-api",
+        "folder_names": [
+          "api",
+          "apis",
+          "restapi"
+        ]
+      },
+      {
+        "name": "folder-app",
+        "folder_names": [
+          "app",
+          "apps"
+        ]
+      },
+      {
+        "name": "folder-apollo",
+        "folder_names": [
+          "apollo",
+          "apollo-client",
+          "apollo-cache",
+          "apollo-config"
+        ]
+      },
+      {
+        "name": "folder-archive",
+        "folder_names": [
+          "archive",
+          "archives",
+          "archival",
+          "backup",
+          "backups",
+          "back-up",
+          "back-ups"
+        ]
+      },
+      {
+        "name": "folder-batch",
+        "folder_names": [
+          "batch",
+          "batchs",
+          "batches"
+        ]
+      },
+      {
+        "name": "folder-cluster",
+        "folder_names": [
+          "cluster",
+          "clusters"
+        ]
+      },
+      {
+        "name": "folder-command",
+        "folder_names": [
+          "command",
+          "commands",
+          "cli",
+          "clis"
+        ]
+      },
+      {
+        "name": "folder-constant",
+        "folder_names": [
+          "constant",
+          "constants"
+        ]
+      },
+      {
+        "name": "folder-container",
+        "folder_names": [
+          "container",
+          "containers",
+          ".devcontainer"
+        ]
+      },
+      {
+        "name": "folder-content",
+        "folder_names": [
+          "content",
+          "contents"
+        ]
+      },
+      {
+        "name": "folder-context",
+        "folder_names": [
+          "context",
+          "contexts"
+        ]
+      },
+      {
+        "name": "folder-core",
+        "folder_names": [
+          "core"
+        ]
+      },
+      {
+        "name": "folder-delta",
+        "folder_names": [
+          "delta",
+          "deltas",
+          "changes"
+        ]
+      },
+      {
+        "name": "folder-dump",
+        "folder_names": [
+          "dump",
+          "dumps"
+        ]
+      },
+      {
+        "name": "folder-examples",
+        "folder_names": [
+          "demo",
+          "demos",
+          "example",
+          "examples",
+          "sample",
+          "samples",
+          "sample-data"
+        ]
+      },
+      {
+        "name": "folder-environment",
+        "folder_names": [
+          ".env",
+          ".environment",
+          "env",
+          "envs",
+          "environment",
+          "environments",
+          ".venv"
+        ]
+      },
+      {
+        "name": "folder-functions",
+        "folder_names": [
+          "function",
+          "functions",
+          "lambda",
+          "lambdas",
+          "logic",
+          "math",
+          "calc",
+          "calculation",
+          "calculations"
+        ]
+      },
+      {
+        "name": "folder-generator",
+        "folder_names": [
+          "generator",
+          "generators",
+          "generated",
+          "cfn-gen",
+          "gen",
+          "gens",
+          "auto"
+        ]
+      },
+      {
+        "name": "folder-hook",
+        "folder_names": [
+          "hook",
+          "hooks",
+          "trigger",
+          "triggers"
+        ]
+      },
+      {
+        "name": "folder-job",
+        "folder_names": [
+          "job",
+          "jobs"
+        ]
+      },
+      {
+        "name": "folder-keys",
+        "folder_names": [
+          "keys",
+          "key",
+          "token",
+          "tokens"
+        ]
+      },
+      {
+        "name": "folder-layout",
+        "folder_names": [
+          "layout",
+          "layouts"
+        ]
+      },
+      {
+        "name": "folder-mail",
+        "folder_names": [
+          "mail",
+          "mails",
+          "email",
+          "emails",
+          "smtp"
+        ]
+      },
+      {
+        "name": "folder-mappings",
+        "folder_names": [
+          "mappings",
+          "mapping"
+        ]
+      },
+      {
+        "name": "folder-meta",
+        "folder_names": [
+          "meta"
+        ]
+      },
+      {
+        "name": "folder-packages",
+        "folder_names": [
+          "package",
+          "packages",
+          "pkg"
+        ]
+      },
+      {
+        "name": "folder-shared",
+        "folder_names": [
+          "shared",
+          "common"
+        ]
+      },
+      {
+        "name": "folder-stack",
+        "folder_names": [
+          "stack",
+          "stacks"
+        ]
+      },
+      {
+        "name": "folder-template",
+        "folder_names": [
+          "template",
+          "templates"
+        ]
+      },
+      {
+        "name": "folder-utils",
+        "folder_names": [
+          "util",
+          "utils",
+          "utility",
+          "utilities"
+        ]
+      },
+      {
+        "name": "folder-private",
+        "folder_names": [
+          "private",
+          ".private"
+        ]
+      },
+      {
+        "name": "folder-error",
+        "folder_names": [
+          "error",
+          "errors",
+          "err"
+        ]
+      },
+      {
+        "name": "folder-event",
+        "folder_names": [
+          "event",
+          "events"
+        ]
+      },
+      {
+        "name": "folder-secure",
+        "folder_names": [
+          "auth",
+          "authentication",
+          "secure",
+          "security",
+          "cert",
+          "certs",
+          "certificate",
+          "certificates",
+          "ssl"
+        ]
+      },
+      {
+        "name": "folder-custom",
+        "folder_names": [
+          "custom",
+          "customs"
+        ]
+      },
+      {
+        "name": "folder-mock",
+        "folder_names": [
+          "mock",
+          "mocks",
+          "draft",
+          "drafts",
+          "concept",
+          "concepts",
+          "sketch",
+          "sketches"
+        ]
+      },
+      {
+        "name": "folder-syntax",
+        "folder_names": [
+          "syntax",
+          "syntaxes",
+          "spellcheck"
+        ]
+      },
+      {
+        "name": "folder-vm",
+        "folder_names": [
+          "vm",
+          "vms"
+        ]
+      },
+      {
+        "name": "folder-stylus",
+        "folder_names": [
+          "stylus"
+        ]
+      },
+      {
+        "name": "folder-flow",
+        "folder_names": [
+          "flow-typed"
+        ]
+      },
+      {
+        "name": "folder-rules",
+        "folder_names": [
+          "rule",
+          "rules",
+          "validation",
+          "validations",
+          "validator",
+          "validators"
+        ]
+      },
+      {
+        "name": "folder-review",
+        "folder_names": [
+          "review",
+          "reviews",
+          "revisal",
+          "revisals",
+          "reviewed"
+        ]
+      },
+      {
+        "name": "folder-animation",
+        "folder_names": [
+          "animation",
+          "animations",
+          "animated"
+        ]
+      },
+      {
+        "name": "folder-guard",
+        "folder_names": [
+          "guard",
+          "guards"
+        ]
+      },
+      {
+        "name": "folder-prisma",
+        "folder_names": [
+          "prisma"
+        ]
+      },
+      {
+        "name": "folder-pipe",
+        "folder_names": [
+          "pipe",
+          "pipes"
+        ]
+      },
+      {
+        "name": "folder-svg",
+        "folder_names": [
+          "svg",
+          "svgs"
+        ]
+      },
+      {
+        "name": "folder-terraform",
+        "folder_names": [
+          "terraform",
+          ".terraform"
+        ]
+      },
+      {
+        "name": "folder-mobile",
+        "folder_names": [
+          "mobile",
+          "mobiles",
+          "portable",
+          "portability"
+        ]
+      },
+      {
+        "name": "folder-stencil",
+        "folder_names": [
+          ".stencil"
+        ]
+      },
+      {
+        "name": "folder-firebase",
+        "folder_names": [
+          ".firebase"
+        ]
+      },
+      {
+        "name": "folder-svelte",
+        "folder_names": [
+          "svelte"
+        ]
+      },
+      {
+        "name": "folder-update",
+        "folder_names": [
+          "update",
+          "updates",
+          "upgrade",
+          "upgrades"
+        ]
+      },
+      {
+        "name": "folder-intellij",
+        "folder_names": [
+          ".idea"
+        ]
+      },
+      {
+        "name": "folder-azure-pipelines",
+        "folder_names": [
+          ".azure-pipelines",
+          ".azure-pipelines-ci"
+        ]
+      },
+      {
+        "name": "folder-mjml",
+        "folder_names": [
+          "mjml"
+        ]
+      },
+      {
+        "name": "folder-admin",
+        "folder_names": [
+          "admin"
+        ]
+      },
+      {
+        "name": "folder-scala",
+        "folder_names": [
+          "scala"
+        ]
+      },
+      {
+        "name": "folder-connection",
+        "folder_names": [
+          "connection",
+          "connections"
+        ]
+      },
+      {
+        "name": "folder-quasar",
+        "folder_names": [
+          ".quasar"
+        ]
+      },
+      {
+        "name": "folder-cobol",
+        "folder_names": [
+          "cobol"
+        ]
+      },
+      {
+        "name": "folder-yarn",
+        "folder_names": [
+          "yarn",
+          ".yarn"
+        ]
+      },
+      {
+        "name": "folder-husky",
+        "folder_names": [
+          "husky",
+          ".husky"
+        ]
+      },
+      {
+        "name": "folder-storybook",
+        "folder_names": [
+          ".storybook",
+          "storybook",
+          "stories",
+          "__stories__"
+        ]
+      },
+      {
+        "name": "folder-base",
+        "folder_names": [
+          "base",
+          ".base"
+        ]
+      },
+      {
+        "name": "folder-cart",
+        "folder_names": [
+          "cart",
+          "shopping-cart",
+          "shopping",
+          "shop"
+        ]
+      },
+      {
+        "name": "folder-home",
+        "folder_names": [
+          "home",
+          ".home",
+          "start",
+          ".start"
+        ]
+      },
+      {
+        "name": "folder-project",
+        "folder_names": [
+          "project",
+          "projects",
+          ".project",
+          ".projects"
+        ]
+      },
+      {
+        "name": "folder-interface",
+        "folder_names": [
+          "interface",
+          "interfaces"
+        ]
+      },
+      {
+        "name": "folder-contract",
+        "folder_names": [
+          "pact",
+          "pacts",
+          "contract",
+          ".contract",
+          "contracts",
+          "contract-testing",
+          "contract-test",
+          "contract-tests"
+        ]
+      },
+      {
+        "name": "folder-queue",
+        "folder_names": [
+          "queue",
+          "queues",
+          "bull",
+          "mq"
+        ]
+      },
+      {
+        "name": "folder-vercel",
+        "folder_names": [
+          "vercel",
+          ".vercel",
+          "now",
+          ".now"
+        ]
+      },
+      {
+        "name": "folder-cypress",
+        "folder_names": [
+          "cypress",
+          ".cypress"
+        ]
+      },
+      {
+        "name": "folder-java",
+        "folder_names": [
+          "java"
+        ]
+      },
+      {
+        "name": "folder-resolver",
+        "folder_names": [
+          "resolver",
+          "resolvers"
+        ]
+      },
+      {
+        "name": "folder-angular",
+        "folder_names": [
+          ".angular"
+        ]
+      }
+    ]
+  }
+}

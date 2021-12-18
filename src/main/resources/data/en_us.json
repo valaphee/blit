@@ -1,1 +1,62 @@
-{"locale":{"key":"en_us","entries":{"main":{"menu":{"file":{"name":"File","sources.name":"Sources","exit.name":"Exit"},"help":{"name":"Help","about.name":"About"}},"navigator":{"go.text":"Go","task.navigate.name":"Navigating to {0}"},"tree":{"column":{"name.title":"Name","size.title":"Size","modified.title":"Modified"},"menu":{"open.name":"Open","delete.name":"Delete"},"task":{"populate.name":"Populating {0}","download.name":"Downloading {0}","upload.name":"Uploading {0}","delete.name":"Deleting {0}"}}},"config":{"general.data_size_unit.text":"Data Size Unit","sources":{"new.text":"New","save.text":"Save","delete.text":"Delete"},"ok.text":"Ok","cancel.text":"Cancel","apply.text":"Apply"}}}}
+{
+  "locale": {
+    "key": "en_us",
+    "entries": {
+      "name": "English (United States)",
+      "main": {
+        "menu": {
+          "file": {
+            "name": "File",
+            "sources.name": "Sources",
+            "exit.name": "Exit"
+          },
+          "help": {
+            "name": "Help",
+            "about.name": "About"
+          }
+        },
+        "navigator": {
+          "go.text": "Go",
+          "task.navigate.name": "Navigating to {0}"
+        },
+        "tree": {
+          "column": {
+            "name.title": "Name",
+            "size.title": "Size",
+            "modified.title": "Modified"
+          },
+          "menu": {
+            "open.name": "Open",
+            "rename.name": "Rename",
+            "delete.name": "Delete"
+          },
+          "task": {
+            "populate.name": "Populating {0}",
+            "download.name": "Downloading {0}",
+            "upload.name": "Uploading {0}",
+            "rename.name": "Renaming {0} to {1}",
+            "delete.name": "Deleting {0}"
+          }
+        }
+      },
+      "rename": {
+        "ok.text": "Ok",
+        "cancel.text": "Abbrechen"
+      },
+      "config": {
+        "general": {
+          "locale.text": "Locale",
+          "data_size_unit.text": "Data Size Unit"
+        },
+        "sources": {
+          "new.text": "New",
+          "save.text": "Save",
+          "delete.text": "Delete"
+        },
+        "ok.text": "Ok",
+        "cancel.text": "Cancel",
+        "apply.text": "Apply"
+      }
+    }
+  }
+}

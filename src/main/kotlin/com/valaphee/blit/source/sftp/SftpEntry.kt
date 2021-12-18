@@ -50,6 +50,10 @@ class SftpEntry(
 
     override suspend fun transferFrom(name: String, stream: InputStream, length: Long) = TODO()
 
+    override suspend fun rename(name: String) {
+        sftpSource.sftpClient.rename(path, "${path.substringBeforeLast('/', "")}/$name")
+    }
+
     override suspend fun delete() {
         sftpSource.sftpClient.remove(path)
     }

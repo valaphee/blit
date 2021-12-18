@@ -16,6 +16,8 @@
 
 package com.valaphee.blit.data.config
 
+import com.google.inject.Injector
+import com.google.inject.Key
 import com.valaphee.blit.data.locale.Locale
 import tornadofx.Fragment
 import tornadofx.combobox
@@ -28,11 +30,14 @@ import tornadofx.form
  */
 class ConfigViewGeneral : Fragment("General") {
     private val locale by di<Locale>()
-    private val _config by di<ConfigModel>()
+    private val configModel by di<ConfigModel>()
+    private val injector by di<Injector>()
 
     override val root = form {
         fieldset {
-            field(locale["config.general.data_size_unit.text"]) { combobox(_config.dataSizeUnit, values = Config.DataSizeUnit.values().toList()) }
+            val locales = injector.getInstance(object : Key<Map<String, @JvmSuppressWildcards Locale>>() {})
+            field(locale["config.general.locale.text"]) { combobox(configModel.locale, locales.keys.toList()){ cellFormat { text = locales[it]!!["name"] } } }
+            field(locale["config.general.data_size_unit.text"]) { combobox(configModel.dataSizeUnit, Config.DataSizeUnit.values().toList()) }
         }
     }
 }

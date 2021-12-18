@@ -50,6 +50,10 @@ class K8scpEntry(
 
     override suspend fun transferFrom(name: String, stream: InputStream, length: Long) = TODO()
 
+    override suspend fun rename(name: String) {
+        K8scpSource.copy.exec(k8scpSource.namespace, k8scpSource.pod, arrayOf("mv", path, "${path.substringBeforeLast('/', "")}/$name"), false).waitFor()
+    }
+
     override suspend fun delete() {
         K8scpSource.copy.exec(k8scpSource.namespace, k8scpSource.pod, arrayOf("rm", "-rf", path), false).waitFor()
     }

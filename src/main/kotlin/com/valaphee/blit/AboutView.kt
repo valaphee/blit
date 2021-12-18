@@ -42,9 +42,9 @@ class AboutView : View("About Blit") {
         imageview(Image(AboutView::class.java.getResourceAsStream("/app.png")))
         label(
             """
-            Blit${AboutView::class.java.`package`.implementationVersion?.let { " $it" } ?: ""}
-            Copyright (c) 2021, Valaphee.
-        """.trimIndent()
+                Blit${AboutView::class.java.`package`.implementationVersion?.let { " $it" } ?: ""}
+                Copyright (c) 2021, Valaphee.
+            """.trimIndent()
         ) { textAlignment = TextAlignment.CENTER }
     }
 }
