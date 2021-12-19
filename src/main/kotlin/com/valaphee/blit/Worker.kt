@@ -17,6 +17,7 @@
 package com.valaphee.blit
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder
+import com.valaphee.blit.source.NotFoundException
 import javafx.beans.property.DoubleProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleStringProperty
@@ -29,6 +30,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import tornadofx.onChange
 import tornadofx.runLater
+import tornadofx.warning
 import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.Executors
 import kotlin.coroutines.AbstractCoroutineContextElement
@@ -44,22 +46,27 @@ class Worker {
     val name: StringProperty = SimpleStringProperty("")
     val progress: DoubleProperty = SimpleDoubleProperty(0.0)
 
-    fun <T> runBlocking(name: String, block: suspend () -> T) = runBlocking { run(name, block) }
+    fun runBlocking(name: String, block: suspend () -> Unit) = runBlocking { run(name, block) }
 
     fun launch(name: String, block: suspend () -> Unit) = coroutineScope.launch { run(name, block) }
 
-    private suspend fun <T> run(name: String, block: suspend () -> T): T {
+    private suspend fun run(name: String, block: suspend () -> Unit) {
         val task = Task(name, SimpleDoubleProperty().apply { onChange { runLater { progress.value = tasks.map { it.progress.value }.average() } } })
         tasks += task
         task.progress.value = 0.0
         runLater { this.name.value = tasks.joinToString(" | ") { it.name } }
-        val value = withContext(task) { block() }
+        withContext(task) {
+            try {
+                block()
+            } catch (ex: NotFoundException) {
+                runLater { warning("Not found", ex.path, title = name) }
+            }
+        }
         tasks -= task
         runLater {
             progress.value = tasks.map { it.progress.value }.average()
             this.name.value = tasks.joinToString(" | ") { it.name }
         }
-        return value
     }
 
     class Task(

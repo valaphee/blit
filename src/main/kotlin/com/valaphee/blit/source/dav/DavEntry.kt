@@ -19,6 +19,7 @@ package com.valaphee.blit.source.dav
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.valaphee.blit.progress
 import com.valaphee.blit.source.AbstractEntry
+import com.valaphee.blit.source.NotFoundException
 import com.valaphee.blit.source.transferToWithProgress
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
@@ -69,7 +70,10 @@ class DavEntry(
 
     override suspend fun transferTo(stream: OutputStream) {
         val httpResponse = davSource.httpClient.get<HttpResponse>("${davSource._url}/$path")
-        httpResponse.content.transferToWithProgress(stream, httpResponse.contentLength() ?: size)
+        when (httpResponse.status) {
+            HttpStatusCode.OK -> httpResponse.content.transferToWithProgress(stream, httpResponse.contentLength() ?: size)
+            HttpStatusCode.NotFound -> throw NotFoundException(path)
+        }
     }
 
     override suspend fun transferFrom(name: String, stream: InputStream, length: Long) {

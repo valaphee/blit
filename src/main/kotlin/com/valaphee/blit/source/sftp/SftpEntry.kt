@@ -17,8 +17,11 @@
 package com.valaphee.blit.source.sftp
 
 import com.valaphee.blit.source.AbstractEntry
+import com.valaphee.blit.source.NotFoundException
 import com.valaphee.blit.source.transferToWithProgress
 import org.apache.sshd.sftp.client.SftpClient
+import org.apache.sshd.sftp.common.SftpConstants
+import org.apache.sshd.sftp.common.SftpException
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -45,17 +48,38 @@ class SftpEntry(
     } else emptyList()
 
     override suspend fun transferTo(stream: OutputStream) {
-        sftpSource.sftpClient.read(toString()).use { it.transferToWithProgress(stream, size) }
+        try {
+            sftpSource.sftpClient.read(path).use { it.transferToWithProgress(stream, size) }
+        } catch (ex: SftpException) {
+            when (ex.status) {
+                SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundException(path)
+                else -> throw ex
+            }
+        }
     }
 
     override suspend fun transferFrom(name: String, stream: InputStream, length: Long) = TODO()
 
     override suspend fun rename(name: String) {
-        sftpSource.sftpClient.rename(path, "${path.substringBeforeLast('/', "")}/$name")
+        try {
+            sftpSource.sftpClient.rename(path, "${path.substringBeforeLast('/', "")}/$name")
+        } catch (ex: SftpException) {
+            when (ex.status) {
+                SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundException(path)
+                else -> throw ex
+            }
+        }
     }
 
     override suspend fun delete() {
-        sftpSource.sftpClient.remove(path)
+        try {
+            sftpSource.sftpClient.remove(path)
+        } catch (ex: SftpException) {
+            when (ex.status) {
+                SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundException(path)
+                else -> throw ex
+            }
+        }
     }
 
     override fun toString() = path

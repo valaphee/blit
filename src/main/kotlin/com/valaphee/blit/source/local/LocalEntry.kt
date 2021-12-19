@@ -17,9 +17,11 @@
 package com.valaphee.blit.source.local
 
 import com.valaphee.blit.source.AbstractEntry
+import com.valaphee.blit.source.NotFoundException
 import com.valaphee.blit.source.transferToWithProgress
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
@@ -28,30 +30,34 @@ import java.io.OutputStream
  * @author Kevin Ludwig
  */
 class LocalEntry(
-    private val path: File
+    private val file: File
 ) : AbstractEntry<LocalEntry>() {
-    override val name: String get() = path.name
-    override val size = path.length()
-    override val modifyTime = path.lastModified()
-    override val directory get() = path.isDirectory
+    override val name: String get() = file.name
+    override val size = file.length()
+    override val modifyTime = file.lastModified()
+    override val directory get() = file.isDirectory
 
-    override suspend fun list() = path.listFiles()?.map { LocalEntry(it) } ?: emptyList()
+    override suspend fun list() = file.listFiles()?.map { LocalEntry(it) } ?: emptyList()
 
     override suspend fun transferTo(stream: OutputStream) {
-        FileInputStream(path).use { it.transferToWithProgress(stream, size) }
+        try {
+            FileInputStream(file).use { it.transferToWithProgress(stream, size) }
+        } catch (ex: FileNotFoundException) {
+            throw NotFoundException("$file")
+        }
     }
 
     override suspend fun transferFrom(name: String, stream: InputStream, length: Long) {
-        FileOutputStream("$path/$name").use { stream.transferToWithProgress(it, size) }
+        FileOutputStream("$file/$name").use { stream.transferToWithProgress(it, size) }
     }
 
     override suspend fun rename(name: String) {
-        path.renameTo(File(path.parentFile, name))
+        file.renameTo(File(file.parentFile, name))
     }
 
     override suspend fun delete() {
-        path.delete()
+        file.delete()
     }
 
-    override fun toString() = path.toString()
+    override fun toString() = "$file"
 }
