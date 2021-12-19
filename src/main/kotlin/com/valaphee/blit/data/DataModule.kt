@@ -16,6 +16,7 @@
 
 package com.valaphee.blit.data
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
@@ -42,6 +43,8 @@ class DataModule(
         if (!::objectMapper.isInitialized) objectMapper = jacksonObjectMapper().apply {
             registerModule(AfterburnerModule())
             propertyNamingStrategy = PropertyNamingStrategies.SNAKE_CASE
+            setSerializationInclusion(JsonInclude.Include.NON_DEFAULT)
+            enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
         }.also { bind(ObjectMapper::class.java).toInstance(it) }
 

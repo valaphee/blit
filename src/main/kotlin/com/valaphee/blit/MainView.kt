@@ -128,8 +128,15 @@ class MainView : View("Blit") {
     }
 
     inner class Pane<T : Entry<T>> : VBox() {
-        private val source = SimpleObjectProperty<Source<T>>().apply { onChange { it?.let { navigate(it.home) } } }
-        private lateinit var _path: String
+        private val source = SimpleObjectProperty<Source<T>>().apply {
+            onChange {
+                it?.let {
+                    _path = null
+                    navigate(it.home)
+                }
+            }
+        }
+        private var _path: String? = null
         private val name = SimpleStringProperty()
         private val tree = Tree<T>()
 
@@ -183,7 +190,7 @@ class MainView : View("Blit") {
             var canonicalPath = path.toCanonicalPath().joinToString("/")
             if (!canonicalPath.endsWith('/')) canonicalPath = "$canonicalPath/"
 
-            if (::_path.isInitialized && canonicalPath == _path) return
+            if (canonicalPath == _path) return
 
             source.value?.let {
                 worker.launch(locale["main.navigator.task.navigate.name", canonicalPath]) {

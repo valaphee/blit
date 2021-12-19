@@ -28,6 +28,7 @@ import io.ktor.client.request.put
 import io.ktor.client.request.request
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.readBytes
+import io.ktor.client.statement.request
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.URLBuilder
 import io.ktor.http.content.OutgoingContent
@@ -53,20 +54,20 @@ class DavEntry(
     override val modifyTime get() = prop.getlastmodified?.time ?: 0
     override val directory get() = prop.resourcetype?.collection != null
 
-    override suspend fun list() = if (directory) {
+    override suspend fun list(): List<DavEntry> = if (directory) {
+        val path = if (path.startsWith('/')) path.substring(1) else path // Unix path correction, "." ("") and "/" are the same
         val httpResponse = davSource.httpClient.request<HttpResponse>("${davSource._url}/$path") { method = httpMethodPropfind }
-        if (httpResponse.status == HttpStatusCode.MultiStatus) {
-            var first = true
-            xmlMapper.readValue<Multistatus>(httpResponse.readBytes()).response.mapNotNull {
-                if (first) {
-                    first = false
-                    null
-                } else {
+        when (httpResponse.status) {
+            HttpStatusCode.MultiStatus -> {
+                val href = httpResponse.request.url.encodedPath
+                xmlMapper.readValue<Multistatus>(httpResponse.readBytes()).response.filter { !it.href.equals(href, true) }.mapNotNull {
                     val name = URLDecoder.decode(it.href.removeSuffix("/").split('/').last(), "UTF-8")
-                    /*if (name != this.name) */DavEntry(davSource, "${if (path == "/") "" else path}/${name}", it.propstat.first().prop)/* else null*/
-                } // TODO: it is not defined in the standard that the first entry has to be the entry itself
+                    it.propstat.find { it.status == "HTTP/1.1 200 OK" }?.prop?.let { DavEntry(davSource, "$path/$name", it) }
+                }
             }
-        } else emptyList()
+            HttpStatusCode.NotFound -> throw NotFoundException(path)
+            else -> TODO()
+        }
     } else emptyList()
 
     override suspend fun transferTo(stream: OutputStream) {
@@ -78,15 +79,15 @@ class DavEntry(
     }
 
     override suspend fun transferFrom(name: String, stream: InputStream, length: Long) {
-        if (davSource.nextcloud && length > chunkSize) {
+        if (davSource.nextcloud && length > davSource.nextcloudUploadChunkSize) {
             val id = "blit-${UUID.randomUUID()}"
             davSource.httpClient.request<Unit>("${davSource.url}/uploads/${davSource.username}/$id") { method = httpMethodMkcol }
 
             /*val jobs = mutableListOf<Job>()*/
-            val chunkCount = ceil(length / chunkSize.toDouble())
+            val chunkCount = ceil(length / davSource.nextcloudUploadChunkSize.toDouble())
             for (i in 0..chunkCount) {
                 /*jobs += ioScope.launch { */
-                davSource.httpClient.put<Unit>("${davSource.url}/uploads/${davSource.username}/$id/${i * chunkSize}") { body = stream.readNBytes(chunkSize.toInt()) }
+                davSource.httpClient.put<Unit>("${davSource.url}/uploads/${davSource.username}/$id/${i * davSource.nextcloudUploadChunkSize}") { body = stream.readNBytes(davSource.nextcloudUploadChunkSize.toInt()) }
                 coroutineContext.progress = i / chunkCount.toDouble() // TODO: more precise progress
                 /*}*/
             }
@@ -124,8 +125,6 @@ class DavEntry(
     }
 
     companion object {
-        private const val chunkSize = 10L * 1024 * 1024
-
         private fun ceil(value: Double): Int {
             val valueInt = (value + 1).toInt()
             return if (value >= valueInt) valueInt else valueInt - 1

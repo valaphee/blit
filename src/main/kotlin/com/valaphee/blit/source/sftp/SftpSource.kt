@@ -35,12 +35,12 @@ import java.nio.file.Paths
  */
 @JsonTypeName("sftp")
 class SftpSource(
-    name: String,
-    @get:JsonProperty("host") val host: String,
-    @get:JsonProperty("port") val port: Int,
-    @get:JsonProperty("username") val username: String,
-    @get:JsonProperty("password") val password: String,
-    @get:JsonProperty("private_key") val privateKey: String
+    name: String  = "",
+    @get:JsonProperty("host") val host: String  = "",
+    @get:JsonProperty("port") val port: Int = 22,
+    @get:JsonProperty("username") val username: String  = "",
+    @get:JsonProperty("password") val password: String = "",
+    @get:JsonProperty("private_key") val privateKey: String = ""
 ) : AbstractSource<SftpEntry>(name) {
     @get:JsonIgnore private val sshSession: ClientSession by lazy {
         val sshSession = sshClient.connect(username, host, port).verify().session
@@ -51,7 +51,7 @@ class SftpSource(
     }
     @get:JsonIgnore internal val sftpClient: SftpClient by lazy { DefaultSftpClientFactory.INSTANCE.createSftpClient(sshSession) }
 
-    override val home: String get() = /*sshSession.executeRemoteCommand("pwd")*/"/" // TODO: pwd
+    override val home: String get() = sshSession.executeRemoteCommand("pwd").lines().first()
 
     override suspend fun get(path: String) = try {
         SftpEntry(this, path, sftpClient.stat(path))

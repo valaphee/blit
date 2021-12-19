@@ -31,7 +31,6 @@ internal fun K8scpSource.stat(path: String): SftpClient.Attributes? {
     val (namespace, pod, path) = getNamespacePodAndPath(path)
     return if (namespace != null) {
         if (pod != null) {
-            println("$namespace - $pod - $path")
             val process = K8scpSource.copy.exec(namespace, pod, arrayOf("stat", "--format", "%A 0 %U %G %s %y %n", path), false)
             val attributes = BufferedReader(InputStreamReader(process.inputStream)).use { parseLsEntry(it.readText())?.second }
             process.waitFor()

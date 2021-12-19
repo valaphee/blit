@@ -47,11 +47,12 @@ import javax.net.ssl.X509TrustManager
  */
 @JsonTypeName("dav")
 class DavSource(
-    name: String,
-    @get:JsonProperty("url") val url: String,
-    @get:JsonProperty("username") val username: String,
-    @get:JsonProperty("password") val password: String,
-    @get:JsonProperty("nextcloud") val nextcloud: Boolean
+    name: String = "",
+    @get:JsonProperty("url") val url: String = "",
+    @get:JsonProperty("username") val username: String = "",
+    @get:JsonProperty("password") val password: String = "",
+    @get:JsonProperty("nextcloud") val nextcloud: Boolean = false,
+    @get:JsonProperty("nextcloud-upload-chunk-size") val nextcloudUploadChunkSize: Long = 10L * 1024 * 1024
 ) : AbstractSource<DavEntry>(name) {
     @get:JsonIgnore internal val httpClient by lazy {
         HttpClient(OkHttp) {

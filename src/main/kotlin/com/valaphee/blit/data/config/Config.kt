@@ -24,6 +24,7 @@ import com.valaphee.blit.source.Source
 import com.valaphee.blit.source.local.LocalSource
 import java.lang.Long.signum
 import java.text.StringCharacterIterator
+import java.util.Locale
 import kotlin.math.abs
 
 /**
@@ -32,7 +33,7 @@ import kotlin.math.abs
 @Singleton
 @DataType("config")
 class Config(
-    @get:JsonProperty("locale") val locale: String? = null,
+    @get:JsonProperty("locale") val locale: String = Locale.getDefault().toLanguageTag().replace('-', '_'),
     @get:JsonProperty("data_size_unit") val dataSizeUnit: DataSizeUnit = DataSizeUnit.IEC,
     @get:JsonProperty("sources") val sources: List<Source<*>> = listOf(LocalSource("local"))
 ) : Data {

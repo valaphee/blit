@@ -26,7 +26,7 @@ import java.io.File
  */
 @JsonTypeName("local")
 class LocalSource(
-    name: String
+    name: String = ""
 ) : AbstractSource<LocalEntry>(name) {
     override val home: String get() = File(System.getProperty("user.home")).absolutePath
 

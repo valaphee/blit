@@ -24,6 +24,8 @@ import javafx.scene.control.TextField
 import tornadofx.Field
 import tornadofx.checkbox
 import tornadofx.field
+import tornadofx.filterInput
+import tornadofx.isLong
 import tornadofx.passwordfield
 import tornadofx.textfield
 import tornadofx.toProperty
@@ -43,6 +45,7 @@ object DavSourceUi : SourceUi {
             field("Username") { textfield(davSource?.username ?: "") },
             field("Password") { passwordfield(davSource?.password ?: "") },
             field("Nextcloud") { checkbox(property = davSource?.nextcloud.toProperty()) },
+            field("Nextcloud Upload Chunk Size") { textfield(davSource?.nextcloudUploadChunkSize?.toString() ?: "") { filterInput { it.controlNewText.isLong() } } }
         )
     }
 
@@ -52,5 +55,6 @@ object DavSourceUi : SourceUi {
         (fields[2].inputs[0] as TextField).text,
         (fields[3].inputs[0] as TextField).text,
         (fields[4].inputs[0] as CheckBox).isSelected,
+        (fields[5].inputs[0] as TextField).text.toLong()
     )
 }

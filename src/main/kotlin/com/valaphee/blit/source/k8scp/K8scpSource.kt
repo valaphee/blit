@@ -31,9 +31,9 @@ import java.io.InputStreamReader
  */
 @JsonTypeName("k8scp")
 class K8scpSource(
-    name: String,
-    @get:JsonProperty("namespace") val namespace: String,
-    @get:JsonProperty("pod") val pod: String
+    name: String = "",
+    @get:JsonProperty("namespace") val namespace: String = "",
+    @get:JsonProperty("pod") val pod: String = ""
 ) : AbstractSource<K8scpEntry>(name) {
     override val home: String get() = if (namespace.isNotEmpty() && pod.isNotEmpty()) {
         val process = copy.exec(namespace, pod, arrayOf("pwd", toString()), false)
