@@ -19,6 +19,7 @@ package com.valaphee.blit.source.k8scp
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeName
 import com.valaphee.blit.source.AbstractSource
+import com.valaphee.blit.source.NotFoundException
 import io.kubernetes.client.Copy
 import io.kubernetes.client.openapi.apis.CoreV1Api
 import io.kubernetes.client.util.Config
@@ -41,9 +42,7 @@ class K8scpSource(
         home
     } else "/"
 
-    override suspend fun isValid(path: String) = stat(path)?.isDirectory ?: false
-
-    override suspend fun get(path: String) = K8scpEntry(this, path, stat(path)!!)
+    override suspend fun get(path: String) = stat(path)?.let { K8scpEntry(this, path, it) } ?: throw NotFoundException(path)
 
     internal fun getNamespacePodAndPath(path: String): Triple<String?, String?, String?> {
         return if (namespace.isNotEmpty()) {

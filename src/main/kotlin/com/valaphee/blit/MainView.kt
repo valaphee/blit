@@ -150,7 +150,12 @@ class MainView : View("Blit") {
                     left = BreadCrumbBar<String>().apply {
                         style(true) { paddingTop = 2.0 }
 
-                        tree.rootProperty().onChange { it?.let { selectedCrumb = if (it.value.toString() == "/") BreadCrumbBar.buildTreeModel("/") else BreadCrumbBar.buildTreeModel(*normalizePath(it.value.toString()).split('/').toTypedArray().apply { if (this[0].isEmpty()) this[0] = "/" }) } }
+                        tree.rootProperty().onChange {
+                            it?.let {
+                                val path = it.value.toString()
+                                selectedCrumb = if (path == "/") BreadCrumbBar.buildTreeModel("/") else BreadCrumbBar.buildTreeModel(*path.toCanonicalPath().toTypedArray().apply { if (this.getOrNull(0)?.isEmpty() == true) this[0] = "/" })
+                            }
+                        }
                         selectedCrumbProperty().onChange {
                             val path = StringBuilder()
                             var item = it
@@ -162,7 +167,12 @@ class MainView : View("Blit") {
                         }
                     }
 
-                    addEventFilter(KeyEvent.KEY_PRESSED) { if (it.code == KeyCode.ENTER) text?.let(::navigateRelative) }
+                    addEventFilter(KeyEvent.KEY_PRESSED) {
+                        when (it.code) {
+                            KeyCode.ENTER -> text?.let(::navigateRelative)
+                            KeyCode.BACK_SPACE -> if (text?.isEmpty() != false) navigateRelative("..")
+                        }
+                    }
                 })
                 button(locale["main.navigator.go.text"]) { action { name.value?.let(::navigateRelative) } }
             }
@@ -170,26 +180,25 @@ class MainView : View("Blit") {
         }
 
         private fun navigate(path: String) {
-            val normalizedPath = normalizePath(path)
+            var canonicalPath = path.toCanonicalPath().joinToString("/")
+            if (!canonicalPath.endsWith('/')) canonicalPath = "$canonicalPath/"
 
-            if (::_path.isInitialized && normalizedPath == _path) return
-            _path = normalizedPath
+            if (::_path.isInitialized && canonicalPath == _path) return
 
-            source.value?.let { source ->
-                worker.launch(locale["main.navigator.task.navigate.name", normalizedPath]) {
-                    if (source.isValid(normalizedPath)) {
-                        val item = source.get(normalizedPath).item
-                        runLater {
-                            name.value = null
-                            tree.root = item
-                            tree.populate(tree.root)
-                        }
+            source.value?.let {
+                worker.launch(locale["main.navigator.task.navigate.name", canonicalPath]) {
+                    val item = it.get(canonicalPath).item
+                    _path = canonicalPath
+                    runLater {
+                        name.value = null
+                        tree.root = item
+                        tree.populate(tree.root)
                     }
                 }
             }
         }
 
-        fun navigateRelative(path: String) = navigate(if (path.startsWith('/')) path else tree.root.value.toString() + "/$path")
+        fun navigateRelative(path: String) = navigate(if (path.startsWith('/') || path.matches(windowsRootPath)) path else "${tree.root.value}/$path")
 
         inner class Tree<T : Entry<T>> : TreeTableView<Entry<T>>() {
             init {
@@ -264,7 +273,7 @@ class MainView : View("Blit") {
                 setOnKeyPressed {
                     when (it.code) {
                         KeyCode.ENTER -> selectionModel.selectedItems.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.toString()) } ?: selectionModel.selectedItems.forEach(::open)
-                        KeyCode.BACK_SPACE -> navigate(root.value.toString().substringBeforeLast('/'))
+                        KeyCode.BACK_SPACE -> navigateRelative("..")
                         KeyCode.C -> if (it.isControlDown) Clipboard.getSystemClipboard().setContent {
                             worker.runBlocking(locale["main.tree.task.download.name"]) {
                                 suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
@@ -333,12 +342,22 @@ class MainView : View("Blit") {
     }
 
     companion object {
+        private val windowsRootPath = "^[a-zA-Z]:[\\\\/].*\$".toRegex()
         private val tableColumnBaseSetWidth = TableColumnBase::class.java.getDeclaredMethod("setWidth", Double::class.java).apply { isAccessible = true }
         private val tmpdir = System.getProperty("java.io.tmpdir")
 
-        private fun normalizePath(path: String): String {
-            val normalizedPath = path.replace('\\', '/').replace("//", "/").replace("//", "/")
-            return if (normalizedPath.length <= 1) normalizedPath else normalizedPath.removeSuffix("/")
+        internal fun String.toCanonicalPath(): List<String> {
+            replace('\\', '/').apply {
+                val canonicalPath = mutableListOf<String>()
+                split('/').forEach {
+                    when (it) {
+                        "." -> Unit
+                        ".." -> canonicalPath.lastOrNull()?.let { if (it != "..") canonicalPath.removeLast() else canonicalPath.add(it) }
+                        else -> if (it.isNotEmpty()) canonicalPath.add(it)
+                    }
+                }
+                return canonicalPath.filter(String::isNotEmpty).let { if (startsWith("/")) it.toMutableList().apply { add(0, "") } else it }
+            }
         }
     }
 }

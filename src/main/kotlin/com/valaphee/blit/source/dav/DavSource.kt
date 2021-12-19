@@ -19,7 +19,9 @@ package com.valaphee.blit.source.dav
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeName
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.valaphee.blit.source.AbstractSource
+import com.valaphee.blit.source.NotFoundException
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.features.HttpTimeout
@@ -31,8 +33,9 @@ import io.ktor.client.features.json.JacksonSerializer
 import io.ktor.client.features.json.Json
 import io.ktor.client.request.request
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.readBytes
+import io.ktor.client.statement.request
 import io.ktor.http.ContentType
-import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import java.security.cert.X509Certificate
 import javax.net.ssl.SSLContext
@@ -75,11 +78,20 @@ class DavSource(
     }
     @get:JsonIgnore internal val _url get() = if (nextcloud) "${url}/files/${username}" else url
 
-    override val home get() = "." // TODO: pwd
+    override val home get() = "/"
 
-    override suspend fun isValid(path: String) = httpClient.request<HttpResponse>("$_url/$path") { method = httpMethodPropfind }.status == HttpStatusCode.MultiStatus
-
-    override suspend fun get(path: String) = DavEntry(this, path, httpClient.request<Multistatus>("$_url/$path") { method = httpMethodPropfind }.response.first().propstat.first().prop) // TODO
+    override suspend fun get(path: String): DavEntry {
+        val path = if (path.startsWith('/')) path.substring(1) else path // Unix path correction, "." ("") and "/" are the same
+        val httpResponse = httpClient.request<HttpResponse>("$_url/$path") { method = httpMethodPropfind }
+        return when (httpResponse.status) {
+            HttpStatusCode.MultiStatus -> {
+                val href = httpResponse.request.url.encodedPath
+                xmlMapper.readValue<Multistatus>(httpResponse.readBytes()).response.find { it.href.equals(href, true) }?.propstat?.find { it.status == "HTTP/1.1 200 OK" }?.prop?.let { DavEntry(this, path, it) } ?: TODO()
+            }
+            HttpStatusCode.NotFound -> throw NotFoundException(path)
+            else -> TODO()
+        }
+    }
 
     companion object {
         private val trustManagers = arrayOf<TrustManager>(object : X509TrustManager {

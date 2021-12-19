@@ -29,6 +29,7 @@ import io.ktor.client.request.request
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.readBytes
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.URLBuilder
 import io.ktor.http.content.OutgoingContent
 import io.ktor.http.contentLength
 import io.ktor.utils.io.ByteWriteChannel
@@ -93,7 +94,7 @@ class DavEntry(
 
             davSource.httpClient.request<Unit>("${davSource.url}/uploads/${davSource.username}/$id/.file") {
                 method = httpMethodMove
-                headers { this["Destination"] = "${davSource._url}/$path/$name" }
+                headers { this["Destination"] = URLBuilder("${davSource._url}/$path/$name").buildString() }
             }
         } else davSource.httpClient.put<Unit>("${davSource._url}/$path/$name") { body = InputStreamContent(stream, length) } // TODO: set progress
     }
@@ -101,7 +102,7 @@ class DavEntry(
     override suspend fun rename(name: String) {
         davSource.httpClient.request<Unit>("${davSource._url}/$path") {
             method = httpMethodMove
-            headers { this["Destination"] = "${davSource._url}/${path.substringBeforeLast('/', "")}/$name" }
+            headers { this["Destination"] = URLBuilder("${davSource._url}/${path.substringBeforeLast('/', "")}/$name").buildString() }
         }
     }
 

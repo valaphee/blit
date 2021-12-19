@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit.source.local
+package com.valaphee.blit.source.dav
 
-import com.fasterxml.jackson.annotation.JsonTypeName
-import com.valaphee.blit.source.AbstractSource
-import com.valaphee.blit.source.NotFoundException
-import java.io.File
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement
 
 /**
  * @author Kevin Ludwig
  */
-@JsonTypeName("local")
-class LocalSource(
-    name: String
-) : AbstractSource<LocalEntry>(name) {
-    override val home: String get() = File(System.getProperty("user.home")).absolutePath
-
-    override suspend fun get(path: String): LocalEntry {
-        val file = File(path)
-        return if (file.exists()) LocalEntry(file) else throw NotFoundException(path)
-    }
-}
+@JacksonXmlRootElement(namespace = "DAV:", localName = "error")
+class Error(
+    @get:JacksonXmlProperty(namespace = "http://sabredav.org/ns", localName = "exception") val exception: String,
+    @get:JacksonXmlProperty(namespace = "http://sabredav.org/ns", localName = "message") val message: String
+)

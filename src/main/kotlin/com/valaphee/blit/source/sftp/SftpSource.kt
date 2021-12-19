@@ -20,11 +20,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeName
 import com.valaphee.blit.source.AbstractSource
+import com.valaphee.blit.source.NotFoundException
 import org.apache.sshd.client.SshClient
 import org.apache.sshd.client.session.ClientSession
 import org.apache.sshd.common.config.keys.loader.openssh.OpenSSHKeyPairResourceParser
 import org.apache.sshd.sftp.client.SftpClient
 import org.apache.sshd.sftp.client.impl.DefaultSftpClientFactory
+import org.apache.sshd.sftp.common.SftpConstants
 import org.apache.sshd.sftp.common.SftpException
 import java.nio.file.Paths
 
@@ -41,7 +43,7 @@ class SftpSource(
     @get:JsonProperty("private_key") val privateKey: String
 ) : AbstractSource<SftpEntry>(name) {
     @get:JsonIgnore private val sshSession: ClientSession by lazy {
-        val sshSession = ssh.connect(username, host, port).verify().session
+        val sshSession = sshClient.connect(username, host, port).verify().session
         if (password.isNotEmpty()) sshSession.addPasswordIdentity(password)
         if (privateKey.isNotEmpty()) OpenSSHKeyPairResourceParser.INSTANCE.loadKeyPairs(null, Paths.get(privateKey), { _, _, _ -> TODO() }).firstOrNull()?.let { sshSession.addPublicKeyIdentity(it) }
         sshSession.auth().verify()
@@ -49,17 +51,18 @@ class SftpSource(
     }
     @get:JsonIgnore internal val sftpClient: SftpClient by lazy { DefaultSftpClientFactory.INSTANCE.createSftpClient(sshSession) }
 
-    override val home: String get() = /*sshSession.executeRemoteCommand("pwd")*/"." // TODO: pwd
+    override val home: String get() = /*sshSession.executeRemoteCommand("pwd")*/"/" // TODO: pwd
 
-    override suspend fun isValid(path: String) = try {
-        sftpClient.stat(path).isDirectory
-    } catch (_: SftpException) {
-        false
+    override suspend fun get(path: String) = try {
+        SftpEntry(this, path, sftpClient.stat(path))
+    } catch (ex: SftpException) {
+        when (ex.status) {
+            SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundException(path)
+            else -> throw ex
+        }
     }
 
-    override suspend fun get(path: String) = SftpEntry(this, path, sftpClient.stat(path))
-
     companion object {
-        private val ssh = SshClient.setUpDefaultClient().apply { start() }
+        private val sshClient = SshClient.setUpDefaultClient().apply { start() }
     }
 }
