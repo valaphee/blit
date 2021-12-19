@@ -34,7 +34,7 @@ class ScpEntry(
     override val modifyTime get() = attributes.modifyTime.toMillis()
     override val directory get() = attributes.isDirectory
 
-    override suspend fun list() = if (directory) source.sshSession.executeRemoteCommand("""ls -l --full-time "$path"""").lines().mapNotNull { parseLsEntry(it)?.let { ScpEntry(source, "${if (this.path == "/") "" else this.path}/${it.first}", it.second) } } else emptyList()
+    override suspend fun list() = if (directory) source.sshSession.executeRemoteCommand("""ls -al --full-time "$path"""").lines().mapNotNull { parseLsEntry(it)?.let { (name, attributes) -> if (name != "." && name != "..") ScpEntry(source, "${if (this.path == "/") "" else this.path}/$name", attributes) else null } } else emptyList()
 
     override suspend fun transferTo(stream: OutputStream) {
         source.scpClient.download(path, stream)

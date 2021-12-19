@@ -44,8 +44,8 @@ class K8scpEntry(
         val (namespace, pod, path) = source.getNamespacePodAndPath(path)
         if (namespace != null) {
             if (pod != null) {
-                val process = K8scpSource.copy.exec(namespace, pod, arrayOf("ls", "-l", "--full-time", path!!), false)
-                val list = BufferedReader(InputStreamReader(process.inputStream)).use { it.readLines().mapNotNull { parseLsEntry(it)?.let { K8scpEntry(source, "${if (this.path == "/") "" else this.path}/${it.first}", it.second) } } }
+                val process = K8scpSource.copy.exec(namespace, pod, arrayOf("ls", "-al", "--full-time", path!!), false)
+                val list = BufferedReader(InputStreamReader(process.inputStream)).use { it.readLines().mapNotNull { parseLsEntry(it)?.let { (name, attributes) -> if (name != "." && name != "..") K8scpEntry(source, "${if (this.path == "/") "" else this.path}/$name", attributes) else null } } }
                 process.waitFor()
                 list
             } else K8scpSource.coreV1Api.listNamespacedPod(namespace, null, null, null, null, null, null, null, null, null, null).items.map { K8scpEntry(source, "${if (this.path == "/") "" else this.path}/${it.metadata!!.name!!}", namespaceOrPodAttributes) }
