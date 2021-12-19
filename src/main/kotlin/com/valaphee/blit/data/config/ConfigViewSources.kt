@@ -18,12 +18,13 @@ package com.valaphee.blit.data.config
 
 import com.valaphee.blit.data.locale.Locale
 import com.valaphee.blit.source.Source
+import com.valaphee.blit.source.SourceUi
 import com.valaphee.blit.source.dav.DavSourceUi
 import com.valaphee.blit.source.k8scp.K8scpSourceUi
 import com.valaphee.blit.source.local.LocalSourceUi
+import com.valaphee.blit.source.scp.ScpSourceUi
 import com.valaphee.blit.source.sftp.SftpSourceUi
 import javafx.beans.property.SimpleObjectProperty
-import javafx.beans.property.SimpleStringProperty
 import javafx.scene.layout.Priority
 import tornadofx.Field
 import tornadofx.Fragment
@@ -54,11 +55,11 @@ class ConfigViewSources : Fragment("Sources") {
         onChange {
             it?.let {
                 type.value = null
-                type.value = sourceUis.values.first { sourceUi -> sourceUi.`class` == it::class }.name
+                type.value = sourceUis.first { sourceUi -> sourceUi.`class` == it::class }
             }
         }
     }
-    private val type = SimpleStringProperty()
+    private val type = SimpleObjectProperty<SourceUi>()
     private lateinit var fields: List<Field>
 
     override val root = hbox {
@@ -80,7 +81,7 @@ class ConfigViewSources : Fragment("Sources") {
                 }
                 button(locale["config.sources.save.text"]) {
                     action {
-                        val source = sourceUis[type.value]!!.getSource(fields)!!
+                        val source = type.value.getSource(fields)!!
                         if (sources.selectionModel.selectedIndex != -1) configModel.sources[sources.selectionModel.selectedIndex] = source
                         else {
                             configModel.sources.add(source)
@@ -99,12 +100,12 @@ class ConfigViewSources : Fragment("Sources") {
         form {
             hgrow = Priority.ALWAYS
 
-            fieldset { field("Type") { combobox<String>(type, sourceUis.keys.toList().asObservable()) } }
-            fieldset { dynamicContent(type) { it?.let { sourceUis[it]!!.getFields(this, source.value).also { fields = it } } } }
+            fieldset { field("Type") { combobox(type, sourceUis.toList().asObservable()) { cellFormat { text = locale["config.sources.${it.javaClass.simpleName}"] } } } }
+            fieldset { dynamicContent(type) { it?.let { it.getFields(this, source.value).also { fields = it } } } }
         }
     }
 
     companion object {
-        private val sourceUis = setOf(DavSourceUi, K8scpSourceUi, LocalSourceUi, SftpSourceUi).associateBy { it.name }
+        private val sourceUis = setOf(DavSourceUi, K8scpSourceUi, LocalSourceUi, ScpSourceUi, SftpSourceUi)
     }
 }

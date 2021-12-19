@@ -34,7 +34,6 @@ import tornadofx.toProperty
  * @author Kevin Ludwig
  */
 object DavSourceUi : SourceUi {
-    override val name get() = "WebDAV"
     override val `class` get() = DavSource::class
 
     override fun getFields(eventTarget: EventTarget, source: Source<*>?) = with(eventTarget) {

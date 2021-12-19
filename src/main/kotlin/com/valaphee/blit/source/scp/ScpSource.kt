@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit.source.sftp
+package com.valaphee.blit.source.scp
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -24,43 +24,34 @@ import com.valaphee.blit.source.NotFoundException
 import org.apache.sshd.client.SshClient
 import org.apache.sshd.client.session.ClientSession
 import org.apache.sshd.common.config.keys.loader.openssh.OpenSSHKeyPairResourceParser
-import org.apache.sshd.sftp.client.SftpClient
-import org.apache.sshd.sftp.client.SftpClientFactory
-import org.apache.sshd.sftp.common.SftpConstants
-import org.apache.sshd.sftp.common.SftpException
+import org.apache.sshd.scp.client.ScpClient
+import org.apache.sshd.scp.client.ScpClientCreator
 import java.nio.file.Paths
 
 /**
  * @author Kevin Ludwig
  */
-@JsonTypeName("sftp")
-class SftpSource(
+@JsonTypeName("scp")
+class ScpSource(
     name: String  = "",
     @get:JsonProperty("host") val host: String  = "",
     @get:JsonProperty("port") val port: Int = 22,
     @get:JsonProperty("username") val username: String  = "",
     @get:JsonProperty("password") val password: String = "",
     @get:JsonProperty("private_key") val privateKey: String = ""
-) : AbstractSource<SftpEntry>(name) {
-    @get:JsonIgnore private val sshSession: ClientSession by lazy {
+) : AbstractSource<ScpEntry>(name) {
+    @get:JsonIgnore internal val sshSession: ClientSession by lazy {
         val sshSession = sshClient.connect(username, host, port).verify().session
         if (password.isNotEmpty()) sshSession.addPasswordIdentity(password)
         if (privateKey.isNotEmpty()) OpenSSHKeyPairResourceParser.INSTANCE.loadKeyPairs(null, Paths.get(privateKey), { _, _, _ -> TODO() }).firstOrNull()?.let { sshSession.addPublicKeyIdentity(it) }
         sshSession.auth().verify()
         sshSession
     }
-    @get:JsonIgnore internal val sftpClient: SftpClient by lazy { SftpClientFactory.instance().createSftpClient(sshSession) }
+    @get:JsonIgnore internal val scpClient: ScpClient by lazy { ScpClientCreator.instance().createScpClient(sshSession) }
 
     override val home: String get() = sshSession.executeRemoteCommand("pwd").lines().first()
 
-    override suspend fun get(path: String) = try {
-        SftpEntry(this, path, sftpClient.stat(path))
-    } catch (ex: SftpException) {
-        when (ex.status) {
-            SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundException(path)
-            else -> throw ex
-        }
-    }
+    override suspend fun get(path: String) = parseLsEntry(sshSession.executeRemoteCommand("""stat --format "%A 0 %U %G %s %y %n" "$path"""").lines().first())?.second?.let { ScpEntry(this, path, it) } ?: throw NotFoundException(path)
 
     companion object {
         private val sshClient = SshClient.setUpDefaultClient().apply { start() }

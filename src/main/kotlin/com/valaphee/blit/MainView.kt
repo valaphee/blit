@@ -86,7 +86,7 @@ class MainView : View("Blit") {
     private val iconManifest by di<IconManifest>()
     private val configModel by di<ConfigModel>()
 
-    private val worker = Worker().apply {
+    private val taskManager = TaskManager().apply {
         val version = System.getProperty("os.version").toFloatOrNull()
         if (System.getProperty("os.name").startsWith("Windows") && version != null && version >= 6.1f) {
             val iTaskbarList3 = CompletableFuture.supplyAsync({ COMRuntime.newInstance(ITaskbarList3::class.java) }, comExecutor).join()
@@ -123,8 +123,8 @@ class MainView : View("Blit") {
             @Suppress("UPPER_BOUND_VIOLATED_WARNING") add(Pane<Entry<*>>())
             @Suppress("UPPER_BOUND_VIOLATED_WARNING") add(Pane<Entry<*>>())
         }
-        label(worker.name)
-        progressbar(worker.progress)
+        label(taskManager.name)
+        progressbar(taskManager.progress)
     }
 
     inner class Pane<T : Entry<T>> : VBox() {
@@ -193,7 +193,7 @@ class MainView : View("Blit") {
             if (canonicalPath == _path) return
 
             source.value?.let {
-                worker.launch(locale["main.navigator.task.navigate.name", canonicalPath]) {
+                taskManager.launch(locale["main.navigator.task.navigate.name", canonicalPath]) {
                     val item = it.get(canonicalPath).item
                     _path = canonicalPath
                     runLater {
@@ -241,7 +241,7 @@ class MainView : View("Blit") {
                             setOnDragDetected {
                                 startDragAndDrop(TransferMode.MOVE).apply {
                                     setContent {
-                                        worker.runBlocking(locale["main.tree.task.download.name"]) {
+                                        taskManager.runBlocking(locale["main.tree.task.download.name"]) {
                                             suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
                                                 File(tmpdir, entry.name).mkdir()
                                                 entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
@@ -282,7 +282,7 @@ class MainView : View("Blit") {
                         KeyCode.ENTER -> selectionModel.selectedItems.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.toString()) } ?: selectionModel.selectedItems.forEach(::open)
                         KeyCode.BACK_SPACE -> navigateRelative("..")
                         KeyCode.C -> if (it.isControlDown) Clipboard.getSystemClipboard().setContent {
-                            worker.runBlocking(locale["main.tree.task.download.name"]) {
+                            taskManager.runBlocking(locale["main.tree.task.download.name"]) {
                                 suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
                                     File(tmpdir, entry.name).mkdir()
                                     entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
@@ -299,7 +299,7 @@ class MainView : View("Blit") {
                                 val item = selectionModel.selectedItem ?: root
                                 val entry = item.value
                                 if (!entry.directory) TODO()
-                                files.forEach { file -> worker.launch(locale["main.tree.task.upload.name", file.name]) { FileInputStream(file).use { entry.transferFrom(file.name, it, file.length()) } } }
+                                files.forEach { file -> taskManager.launch(locale["main.tree.task.upload.name", file.name]) { FileInputStream(file).use { entry.transferFrom(file.name, it, file.length()) } } }
                             }
                         }
                         KeyCode.DELETE -> selectionModel.selectedItems.forEach(::delete)
@@ -315,22 +315,22 @@ class MainView : View("Blit") {
             private fun open(item: TreeItem<Entry<T>>) {
                 if (Desktop.isDesktopSupported()) {
                     val entry = item.value
-                    worker.launch(locale["main.tree.task.download.name", entry]) { Desktop.getDesktop().open(File(tmpdir, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }) } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
+                    taskManager.launch(locale["main.tree.task.download.name", entry]) { Desktop.getDesktop().open(File(tmpdir, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }) } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
                 }
             }
 
             private fun rename(item: TreeItem<Entry<T>>) {
                 val entry = item.value
-                RenameView(entry.name) { worker.launch(locale["main.tree.task.rename.name", entry, it]) { entry.rename(it) } }.openModal(resizable = false)
+                RenameView(entry.name) { taskManager.launch(locale["main.tree.task.rename.name", entry, it]) { entry.rename(it) } }.openModal(resizable = false)
             }
 
             private fun delete(item: TreeItem<Entry<T>>) {
                 val entry = item.value
-                worker.launch(locale["main.tree.task.delete.name", entry]) { entry.delete() }
+                taskManager.launch(locale["main.tree.task.delete.name", entry]) { entry.delete() }
             }
 
             internal fun populate(item: TreeItem<Entry<T>>) {
-                worker.launch(locale["main.tree.task.populate.name", item.value]) {
+                taskManager.launch(locale["main.tree.task.populate.name", item.value]) {
                     val children = item.value!!.list()
                     runLater {
                         populateTree(item, { entry ->

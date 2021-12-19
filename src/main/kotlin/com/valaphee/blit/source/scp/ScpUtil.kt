@@ -14,30 +14,16 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit.source.k8scp
+package com.valaphee.blit.source.scp
 
 import org.apache.sshd.sftp.client.SftpClient
 import org.apache.sshd.sftp.common.SftpConstants
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import java.nio.file.attribute.FileTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 private val spaces = "\\s+".toRegex()
 private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSSSSS Z")
-
-internal fun K8scpSource.stat(path: String): SftpClient.Attributes? {
-    val (namespace, pod, path) = getNamespacePodAndPath(path)
-    return if (namespace != null) {
-        if (pod != null) {
-            val process = K8scpSource.copy.exec(namespace, pod, arrayOf("stat", "--format", "%A 0 %U %G %s %y %n", path), false)
-            val attributes = BufferedReader(InputStreamReader(process.inputStream)).use { parseLsEntry(it.readText())?.second }
-            process.waitFor()
-            attributes
-        } else K8scpEntry.namespaceOrPodAttributes
-    } else K8scpEntry.namespaceOrPodAttributes
-}
 
 internal fun parseLsEntry(entry: String): Pair<String, SftpClient.Attributes>? {
     val entryColumns = entry.replace(spaces, " ").trim().split(' ')

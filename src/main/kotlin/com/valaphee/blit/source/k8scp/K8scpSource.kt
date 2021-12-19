@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeName
 import com.valaphee.blit.source.AbstractSource
 import com.valaphee.blit.source.NotFoundException
+import com.valaphee.blit.source.scp.parseLsEntry
 import io.kubernetes.client.Copy
 import io.kubernetes.client.openapi.apis.CoreV1Api
 import io.kubernetes.client.util.Config
@@ -42,7 +43,14 @@ class K8scpSource(
         home
     } else "/"
 
-    override suspend fun get(path: String) = stat(path)?.let { K8scpEntry(this, path, it) } ?: throw NotFoundException(path)
+    override suspend fun get(path: String): K8scpEntry {
+        val (namespace, pod, path) = getNamespacePodAndPath(path)
+        return if (namespace != null && pod != null) {
+            val process = copy.exec(namespace, pod, arrayOf("stat", "--format", "%A 0 %U %G %s %y %n", path), false)
+            val attributes = BufferedReader(InputStreamReader(process.inputStream)).use { parseLsEntry(it.readText())?.second }
+            if (process.waitFor() == 0) attributes?.let { K8scpEntry(this, path!!, it) } ?: throw NotFoundException(path!!) else throw NotFoundException(path!!)
+        } else K8scpEntry(this, path!!, K8scpEntry.namespaceOrPodAttributes)
+    }
 
     internal fun getNamespacePodAndPath(path: String): Triple<String?, String?, String?> {
         return if (namespace.isNotEmpty()) {

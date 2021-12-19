@@ -36,7 +36,7 @@ class ConfigViewGeneral : Fragment("General") {
     override val root = form {
         fieldset {
             val locales = injector.getInstance(object : Key<Map<String, @JvmSuppressWildcards Locale>>() {})
-            field(locale["config.general.locale.text"]) { combobox(configModel.locale, locales.keys.toList()){ cellFormat { text = locales[it]!!["name"] } } }
+            field(locale["config.general.locale.text"]) { combobox(configModel.locale, locales.keys.toList()) { cellFormat { text = locales[it]!!["name"] } } }
             field(locale["config.general.data_size_unit.text"]) { combobox(configModel.dataSizeUnit, Config.DataSizeUnit.values().toList()) }
         }
     }

@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.valaphee.blit.source.dav.DavSource
 import com.valaphee.blit.source.k8scp.K8scpSource
 import com.valaphee.blit.source.local.LocalSource
+import com.valaphee.blit.source.scp.ScpSource
 import com.valaphee.blit.source.sftp.SftpSource
 
 /**
@@ -37,6 +38,7 @@ import com.valaphee.blit.source.sftp.SftpSource
     JsonSubTypes.Type(DavSource::class),
     JsonSubTypes.Type(K8scpSource::class),
     JsonSubTypes.Type(LocalSource::class),
+    JsonSubTypes.Type(ScpSource::class),
     JsonSubTypes.Type(SftpSource::class)
 )
 interface Source<T : Entry<T>> {

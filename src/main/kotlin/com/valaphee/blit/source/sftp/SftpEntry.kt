@@ -29,7 +29,7 @@ import java.io.OutputStream
  * @author Kevin Ludwig
  */
 class SftpEntry(
-    private val sftpSource: SftpSource,
+    private val source: SftpSource,
     private val path: String,
     private var attributes: SftpClient.Attributes
 ) : AbstractEntry<SftpEntry>() {
@@ -39,9 +39,9 @@ class SftpEntry(
     override val directory get() = attributes.isDirectory
 
     override suspend fun list() = if (directory) try {
-        sftpSource.sftpClient.readDir(path).mapNotNull {
+        source.sftpClient.readDir(path).mapNotNull {
             val name = it.filename
-            if (name != "." && name != "..") SftpEntry(sftpSource, "${if (path == "/") "" else path}/$name", it.attributes) else null
+            if (name != "." && name != "..") SftpEntry(source, "${if (path == "/") "" else path}/$name", it.attributes) else null
         }
     } catch (_: RuntimeException) {
         emptyList()
@@ -49,7 +49,7 @@ class SftpEntry(
 
     override suspend fun transferTo(stream: OutputStream) {
         try {
-            sftpSource.sftpClient.read(path).use { it.transferToWithProgress(stream, size) }
+            source.sftpClient.read(path).use { it.transferToWithProgress(stream, size) }
         } catch (ex: SftpException) {
             when (ex.status) {
                 SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundException(path)
@@ -62,7 +62,7 @@ class SftpEntry(
 
     override suspend fun rename(name: String) {
         try {
-            sftpSource.sftpClient.rename(path, "${path.substringBeforeLast('/', "")}/$name")
+            source.sftpClient.rename(path, "${path.substringBeforeLast('/', "")}/$name")
         } catch (ex: SftpException) {
             when (ex.status) {
                 SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundException(path)
@@ -73,7 +73,7 @@ class SftpEntry(
 
     override suspend fun delete() {
         try {
-            sftpSource.sftpClient.remove(path)
+            source.sftpClient.remove(path)
         } catch (ex: SftpException) {
             when (ex.status) {
                 SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundException(path)

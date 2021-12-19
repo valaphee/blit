@@ -47,6 +47,7 @@ dependencies {
     implementation("io.kubernetes:client-java:14.0.0")
     implementation("no.tornado:tornadofx:1.7.20")
     implementation("org.apache.sshd:sshd-netty:2.8.0")
+    implementation("org.apache.sshd:sshd-scp:2.8.0")
     implementation("org.apache.sshd:sshd-sftp:2.8.0")
     implementation("org.controlsfx:controlsfx:11.1.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.0-RC2")

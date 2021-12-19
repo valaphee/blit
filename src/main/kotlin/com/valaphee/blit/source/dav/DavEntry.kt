@@ -45,7 +45,7 @@ import kotlin.coroutines.coroutineContext
  * @author Kevin Ludwig
  */
 class DavEntry(
-    private val davSource: DavSource,
+    private val source: DavSource,
     private val path: String,
     private val prop: Multistatus.Response.Propstat.Prop
 ) : AbstractEntry<DavEntry>() {
@@ -56,13 +56,13 @@ class DavEntry(
 
     override suspend fun list(): List<DavEntry> = if (directory) {
         val path = if (path.startsWith('/')) path.substring(1) else path // Unix path correction, "." ("") and "/" are the same
-        val httpResponse = davSource.httpClient.request<HttpResponse>("${davSource._url}/$path") { method = httpMethodPropfind }
+        val httpResponse = source.httpClient.request<HttpResponse>("${source._url}/$path") { method = httpMethodPropfind }
         when (httpResponse.status) {
             HttpStatusCode.MultiStatus -> {
                 val href = httpResponse.request.url.encodedPath
                 xmlMapper.readValue<Multistatus>(httpResponse.readBytes()).response.filter { !it.href.equals(href, true) }.mapNotNull {
                     val name = URLDecoder.decode(it.href.removeSuffix("/").split('/').last(), "UTF-8")
-                    it.propstat.find { it.status == "HTTP/1.1 200 OK" }?.prop?.let { DavEntry(davSource, "$path/$name", it) }
+                    it.propstat.find { it.status == "HTTP/1.1 200 OK" }?.prop?.let { DavEntry(source, "$path/$name", it) }
                 }
             }
             HttpStatusCode.NotFound -> throw NotFoundException(path)
@@ -71,7 +71,7 @@ class DavEntry(
     } else emptyList()
 
     override suspend fun transferTo(stream: OutputStream) {
-        val httpResponse = davSource.httpClient.get<HttpResponse>("${davSource._url}/$path")
+        val httpResponse = source.httpClient.get<HttpResponse>("${source._url}/$path")
         when (httpResponse.status) {
             HttpStatusCode.OK -> httpResponse.content.transferToWithProgress(stream, httpResponse.contentLength() ?: size)
             HttpStatusCode.NotFound -> throw NotFoundException(path)
@@ -79,36 +79,36 @@ class DavEntry(
     }
 
     override suspend fun transferFrom(name: String, stream: InputStream, length: Long) {
-        if (davSource.nextcloud && length > davSource.nextcloudUploadChunkSize) {
+        if (source.nextcloud && length > source.nextcloudUploadChunkSize) {
             val id = "blit-${UUID.randomUUID()}"
-            davSource.httpClient.request<Unit>("${davSource.url}/uploads/${davSource.username}/$id") { method = httpMethodMkcol }
+            source.httpClient.request<Unit>("${source.url}/uploads/${source.username}/$id") { method = httpMethodMkcol }
 
             /*val jobs = mutableListOf<Job>()*/
-            val chunkCount = ceil(length / davSource.nextcloudUploadChunkSize.toDouble())
+            val chunkCount = ceil(length / source.nextcloudUploadChunkSize.toDouble())
             for (i in 0..chunkCount) {
                 /*jobs += ioScope.launch { */
-                davSource.httpClient.put<Unit>("${davSource.url}/uploads/${davSource.username}/$id/${i * davSource.nextcloudUploadChunkSize}") { body = stream.readNBytes(davSource.nextcloudUploadChunkSize.toInt()) }
+                source.httpClient.put<Unit>("${source.url}/uploads/${source.username}/$id/${i * source.nextcloudUploadChunkSize}") { body = stream.readNBytes(source.nextcloudUploadChunkSize.toInt()) }
                 coroutineContext.progress = i / chunkCount.toDouble() // TODO: more precise progress
                 /*}*/
             }
             /*jobs.joinAll()*/
 
-            davSource.httpClient.request<Unit>("${davSource.url}/uploads/${davSource.username}/$id/.file") {
+            source.httpClient.request<Unit>("${source.url}/uploads/${source.username}/$id/.file") {
                 method = httpMethodMove
-                headers { this["Destination"] = URLBuilder("${davSource._url}/$path/$name").buildString() }
+                headers { this["Destination"] = URLBuilder("${source._url}/$path/$name").buildString() }
             }
-        } else davSource.httpClient.put<Unit>("${davSource._url}/$path/$name") { body = InputStreamContent(stream, length) } // TODO: set progress
+        } else source.httpClient.put<Unit>("${source._url}/$path/$name") { body = InputStreamContent(stream, length) } // TODO: set progress
     }
 
     override suspend fun rename(name: String) {
-        davSource.httpClient.request<Unit>("${davSource._url}/$path") {
+        source.httpClient.request<Unit>("${source._url}/$path") {
             method = httpMethodMove
-            headers { this["Destination"] = URLBuilder("${davSource._url}/${path.substringBeforeLast('/', "")}/$name").buildString() }
+            headers { this["Destination"] = URLBuilder("${source._url}/${path.substringBeforeLast('/', "")}/$name").buildString() }
         }
     }
 
     override suspend fun delete() {
-        davSource.httpClient.delete<Unit>("${davSource._url}/$path")
+        source.httpClient.delete<Unit>("${source._url}/$path")
     }
 
     override fun toString() = path

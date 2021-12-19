@@ -28,7 +28,6 @@ import tornadofx.textfield
  * @author Kevin Ludwig
  */
 object LocalSourceUi : SourceUi {
-    override val name get() = "Local"
     override val `class` get() = LocalSource::class
 
     override fun getFields(eventTarget: EventTarget, source: Source<*>?) = with(eventTarget) {

@@ -39,7 +39,7 @@ import kotlin.coroutines.CoroutineContext
 /**
  * @author Kevin Ludwig
  */
-class Worker {
+class TaskManager {
     private val coroutineScope = CoroutineScope(Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), ThreadFactoryBuilder().setNameFormat("blit-%d").setDaemon(true).build()).asCoroutineDispatcher() + SupervisorJob())
     private val tasks = ConcurrentLinkedDeque<Task>()
 
@@ -78,5 +78,5 @@ class Worker {
 }
 
 var CoroutineContext.progress: Double
-    get() = get(Worker.Task)!!.progress.value
-    set(value) { get(Worker.Task)!!.progress.value = value }
+    get() = get(TaskManager.Task)!!.progress.value
+    set(value) { get(TaskManager.Task)!!.progress.value = value }

@@ -24,7 +24,6 @@ import kotlin.reflect.KClass
  * @author Kevin Ludwig
  */
 interface SourceUi {
-    val name: String
     val `class`: KClass<out Source<*>>
 
     fun getFields(eventTarget: EventTarget, source: Source<*>?): List<Field>

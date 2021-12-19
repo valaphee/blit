@@ -51,7 +51,12 @@
         "sources": {
           "new.text": "Neu",
           "save.text": "Speichern",
-          "delete.text": "Löschen"
+          "delete.text": "Löschen",
+          "DavSourceUi": "WebDAV",
+          "K8scpSourceUi": "K8s CP",
+          "LocalSourceUi": "Lokal",
+          "ScpSourceUi": "SCP",
+          "SftpSourceUi": "SFTP"
         },
         "ok.text": "Ok",
         "cancel.text": "Abbrechen",

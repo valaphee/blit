@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit.source.sftp
+package com.valaphee.blit.source.scp
 
 import com.valaphee.blit.source.Source
 import com.valaphee.blit.source.SourceUi
@@ -34,11 +34,11 @@ import java.io.File
 /**
  * @author Kevin Ludwig
  */
-object SftpSourceUi : SourceUi {
-    override val `class` get() = SftpSource::class
+object ScpSourceUi : SourceUi {
+    override val `class` get() = ScpSource::class
 
     override fun getFields(eventTarget: EventTarget, source: Source<*>?) = with(eventTarget) {
-        val sftpSource = source as? SftpSource
+        val sftpSource = source as? ScpSource
         listOf(
             field("Name") { textfield(source?.name ?: "") },
             field("Host") { textfield(sftpSource?.host ?: "") },
@@ -57,7 +57,7 @@ object SftpSourceUi : SourceUi {
         )
     }
 
-    override fun getSource(fields: List<Field>) = SftpSource(
+    override fun getSource(fields: List<Field>) = ScpSource(
         (fields[0].inputs[0] as TextField).text,
         (fields[1].inputs[0] as TextField).text,
         (fields[2].inputs[0] as TextField).text.toInt(),
