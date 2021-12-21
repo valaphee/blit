@@ -34,9 +34,10 @@ import tornadofx.toProperty
  * @author Kevin Ludwig
  */
 object DavSourceUi : SourceUi {
+    override val key get() = "dav"
     override val `class` get() = DavSource::class
 
-    override fun getFields(eventTarget: EventTarget, source: Source<*>?) = with(eventTarget) {
+    override fun getConfigureUi(eventTarget: EventTarget, source: Source<*>?) = with(eventTarget) {
         val davSource = source as? DavSource
         listOf(
             field("Name") { textfield(source?.name ?: "") },
@@ -48,7 +49,7 @@ object DavSourceUi : SourceUi {
         )
     }
 
-    override fun getSource(fields: List<Field>) = DavSource(
+    override fun getConfigurationFromUi(fields: List<Field>) = DavSource(
         (fields[0].inputs[0] as TextField).text,
         (fields[1].inputs[0] as TextField).text,
         (fields[2].inputs[0] as TextField).text,

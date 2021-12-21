@@ -7,6 +7,7 @@
         "menu": {
           "file": {
             "name": "Datei",
+            "general.name": "Allgemein",
             "sources.name": "Quellen",
             "exit.name": "Beenden"
           },
@@ -46,17 +47,28 @@
       "config": {
         "general": {
           "locale.text": "Sprache",
-          "data_size_unit.text": "Datengrößeneinheit"
+          "data_size_unit": {
+            "text": "Datengrößeneinheit",
+            "bytes": "Bytes",
+            "iec": "IEC",
+            "si": "SI"
+          },
+          "temporary_path": {
+            "text": "Temporärer Pfad",
+            "invalid": "Ungültiger Pfad"
+          }
         },
         "sources": {
           "new.text": "Neu",
           "save.text": "Speichern",
           "delete.text": "Löschen",
-          "DavSourceUi": "WebDAV",
-          "K8scpSourceUi": "K8s CP",
-          "LocalSourceUi": "Lokal",
-          "ScpSourceUi": "SCP",
-          "SftpSourceUi": "SFTP"
+          "type": {
+            "dav": "WebDAV",
+            "k8scp": "K8s CP",
+            "local": "Lokal",
+            "scp": "SCP",
+            "sftp": "SFTP"
+          }
         },
         "ok.text": "Ok",
         "cancel.text": "Abbrechen",

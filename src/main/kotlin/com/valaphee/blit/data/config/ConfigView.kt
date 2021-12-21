@@ -17,28 +17,35 @@
 package com.valaphee.blit.data.config
 
 import com.valaphee.blit.data.locale.Locale
+import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import javafx.scene.layout.Priority
 import javafx.stage.Stage
 import jfxtras.styles.jmetro.JMetro
 import jfxtras.styles.jmetro.JMetroStyleClass
 import jfxtras.styles.jmetro.Style
+import tornadofx.Component
+import tornadofx.Fragment
 import tornadofx.View
 import tornadofx.action
 import tornadofx.button
 import tornadofx.buttonbar
 import tornadofx.enableWhen
+import tornadofx.select
 import tornadofx.tab
 import tornadofx.tabpane
 import tornadofx.vbox
 import tornadofx.vgrow
+import kotlin.reflect.KClass
 
 /**
  * @author Kevin Ludwig
  */
 class ConfigView : View("Configure Blit") {
     private val locale by di<Locale>()
-    private val configModel by di<ConfigModel>()
+    private val configModel by di<Config.Model>()
+
+    private var tabs = mutableMapOf<KClass<out Component>, Tab>()
 
     override val root = vbox {
         JMetro(this, Style.DARK)
@@ -51,8 +58,8 @@ class ConfigView : View("Configure Blit") {
             vgrow = Priority.ALWAYS
             tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
 
-            tab(ConfigViewGeneral::class)
-            tab(ConfigViewSources::class)
+            this@ConfigView.tabs[ConfigViewGeneral::class] = tab(ConfigViewGeneral::class)
+            this@ConfigView.tabs[ConfigViewSources::class] = tab(ConfigViewSources::class)
         }
         buttonbar {
             button(locale["config.ok.text"]) {
@@ -72,5 +79,14 @@ class ConfigView : View("Configure Blit") {
                 action(configModel::commit)
             }
         }
+    }
+
+    fun <T : Fragment> select(`class`: KClass<out T>) {
+        tabs[`class`]?.select()
+    }
+
+    inline fun <reified T> select() {
+        @Suppress("UNCHECKED_CAST")
+        select(T::class as KClass<Fragment>)
     }
 }

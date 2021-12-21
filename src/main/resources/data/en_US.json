@@ -7,6 +7,7 @@
         "menu": {
           "file": {
             "name": "File",
+            "general.name": "General",
             "sources.name": "Sources",
             "exit.name": "Exit"
           },
@@ -41,22 +42,33 @@
       },
       "rename": {
         "ok.text": "Ok",
-        "cancel.text": "Abbrechen"
+        "cancel.text": "Cancel"
       },
       "config": {
         "general": {
           "locale.text": "Locale",
-          "data_size_unit.text": "Data Size Unit"
+          "data_size_unit": {
+            "text": "Data Size Unit",
+            "bytes": "Bytes",
+            "iec": "IEC",
+            "si": "SI"
+          },
+          "temporary_path": {
+            "text": "Temporary Path",
+            "invalid": "Invalid Path"
+          }
         },
         "sources": {
           "new.text": "New",
           "save.text": "Save",
           "delete.text": "Delete",
-          "DavSourceUi": "WebDAV",
-          "K8scpSourceUi": "K8s CP",
-          "LocalSourceUi": "Local",
-          "ScpSourceUi": "SCP",
-          "SftpSourceUi": "SFTP"
+          "type": {
+            "dav": "WebDAV",
+            "k8scp": "K8s CP",
+            "local": "Local",
+            "scp": "SCP",
+            "sftp": "SFTP"
+          }
         },
         "ok.text": "Ok",
         "cancel.text": "Cancel",

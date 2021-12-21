@@ -35,9 +35,10 @@ import java.io.File
  * @author Kevin Ludwig
  */
 object ScpSourceUi : SourceUi {
+    override val key get() = "scp"
     override val `class` get() = ScpSource::class
 
-    override fun getFields(eventTarget: EventTarget, source: Source<*>?) = with(eventTarget) {
+    override fun getConfigureUi(eventTarget: EventTarget, source: Source<*>?) = with(eventTarget) {
         val sftpSource = source as? ScpSource
         listOf(
             field("Name") { textfield(source?.name ?: "") },
@@ -57,7 +58,7 @@ object ScpSourceUi : SourceUi {
         )
     }
 
-    override fun getSource(fields: List<Field>) = ScpSource(
+    override fun getConfigurationFromUi(fields: List<Field>) = ScpSource(
         (fields[0].inputs[0] as TextField).text,
         (fields[1].inputs[0] as TextField).text,
         (fields[2].inputs[0] as TextField).text.toInt(),

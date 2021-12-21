@@ -28,15 +28,16 @@ import tornadofx.textfield
  * @author Kevin Ludwig
  */
 object LocalSourceUi : SourceUi {
+    override val key get() = "local"
     override val `class` get() = LocalSource::class
 
-    override fun getFields(eventTarget: EventTarget, source: Source<*>?) = with(eventTarget) {
+    override fun getConfigureUi(eventTarget: EventTarget, source: Source<*>?) = with(eventTarget) {
         listOf(
             field("Name") { textfield(source?.name ?: "") }
         )
     }
 
-    override fun getSource(fields: List<Field>) = LocalSource(
+    override fun getConfigurationFromUi(fields: List<Field>) = LocalSource(
         (fields[0].inputs[0] as TextField).text
     )
 }

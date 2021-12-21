@@ -49,7 +49,7 @@ import tornadofx.vgrow
  */
 class ConfigViewSources : Fragment("Sources") {
     private val locale by di<Locale>()
-    private val configModel by di<ConfigModel>()
+    private val configModel by di<Config.Model>()
 
     private val source = SimpleObjectProperty<Source<*>>().apply {
         onChange {
@@ -73,6 +73,8 @@ class ConfigViewSources : Fragment("Sources") {
             }
             add(sources)
             hbox {
+                spacing = 8.0
+
                 button(locale["config.sources.new.text"]) {
                     action {
                         sources.selectionModel.select(null)
@@ -81,7 +83,7 @@ class ConfigViewSources : Fragment("Sources") {
                 }
                 button(locale["config.sources.save.text"]) {
                     action {
-                        val source = type.value.getSource(fields)!!
+                        val source = type.value.getConfigurationFromUi(fields)!!
                         if (sources.selectionModel.selectedIndex != -1) configModel.sources[sources.selectionModel.selectedIndex] = source
                         else {
                             configModel.sources.add(source)
@@ -100,8 +102,12 @@ class ConfigViewSources : Fragment("Sources") {
         form {
             hgrow = Priority.ALWAYS
 
-            fieldset { field("Type") { combobox(type, sourceUis.toList().asObservable()) { cellFormat { text = locale["config.sources.${it.javaClass.simpleName}"] } } } }
-            fieldset { dynamicContent(type) { it?.let { it.getFields(this, source.value).also { fields = it } } } }
+            fieldset {
+                dynamicContent(type) {
+                    field("Type") { combobox(type, sourceUis.toList().asObservable()) { cellFormat { text = locale["config.sources.type.${it.key}"] } } }
+                    it?.let { it.getConfigureUi(this, source.value).also { fields = it } }
+                }
+            }
         }
     }
 

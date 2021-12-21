@@ -24,20 +24,24 @@ import tornadofx.combobox
 import tornadofx.field
 import tornadofx.fieldset
 import tornadofx.form
+import tornadofx.textfield
+import tornadofx.validator
+import java.io.File
 
 /**
  * @author Kevin Ludwig
  */
 class ConfigViewGeneral : Fragment("General") {
     private val locale by di<Locale>()
-    private val configModel by di<ConfigModel>()
+    private val configModel by di<Config.Model>()
     private val injector by di<Injector>()
 
     override val root = form {
         fieldset {
             val locales = injector.getInstance(object : Key<Map<String, @JvmSuppressWildcards Locale>>() {})
             field(locale["config.general.locale.text"]) { combobox(configModel.locale, locales.keys.toList()) { cellFormat { text = locales[it]!!["name"] } } }
-            field(locale["config.general.data_size_unit.text"]) { combobox(configModel.dataSizeUnit, Config.DataSizeUnit.values().toList()) }
+            field(locale["config.general.data_size_unit.text"]) { combobox(configModel.dataSizeUnit, Config.DataSizeUnit.values().toList()) { cellFormat { text = locale["config.general.data_size_unit.${it.key}"] } } }
+            field(locale["config.general.temporary_path.text"]) { textfield(configModel.temporaryPath) { validator { if (it.isNullOrBlank() || !File(it).isDirectory) error(locale["config.general.temporary_path.invalid"]) else null } } }
         }
     }
 }

@@ -24,9 +24,12 @@ import kotlin.reflect.KClass
  * @author Kevin Ludwig
  */
 interface SourceUi {
+    val key: String
     val `class`: KClass<out Source<*>>
 
-    fun getFields(eventTarget: EventTarget, source: Source<*>?): List<Field>
+    @Deprecated("")
+    fun getConfigureUi(eventTarget: EventTarget, source: Source<*>?): List<Field>
 
-    fun getSource(fields: List<Field>): Source<*>?
+    @Deprecated("")
+    fun getConfigurationFromUi(fields: List<Field>): Source<*>?
 }

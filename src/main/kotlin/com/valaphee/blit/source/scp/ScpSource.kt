@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeName
 import com.valaphee.blit.source.AbstractSource
 import com.valaphee.blit.source.NotFoundException
-import org.apache.sshd.client.SshClient
+import com.valaphee.blit.source.sftp.SftpSource
 import org.apache.sshd.client.session.ClientSession
 import org.apache.sshd.common.config.keys.loader.openssh.OpenSSHKeyPairResourceParser
 import org.apache.sshd.scp.client.ScpClient
@@ -41,7 +41,7 @@ class ScpSource(
     @get:JsonProperty("private_key") val privateKey: String = ""
 ) : AbstractSource<ScpEntry>(name) {
     @get:JsonIgnore internal val sshSession: ClientSession by lazy {
-        val sshSession = sshClient.connect(username, host, port).verify().session
+        val sshSession = SftpSource.sshClient.connect(username, host, port).verify().session
         if (password.isNotEmpty()) sshSession.addPasswordIdentity(password)
         if (privateKey.isNotEmpty()) OpenSSHKeyPairResourceParser.INSTANCE.loadKeyPairs(null, Paths.get(privateKey), { _, _, _ -> TODO() }).firstOrNull()?.let { sshSession.addPublicKeyIdentity(it) }
         sshSession.auth().verify()
@@ -52,8 +52,4 @@ class ScpSource(
     override val home: String get() = sshSession.executeRemoteCommand("pwd").lines().first()
 
     override suspend fun get(path: String) = parseLsEntry(sshSession.executeRemoteCommand("""stat --format "%A 0 %U %G %s %y %n" "$path"""").lines().first())?.second?.let { ScpEntry(this, path, it) } ?: throw NotFoundException(path)
-
-    companion object {
-        private val sshClient = SshClient.setUpDefaultClient().apply { start() }
-    }
 }

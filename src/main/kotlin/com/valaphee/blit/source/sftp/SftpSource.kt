@@ -24,11 +24,13 @@ import com.valaphee.blit.source.NotFoundException
 import org.apache.sshd.client.SshClient
 import org.apache.sshd.client.session.ClientSession
 import org.apache.sshd.common.config.keys.loader.openssh.OpenSSHKeyPairResourceParser
+import org.apache.sshd.core.CoreModuleProperties
 import org.apache.sshd.sftp.client.SftpClient
 import org.apache.sshd.sftp.client.SftpClientFactory
 import org.apache.sshd.sftp.common.SftpConstants
 import org.apache.sshd.sftp.common.SftpException
 import java.nio.file.Paths
+import java.time.Duration
 
 /**
  * @author Kevin Ludwig
@@ -63,6 +65,9 @@ class SftpSource(
     }
 
     companion object {
-        private val sshClient = SshClient.setUpDefaultClient().apply { start() }
+        internal val sshClient = SshClient.setUpDefaultClient().apply {
+            CoreModuleProperties.HEARTBEAT_INTERVAL.set(this, Duration.ofSeconds(2))
+            start()
+        }
     }
 }

@@ -16,8 +16,10 @@
 
 package com.valaphee.blit
 
-import com.valaphee.blit.data.config.ConfigModel
+import com.valaphee.blit.data.config.Config
 import com.valaphee.blit.data.config.ConfigView
+import com.valaphee.blit.data.config.ConfigViewGeneral
+import com.valaphee.blit.data.config.ConfigViewSources
 import com.valaphee.blit.data.locale.Locale
 import com.valaphee.blit.data.manifest.IconManifest
 import com.valaphee.blit.source.Entry
@@ -84,7 +86,7 @@ import java.util.concurrent.CompletableFuture
 class MainView : View("Blit") {
     private val locale by di<Locale>()
     private val iconManifest by di<IconManifest>()
-    private val configModel by di<ConfigModel>()
+    private val configModel by di<Config.Model>()
 
     private val taskManager = TaskManager().apply {
         val version = System.getProperty("os.version").toFloatOrNull()
@@ -111,7 +113,22 @@ class MainView : View("Blit") {
 
         menubar {
             menu(locale["main.menu.file.name"]) {
-                item(locale["main.menu.file.sources.name"]) { action { find<ConfigView> { openModal() } } }
+                item(locale["main.menu.file.general.name"]) {
+                    action {
+                        find<ConfigView> {
+                            select<ConfigViewGeneral>()
+                            openModal()
+                        }
+                    }
+                }
+                item(locale["main.menu.file.sources.name"]) {
+                    action {
+                        find<ConfigView> {
+                            select<ConfigViewSources>()
+                            openModal()
+                        }
+                    }
+                }
                 separator()
                 item(locale["main.menu.file.exit.name"]) { action { (scene.window as Stage).close() } }
             }
@@ -243,9 +260,9 @@ class MainView : View("Blit") {
                                     setContent {
                                         taskManager.runBlocking(locale["main.tree.task.download.name"]) {
                                             suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
-                                                File(tmpdir, entry.name).mkdir()
+                                                File(configModel.temporaryPath.value, entry.name).mkdir()
                                                 entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
-                                            } else listOf(File(tmpdir, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
+                                            } else listOf(File(configModel.temporaryPath.value, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
 
                                             putFiles(selectionModel.selectedItems.flatMap { flatten(it.value) })
                                         }
@@ -284,9 +301,9 @@ class MainView : View("Blit") {
                         KeyCode.C -> if (it.isControlDown) Clipboard.getSystemClipboard().setContent {
                             taskManager.runBlocking(locale["main.tree.task.download.name"]) {
                                 suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
-                                    File(tmpdir, entry.name).mkdir()
+                                    File(configModel.temporaryPath.value, entry.name).mkdir()
                                     entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
-                                } else listOf(File(tmpdir, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
+                                } else listOf(File(configModel.temporaryPath.value, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
 
                                 putFiles(selectionModel.selectedItems.flatMap { flatten(it.value) })
 
@@ -315,7 +332,7 @@ class MainView : View("Blit") {
             private fun open(item: TreeItem<Entry<T>>) {
                 if (Desktop.isDesktopSupported()) {
                     val entry = item.value
-                    taskManager.launch(locale["main.tree.task.download.name", entry]) { Desktop.getDesktop().open(File(tmpdir, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }) } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
+                    taskManager.launch(locale["main.tree.task.download.name", entry]) { Desktop.getDesktop().open(File(configModel.temporaryPath.value, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }) } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
                 }
             }
 
@@ -351,7 +368,6 @@ class MainView : View("Blit") {
     companion object {
         private val windowsRootPath = "^[a-zA-Z]:[\\\\/].*\$".toRegex()
         private val tableColumnBaseSetWidth = TableColumnBase::class.java.getDeclaredMethod("setWidth", Double::class.java).apply { isAccessible = true }
-        private val tmpdir = System.getProperty("java.io.tmpdir")
 
         internal fun String.toCanonicalPath(): List<String> {
             replace('\\', '/').apply {
