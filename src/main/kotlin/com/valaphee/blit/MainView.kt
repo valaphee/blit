@@ -149,6 +149,7 @@ class MainView : View("Blit") {
             onChange {
                 it?.let {
                     _path = null
+                    tree.root = null
                     navigate(it.home)
                 }
             }

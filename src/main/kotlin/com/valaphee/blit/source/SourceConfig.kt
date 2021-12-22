@@ -16,20 +16,18 @@
 
 package com.valaphee.blit.source
 
+import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventTarget
-import tornadofx.Field
-import kotlin.reflect.KClass
 
 /**
  * @author Kevin Ludwig
  */
-interface SourceUi {
-    val key: String
-    val `class`: KClass<out Source<*>>
+abstract class SourceConfig(
+    name: String
+) {
+    val nameProperty = SimpleStringProperty(name)
 
-    @Deprecated("")
-    fun getConfigureUi(eventTarget: EventTarget, source: Source<*>?): List<Field>
+    abstract fun newUi(eventTarget: EventTarget)
 
-    @Deprecated("")
-    fun getConfigurationFromUi(fields: List<Field>): Source<*>?
+    abstract fun newSource(): Source<*>
 }

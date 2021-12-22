@@ -16,28 +16,22 @@
 
 package com.valaphee.blit.source.local
 
-import com.valaphee.blit.source.Source
-import com.valaphee.blit.source.SourceUi
+import com.valaphee.blit.source.SourceConfig
 import javafx.event.EventTarget
-import javafx.scene.control.TextField
-import tornadofx.Field
 import tornadofx.field
 import tornadofx.textfield
 
 /**
  * @author Kevin Ludwig
  */
-object LocalSourceUi : SourceUi {
-    override val key get() = "local"
-    override val `class` get() = LocalSource::class
-
-    override fun getConfigureUi(eventTarget: EventTarget, source: Source<*>?) = with(eventTarget) {
-        listOf(
-            field("Name") { textfield(source?.name ?: "") }
-        )
+class LocalSourceConfig(
+    name: String
+) : SourceConfig(name) {
+    override fun newUi(eventTarget: EventTarget) {
+        with(eventTarget) {
+            field("Name") { textfield(nameProperty) }
+        }
     }
 
-    override fun getConfigurationFromUi(fields: List<Field>) = LocalSource(
-        (fields[0].inputs[0] as TextField).text
-    )
+    override fun newSource() = LocalSource(nameProperty.value)
 }

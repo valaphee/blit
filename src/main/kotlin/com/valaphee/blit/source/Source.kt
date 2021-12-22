@@ -16,34 +16,12 @@
 
 package com.valaphee.blit.source
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.valaphee.blit.source.dav.DavSource
-import com.valaphee.blit.source.k8scp.K8scpSource
-import com.valaphee.blit.source.local.LocalSource
-import com.valaphee.blit.source.scp.ScpSource
-import com.valaphee.blit.source.sftp.SftpSource
-
 /**
  * @author Kevin Ludwig
  */
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    include = JsonTypeInfo.As.PROPERTY,
-    property = "type"
-)
-@JsonSubTypes(
-    JsonSubTypes.Type(DavSource::class),
-    JsonSubTypes.Type(K8scpSource::class),
-    JsonSubTypes.Type(LocalSource::class),
-    JsonSubTypes.Type(ScpSource::class),
-    JsonSubTypes.Type(SftpSource::class)
-)
 interface Source<T : Entry<T>> {
-    @get:JsonProperty("name") val name: String
-    @get:JsonIgnore val home: String
+    val name: String
+    val home: String
 
     suspend fun get(path: String): T
 }

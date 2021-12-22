@@ -79,4 +79,6 @@ class TaskManager {
 
 var CoroutineContext.progress: Double
     get() = get(TaskManager.Task)!!.progress.value
-    set(value) { get(TaskManager.Task)!!.progress.value = value }
+    set(value) {
+        get(TaskManager.Task)!!.progress.value = value
+    }

@@ -14,22 +14,32 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit.source.local
+package com.valaphee.blit.source
 
-import com.valaphee.blit.source.AbstractSource
-import com.valaphee.blit.source.NotFoundException
-import java.io.File
+import java.io.FilterInputStream
+import java.io.InputStream
 
 /**
  * @author Kevin Ludwig
  */
-class LocalSource(
-    name: String
-) : AbstractSource<LocalEntry>(name) {
-    override val home: String get() = File(System.getProperty("user.home")).absolutePath
+class TransferInputStream(
+    stream: InputStream,
+    private val read: (Long) -> Unit
+) : FilterInputStream(stream) {
+    private var readSum = 0L
 
-    override suspend fun get(path: String): LocalEntry {
-        val file = File(path)
-        return if (file.exists()) LocalEntry(file) else throw NotFoundException(path)
+    override fun read() = super.read().also {
+        readSum++
+        read(readSum)
+    }
+
+    override fun read(b: ByteArray, off: Int, len: Int) = super.read(b, off, len).also {
+        readSum += it
+        read(readSum)
+    }
+
+    override fun skip(n: Long) = super.skip(n).also {
+        readSum += it
+        read(readSum)
     }
 }

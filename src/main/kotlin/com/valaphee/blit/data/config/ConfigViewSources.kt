@@ -17,30 +17,19 @@
 package com.valaphee.blit.data.config
 
 import com.valaphee.blit.data.locale.Locale
-import com.valaphee.blit.source.Source
-import com.valaphee.blit.source.SourceUi
-import com.valaphee.blit.source.dav.DavSourceUi
-import com.valaphee.blit.source.k8scp.K8scpSourceUi
-import com.valaphee.blit.source.local.LocalSourceUi
-import com.valaphee.blit.source.scp.ScpSourceUi
-import com.valaphee.blit.source.sftp.SftpSourceUi
+import com.valaphee.blit.source.SourceConfig
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.layout.Priority
-import tornadofx.Field
 import tornadofx.Fragment
 import tornadofx.action
-import tornadofx.asObservable
 import tornadofx.bindSelected
 import tornadofx.button
-import tornadofx.combobox
 import tornadofx.dynamicContent
-import tornadofx.field
 import tornadofx.fieldset
 import tornadofx.form
 import tornadofx.hbox
 import tornadofx.hgrow
 import tornadofx.listview
-import tornadofx.onChange
 import tornadofx.vbox
 import tornadofx.vgrow
 
@@ -51,50 +40,30 @@ class ConfigViewSources : Fragment("Sources") {
     private val locale by di<Locale>()
     private val configModel by di<Config.Model>()
 
-    private val source = SimpleObjectProperty<Source<*>>().apply {
-        onChange {
-            it?.let {
-                type.value = null
-                type.value = sourceUis.first { sourceUi -> sourceUi.`class` == it::class }
-            }
-        }
-    }
-    private val type = SimpleObjectProperty<SourceUi>()
-    private lateinit var fields: List<Field>
+    private val source = SimpleObjectProperty<SourceConfig>()
 
     override val root = hbox {
         vbox {
-            val sources = listview(configModel.sources) {
+            add(listview(configModel.sources) {
                 bindSelected(source)
 
                 vgrow = Priority.ALWAYS
 
                 selectionModel.selectFirst()
-            }
-            add(sources)
+            })
             hbox {
                 spacing = 8.0
 
                 button(locale["config.sources.new.text"]) {
                     action {
-                        sources.selectionModel.select(null)
-                        type.value = null
                     }
                 }
                 button(locale["config.sources.save.text"]) {
                     action {
-                        val source = type.value.getConfigurationFromUi(fields)!!
-                        if (sources.selectionModel.selectedIndex != -1) configModel.sources[sources.selectionModel.selectedIndex] = source
-                        else {
-                            configModel.sources.add(source)
-                            sources.selectionModel.select(source)
-                        }
                     }
                 }
                 button(locale["config.sources.delete.text"]) {
                     action {
-                        configModel.sources.remove(source.value)
-                        sources.selectionModel.selectFirst()
                     }
                 }
             }
@@ -103,15 +72,10 @@ class ConfigViewSources : Fragment("Sources") {
             hgrow = Priority.ALWAYS
 
             fieldset {
-                dynamicContent(type) {
-                    field("Type") { combobox(type, sourceUis.toList().asObservable()) { cellFormat { text = locale["config.sources.type.${it.key}"] } } }
-                    it?.let { it.getConfigureUi(this, source.value).also { fields = it } }
+                dynamicContent(source) {
+                    source.value?.newUi(this)
                 }
             }
         }
-    }
-
-    companion object {
-        private val sourceUis = setOf(DavSourceUi, K8scpSourceUi, LocalSourceUi, ScpSourceUi, SftpSourceUi)
     }
 }

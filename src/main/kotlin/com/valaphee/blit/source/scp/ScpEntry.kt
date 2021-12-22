@@ -16,10 +16,17 @@
 
 package com.valaphee.blit.source.scp
 
+import com.valaphee.blit.progress
 import com.valaphee.blit.source.AbstractEntry
+import com.valaphee.blit.source.TransferInputStream
+import io.ktor.utils.io.pool.useInstance
+import kotlinx.coroutines.sync.withPermit
+import org.apache.sshd.scp.common.helpers.ScpTimestampCommandDetails
 import org.apache.sshd.sftp.client.SftpClient
 import java.io.InputStream
 import java.io.OutputStream
+import java.nio.file.attribute.PosixFilePermission
+import kotlin.coroutines.coroutineContext
 
 /**
  * @author Kevin Ludwig
@@ -34,21 +41,29 @@ class ScpEntry(
     override val modifyTime get() = attributes.modifyTime.toMillis()
     override val directory get() = attributes.isDirectory
 
-    override suspend fun list() = if (directory) source.sshSession.executeRemoteCommand("""ls -al --full-time "$path"""").lines().mapNotNull { parseLsEntry(it)?.let { (name, attributes) -> if (name != "." && name != "..") ScpEntry(source, "${if (this.path == "/") "" else this.path}/$name", attributes) else null } } else emptyList()
+    override suspend fun list() = if (directory) source.semaphore.withPermit { source.pool.useInstance { it.session.executeRemoteCommand("""ls -al --full-time "$path"""").lines().mapNotNull { parseLsEntry(it)?.let { (name, attributes) -> if (name != "." && name != "..") ScpEntry(source, "${if (this.path == "/") "" else this.path}/$name", attributes) else null } } } } else emptyList()
 
     override suspend fun transferTo(stream: OutputStream) {
-        source.scpClient.download(path, stream)
+        source.semaphore.withPermit { source.pool.useInstance { it.download(path, stream) } }
     }
 
-    override suspend fun transferFrom(name: String, stream: InputStream, length: Long) = TODO()
+    override suspend fun transferFrom(name: String, stream: InputStream, length: Long) {
+        val coroutineContext = coroutineContext
+        val time = System.currentTimeMillis()
+        source.semaphore.withPermit { source.pool.useInstance { it.upload(TransferInputStream(stream) { coroutineContext.progress = it / length.toDouble()}, "$path/$name", length, permissions, ScpTimestampCommandDetails(time, time)) } }
+    }
 
     override suspend fun rename(name: String) {
-        source.sshSession.executeRemoteCommand("""mv "$path" "${path.substringBeforeLast('/', "")}/$name"""")
+        source.semaphore.withPermit { source.pool.useInstance { it.session.executeRemoteCommand("""mv "$path" "${path.substringBeforeLast('/', "")}/$name"""") } }
     }
 
     override suspend fun delete() {
-        source.sshSession.executeRemoteCommand("""rm -rf "$path"""")
+        source.semaphore.withPermit { source.pool.useInstance { it.session.executeRemoteCommand("""rm -rf "$path"""") } }
     }
 
     override fun toString() = path
+
+    companion object {
+        private val permissions = listOf(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.GROUP_READ, PosixFilePermission.GROUP_WRITE, PosixFilePermission.GROUP_EXECUTE, PosixFilePermission.OTHERS_READ, PosixFilePermission.OTHERS_EXECUTE)
+    }
 }

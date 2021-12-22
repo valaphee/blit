@@ -16,36 +16,25 @@
 
 package com.valaphee.blit.data.config
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonValue
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.google.inject.Inject
-import com.google.inject.Singleton
-import com.valaphee.blit.data.Data
-import com.valaphee.blit.data.DataType
-import com.valaphee.blit.source.Source
-import com.valaphee.blit.source.local.LocalSource
+import com.valaphee.blit.source.SourceConfig
 import javafx.beans.property.SimpleListProperty
+import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.SimpleStringProperty
 import tornadofx.ItemViewModel
-import tornadofx.toObservable
-import tornadofx.toProperty
-import java.io.File
-import java.lang.Long.signum
+import tornadofx.asObservable
 import java.text.StringCharacterIterator
-import java.util.Locale
 import kotlin.math.abs
 
 /**
  * @author Kevin Ludwig
  */
-@Singleton
-@DataType("config")
 class Config(
-    @get:JsonProperty("locale") val locale: String = Locale.getDefault().toLanguageTag().replace('-', '_'),
-    @get:JsonProperty("data_size_unit") val dataSizeUnit: DataSizeUnit = DataSizeUnit.IEC,
-    @get:JsonProperty("temporary_path") val temporaryPath: String = System.getProperty("java.io.tmpdir"),
-    @get:JsonProperty("sources") val sources: List<Source<*>> = listOf(LocalSource("local"))
-) : Data {
+    locale: String,
+    dataSizeUnit: DataSizeUnit,
+    temporaryPath: String,
+    sources: List<SourceConfig>
+) {
     enum class DataSizeUnit(
         @get:JsonValue val key: String,
         val format: (Long) -> String
@@ -62,7 +51,7 @@ class Config(
                     suffix.next()
                     i -= 10
                 }
-                sizeVar *= signum(it)
+                sizeVar *= java.lang.Long.signum(it)
                 String.format("%.1f %ciB", sizeVar / 1024.0, suffix.current())
             }
         }),
@@ -79,19 +68,15 @@ class Config(
         })
     }
 
-    @Singleton
-    class Model @Inject constructor(
-        config: Config
-    ) : ItemViewModel<Config>(config) {
-        private val objectMapper by di<ObjectMapper>()
+    val localeProperty = SimpleStringProperty(locale)
+    val dataSizeUnitProperty = SimpleObjectProperty(dataSizeUnit)
+    val temporaryPathProperty = SimpleStringProperty(temporaryPath)
+    val sourcesProperty = SimpleListProperty(sources.asObservable())
 
-        val locale = bind { config.locale.toProperty() }
-        val dataSizeUnit = bind { config.dataSizeUnit.toProperty() }
-        val temporaryPath = bind { config.temporaryPath.toProperty() }
-        val sources = bind { SimpleListProperty(config.sources.toObservable()) }
-
-        override fun onCommit() {
-            objectMapper.writeValue(File(File("data").also(File::mkdir), "config.json"), Config(locale.value, dataSizeUnit.value, temporaryPath.value, sources.value))
-        }
+    class Model : ItemViewModel<Config>() {
+        val locale = bind(Config::localeProperty)
+        val dataSizeUnit = bind(Config::dataSizeUnitProperty)
+        val temporaryPath = bind(Config::temporaryPathProperty)
+        val sources = bind(Config::sourcesProperty)
     }
 }

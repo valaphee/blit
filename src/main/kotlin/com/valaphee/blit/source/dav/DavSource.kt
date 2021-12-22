@@ -16,9 +16,6 @@
 
 package com.valaphee.blit.source.dav
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonTypeName
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.valaphee.blit.source.AbstractSource
 import com.valaphee.blit.source.NotFoundException
@@ -45,16 +42,15 @@ import javax.net.ssl.X509TrustManager
 /**
  * @author Kevin Ludwig
  */
-@JsonTypeName("dav")
 class DavSource(
-    name: String = "",
-    @get:JsonProperty("url") val url: String = "",
-    @get:JsonProperty("username") val username: String = "",
-    @get:JsonProperty("password") val password: String = "",
-    @get:JsonProperty("nextcloud") val nextcloud: Boolean = false,
-    @get:JsonProperty("nextcloud-upload-chunk-size") val nextcloudUploadChunkSize: Long = 10L * 1024 * 1024
+    name: String,
+    private val url: String,
+    private val username: String,
+    private val password: String,
+    private val nextcloud: Boolean,
+    private val nextcloudUploadChunkSize: Long
 ) : AbstractSource<DavEntry>(name) {
-    @get:JsonIgnore internal val httpClient by lazy {
+    internal val httpClient by lazy {
         HttpClient(OkHttp) {
             engine {
                 config {
@@ -77,7 +73,7 @@ class DavSource(
             }
         }
     }
-    @get:JsonIgnore internal val _url get() = if (nextcloud) "${url}/files/${username}" else url
+    internal val _url get() = if (nextcloud) "${url}/files/${username}" else url
 
     override val home get() = "/"
 

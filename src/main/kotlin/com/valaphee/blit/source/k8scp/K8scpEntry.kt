@@ -26,6 +26,7 @@ import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.OutputStream
+import java.nio.file.Path
 
 /**
  * @author Kevin Ludwig
@@ -57,7 +58,10 @@ class K8scpEntry(
         K8scpSource.copy.copyFileFromPod(namespace, pod, path!!).use { it.transferToWithProgress(stream, size) }
     }
 
-    override suspend fun transferFrom(name: String, stream: InputStream, length: Long) = TODO()
+    override suspend fun transferFrom(name: String, stream: InputStream, length: Long) {
+        val (namespace, pod, path) = source.getNamespacePodAndPath(path)
+        K8scpSource.copy.copyFileToPod(namespace, pod, null, stream.readNBytes(length.toInt()), Path.of("$path/$name"))
+    }
 
     override suspend fun rename(name: String) {
         val (namespace, pod, path) = source.getNamespacePodAndPath(path)
