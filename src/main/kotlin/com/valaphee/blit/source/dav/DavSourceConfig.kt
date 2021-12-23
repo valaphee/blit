@@ -70,4 +70,30 @@ class DavSourceConfig(
     }
 
     override fun newSource() = DavSource(nameProperty.value, urlProperty.value, usernameProperty.value, passwordProperty.value, nextcloudProperty.value, nextcloudUploadChunkSizeProperty.value)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as DavSourceConfig
+
+        if (name != other.name) return false
+        if (url != other.url) return false
+        if (username != other.username) return false
+        if (password != other.password) return false
+        if (nextcloud != other.nextcloud) return false
+        if (nextcloudUploadChunkSize != other.nextcloudUploadChunkSize) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + url.hashCode()
+        result = 31 * result + username.hashCode()
+        result = 31 * result + password.hashCode()
+        result = 31 * result + nextcloud.hashCode()
+        result = 31 * result + nextcloudUploadChunkSize.hashCode()
+        return result
+    }
 }

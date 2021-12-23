@@ -48,7 +48,7 @@ abstract class SourceConfig(
     name: String
 ) {
     @get:JsonIgnore protected val nameProperty = SimpleStringProperty(name)
-    var name by nameProperty
+    var name: String by nameProperty
 
     abstract fun newUi(eventTarget: EventTarget)
 

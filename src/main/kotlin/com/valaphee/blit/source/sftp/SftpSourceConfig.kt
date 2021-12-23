@@ -18,6 +18,7 @@ package com.valaphee.blit.source.sftp
 
 import com.fasterxml.jackson.annotation.JsonTypeName
 import com.valaphee.blit.source.SourceConfig
+import com.valaphee.blit.source.scp.ScpSourceConfig
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventTarget
@@ -84,4 +85,32 @@ class SftpSourceConfig(
     }
 
     override fun newSource() = SftpSource(nameProperty.value, hostProperty.value, portProperty.value, usernameProperty.value, passwordProperty.value, privateKeyProperty.value, connectionPoolSizeProperty.value)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ScpSourceConfig
+
+        if (name != other.name) return false
+        if (host != other.host) return false
+        if (port != other.port) return false
+        if (username != other.username) return false
+        if (password != other.password) return false
+        if (privateKey != other.privateKey) return false
+        if (connectionPoolSize != other.connectionPoolSize) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + host.hashCode()
+        result = 31 * result + port.hashCode()
+        result = 31 * result + username.hashCode()
+        result = 31 * result + password.hashCode()
+        result = 31 * result + privateKey.hashCode()
+        result = 31 * result + connectionPoolSize.hashCode()
+        return result
+    }
 }

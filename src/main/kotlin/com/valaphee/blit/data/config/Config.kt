@@ -18,6 +18,7 @@ package com.valaphee.blit.data.config
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonValue
+import com.google.inject.Inject
 import com.google.inject.Singleton
 import com.valaphee.blit.data.Data
 import com.valaphee.blit.data.DataType
@@ -89,7 +90,10 @@ class Config(
     @get:JsonIgnore internal val sourcesProperty = SimpleListProperty(sources.asObservable())
     var sources: ObservableList<SourceConfig> by sourcesProperty
 
-    class Model : ItemViewModel<Config>() {
+    @Singleton
+    class Model @Inject constructor(
+        config: Config
+    ) : ItemViewModel<Config>(config) {
         val locale = bind(Config::localeProperty)
         val dataSizeUnit = bind(Config::dataSizeUnitProperty)
         val temporaryPath = bind(Config::temporaryPathProperty)

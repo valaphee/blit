@@ -30,6 +30,7 @@ import tornadofx.View
 import tornadofx.action
 import tornadofx.button
 import tornadofx.buttonbar
+import tornadofx.enableWhen
 import tornadofx.select
 import tornadofx.tab
 import tornadofx.tabpane
@@ -42,7 +43,7 @@ import kotlin.reflect.KClass
  */
 class ConfigView : View("Configure Blit") {
     private val locale by di<Locale>()
-    private val _config by di<Config>()
+    private val configModel by di<Config.Model>()
 
     private var tabs = mutableMapOf<KClass<out Component>, Tab>()
 
@@ -63,19 +64,19 @@ class ConfigView : View("Configure Blit") {
         buttonbar {
             button(locale["config.ok.text"]) {
                 action {
-                    //_config.commit()
+                    configModel.commit()
                     (scene.window as Stage).close()
                 }
             }
             button(locale["config.cancel.text"]) {
                 action {
-                    //_config.rollback()
+                    configModel.rollback()
                     (scene.window as Stage).close()
                 }
             }
             button(locale["config.apply.text"]) {
-                //enableWhen(_config.dirty)
-                //action(_config::commit)
+                enableWhen(configModel.dirty)
+                action(configModel::commit)
             }
         }
     }

@@ -18,6 +18,7 @@ package com.valaphee.blit.source.local
 
 import com.fasterxml.jackson.annotation.JsonTypeName
 import com.valaphee.blit.source.SourceConfig
+import com.valaphee.blit.source.k8scp.K8scpSourceConfig
 import javafx.event.EventTarget
 import tornadofx.field
 import tornadofx.textfield
@@ -36,4 +37,17 @@ class LocalSourceConfig(
     }
 
     override fun newSource() = LocalSource(nameProperty.value)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as K8scpSourceConfig
+
+        if (name != other.name) return false
+
+        return true
+    }
+
+    override fun hashCode() = name.hashCode()
 }
