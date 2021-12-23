@@ -16,22 +16,29 @@
 
 package com.valaphee.blit.source.k8scp
 
+import com.fasterxml.jackson.annotation.JsonTypeName
 import com.valaphee.blit.source.SourceConfig
 import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventTarget
 import tornadofx.field
+import tornadofx.getValue
+import tornadofx.setValue
 import tornadofx.textfield
 
 /**
  * @author Kevin Ludwig
  */
+@JsonTypeName("k8scp")
 class K8scpSourceConfig(
     name: String,
     namespace: String = "",
     pod: String = "",
 ) : SourceConfig(name) {
-    val namespaceProperty = SimpleStringProperty(namespace)
-    val podProperty = SimpleStringProperty(pod)
+    private val namespaceProperty = SimpleStringProperty(namespace)
+    var namespace: String by namespaceProperty
+
+    private val podProperty = SimpleStringProperty(pod)
+    var pod: String by podProperty
 
     override fun newUi(eventTarget: EventTarget) {
         with(eventTarget) {

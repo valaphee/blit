@@ -23,23 +23,48 @@ import java.io.InputStream
  * @author Kevin Ludwig
  */
 class TransferInputStream(
-    stream: InputStream,
-    private val read: (Long) -> Unit
+    private val stream: InputStream,
+    private val onRead: (Long) -> Unit
 ) : FilterInputStream(stream) {
     private var readSum = 0L
+    private var mark = -1L
 
-    override fun read() = super.read().also {
-        readSum++
-        read(readSum)
+    override fun read(): Int {
+        val result = stream.read()
+        if (result != -1) {
+            readSum++
+            onRead(readSum)
+        }
+        return result
     }
 
-    override fun read(b: ByteArray, off: Int, len: Int) = super.read(b, off, len).also {
-        readSum += it
-        read(readSum)
+    override fun read(b: ByteArray, off: Int, len: Int): Int {
+        val result = stream.read(b, off, len)
+        if (result != -1) {
+            readSum += result
+            onRead(readSum)
+        }
+        return result
     }
 
-    override fun skip(n: Long) = super.skip(n).also {
-        readSum += it
-        read(readSum)
+    override fun skip(n: Long): Long {
+        val result = stream.skip(n)
+        readSum += result
+        return result
+    }
+
+    override fun mark(readlimit: Int) {
+        stream.mark(readlimit)
+        mark = readSum
+    }
+
+    override fun reset() {
+        require(stream.markSupported())
+        require(mark != -1L)
+
+        stream.reset()
+
+        readSum = mark
+        onRead(readSum)
     }
 }

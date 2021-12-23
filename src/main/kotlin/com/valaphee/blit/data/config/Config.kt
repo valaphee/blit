@@ -16,25 +16,34 @@
 
 package com.valaphee.blit.data.config
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonValue
+import com.google.inject.Singleton
+import com.valaphee.blit.data.Data
+import com.valaphee.blit.data.DataType
 import com.valaphee.blit.source.SourceConfig
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
+import javafx.collections.ObservableList
 import tornadofx.ItemViewModel
 import tornadofx.asObservable
+import tornadofx.getValue
+import tornadofx.setValue
 import java.text.StringCharacterIterator
 import kotlin.math.abs
 
 /**
  * @author Kevin Ludwig
  */
+@Singleton
+@DataType("config")
 class Config(
     locale: String,
     dataSizeUnit: DataSizeUnit,
     temporaryPath: String,
     sources: List<SourceConfig>
-) {
+) : Data {
     enum class DataSizeUnit(
         @get:JsonValue val key: String,
         val format: (Long) -> String
@@ -68,10 +77,17 @@ class Config(
         })
     }
 
-    val localeProperty = SimpleStringProperty(locale)
-    val dataSizeUnitProperty = SimpleObjectProperty(dataSizeUnit)
-    val temporaryPathProperty = SimpleStringProperty(temporaryPath)
-    val sourcesProperty = SimpleListProperty(sources.asObservable())
+    @get:JsonIgnore internal val localeProperty = SimpleStringProperty(locale)
+    var locale: String by localeProperty
+
+    @get:JsonIgnore internal val dataSizeUnitProperty = SimpleObjectProperty(dataSizeUnit)
+    var dataSizeUnit: DataSizeUnit by dataSizeUnitProperty
+
+    @get:JsonIgnore internal val temporaryPathProperty = SimpleStringProperty(temporaryPath)
+    var temporaryPath: String by temporaryPathProperty
+
+    @get:JsonIgnore internal val sourcesProperty = SimpleListProperty(sources.asObservable())
+    var sources: ObservableList<SourceConfig> by sourcesProperty
 
     class Model : ItemViewModel<Config>() {
         val locale = bind(Config::localeProperty)

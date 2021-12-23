@@ -16,6 +16,7 @@
 
 package com.valaphee.blit.source.sftp
 
+import com.fasterxml.jackson.annotation.JsonTypeName
 import com.valaphee.blit.source.SourceConfig
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
@@ -25,14 +26,17 @@ import tornadofx.button
 import tornadofx.chooseFile
 import tornadofx.field
 import tornadofx.filterInput
+import tornadofx.getValue
 import tornadofx.isInt
 import tornadofx.passwordfield
+import tornadofx.setValue
 import tornadofx.textfield
 import java.io.File
 
 /**
  * @author Kevin Ludwig
  */
+@JsonTypeName("sftp")
 class SftpSourceConfig(
     name: String,
     host: String = "",
@@ -42,12 +46,23 @@ class SftpSourceConfig(
     privateKey: String = "",
     connectionPoolSize: Int = 4
 ) : SourceConfig(name) {
-    val hostProperty = SimpleStringProperty(host)
-    val portProperty = SimpleIntegerProperty(port)
-    val usernameProperty = SimpleStringProperty(username)
-    val passwordProperty = SimpleStringProperty(password)
-    val privateKeyProperty = SimpleStringProperty(privateKey)
-    val connectionPoolSizeProperty = SimpleIntegerProperty(connectionPoolSize)
+    private val hostProperty = SimpleStringProperty(host)
+    var host: String by hostProperty
+
+    private val portProperty = SimpleIntegerProperty(port)
+    var port: Int by portProperty
+
+    private val usernameProperty = SimpleStringProperty(username)
+    var username: String by usernameProperty
+
+    private val passwordProperty = SimpleStringProperty(password)
+    var password: String by passwordProperty
+
+    private val privateKeyProperty = SimpleStringProperty(privateKey)
+    var privateKey: String by privateKeyProperty
+
+    private val connectionPoolSizeProperty = SimpleIntegerProperty(connectionPoolSize)
+    var connectionPoolSize: Int by connectionPoolSizeProperty
 
     override fun newUi(eventTarget: EventTarget) {
         with(eventTarget) {

@@ -33,15 +33,15 @@ import java.io.File
  */
 class ConfigViewGeneral : Fragment("General") {
     private val locale by di<Locale>()
-    private val configModel by di<Config.Model>()
+    private val _config by di<Config>()
     private val injector by di<Injector>()
 
     override val root = form {
         fieldset {
             val locales = injector.getInstance(object : Key<Map<String, @JvmSuppressWildcards Locale>>() {})
-            field(locale["config.general.locale.text"]) { combobox(configModel.locale, locales.keys.toList()) { cellFormat { text = locales[it]!!["name"] } } }
-            field(locale["config.general.data_size_unit.text"]) { combobox(configModel.dataSizeUnit, Config.DataSizeUnit.values().toList()) { cellFormat { text = locale["config.general.data_size_unit.${it.key}"] } } }
-            field(locale["config.general.temporary_path.text"]) { textfield(configModel.temporaryPath) { validator { if (it.isNullOrBlank() || !File(it).isDirectory) error(locale["config.general.temporary_path.invalid"]) else null } } }
+            field(locale["config.general.locale.text"]) { combobox(_config.localeProperty, locales.keys.toList()) { cellFormat { text = locales[it]!!["name"] } } }
+            field(locale["config.general.data_size_unit.text"]) { combobox(_config.dataSizeUnitProperty, Config.DataSizeUnit.values().toList()) { cellFormat { text = locale["config.general.data_size_unit.${it.key}"] } } }
+            field(locale["config.general.temporary_path.text"]) { textfield(_config.temporaryPathProperty) { validator { if (it.isNullOrBlank() || !File(it).isDirectory) error(locale["config.general.temporary_path.invalid"]) else null } } }
         }
     }
 }

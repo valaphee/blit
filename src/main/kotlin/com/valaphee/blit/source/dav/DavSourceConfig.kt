@@ -16,6 +16,7 @@
 
 package com.valaphee.blit.source.dav
 
+import com.fasterxml.jackson.annotation.JsonTypeName
 import com.valaphee.blit.source.SourceConfig
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleLongProperty
@@ -24,13 +25,16 @@ import javafx.event.EventTarget
 import tornadofx.checkbox
 import tornadofx.field
 import tornadofx.filterInput
+import tornadofx.getValue
 import tornadofx.isLong
 import tornadofx.passwordfield
+import tornadofx.setValue
 import tornadofx.textfield
 
 /**
  * @author Kevin Ludwig
  */
+@JsonTypeName("dav")
 class DavSourceConfig(
     name: String,
     url: String = "",
@@ -39,11 +43,20 @@ class DavSourceConfig(
     nextcloud: Boolean = false,
     nextcloudUploadChunkSize: Long = 10L * 1024 * 1024
 ) : SourceConfig(name) {
-    val urlProperty = SimpleStringProperty(url)
-    val usernameProperty = SimpleStringProperty(username)
-    val passwordProperty = SimpleStringProperty(password)
-    val nextcloudProperty = SimpleBooleanProperty(nextcloud)
-    val nextcloudUploadChunkSizeProperty = SimpleLongProperty(nextcloudUploadChunkSize)
+    private val urlProperty = SimpleStringProperty(url)
+    var url: String by urlProperty
+
+    private val usernameProperty = SimpleStringProperty(username)
+    var username: String by usernameProperty
+
+    private val passwordProperty = SimpleStringProperty(password)
+    var password: String by passwordProperty
+
+    private val nextcloudProperty = SimpleBooleanProperty(nextcloud)
+    var nextcloud: Boolean by nextcloudProperty
+
+    private val nextcloudUploadChunkSizeProperty = SimpleLongProperty(nextcloudUploadChunkSize)
+    var nextcloudUploadChunkSize: Long by nextcloudUploadChunkSizeProperty
 
     override fun newUi(eventTarget: EventTarget) {
         with(eventTarget) {

@@ -16,6 +16,7 @@
 
 package com.valaphee.blit.source.local
 
+import com.fasterxml.jackson.annotation.JsonTypeName
 import com.valaphee.blit.source.SourceConfig
 import javafx.event.EventTarget
 import tornadofx.field
@@ -24,6 +25,7 @@ import tornadofx.textfield
 /**
  * @author Kevin Ludwig
  */
+@JsonTypeName("local")
 class LocalSourceConfig(
     name: String
 ) : SourceConfig(name) {

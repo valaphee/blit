@@ -24,9 +24,9 @@ import com.valaphee.blit.data.locale.Locale
 import com.valaphee.blit.data.manifest.IconManifest
 import com.valaphee.blit.source.Entry
 import com.valaphee.blit.source.Source
+import com.valaphee.blit.source.SourceConfig
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
-import javafx.collections.ObservableList
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.SelectionMode
 import javafx.scene.control.TableColumnBase
@@ -86,7 +86,7 @@ import java.util.concurrent.CompletableFuture
 class MainView : View("Blit") {
     private val locale by di<Locale>()
     private val iconManifest by di<IconManifest>()
-    private val configModel by di<Config.Model>()
+    private val _config by di<Config>()
 
     private val taskManager = TaskManager().apply {
         val version = System.getProperty("os.version").toFloatOrNull()
@@ -145,6 +145,14 @@ class MainView : View("Blit") {
     }
 
     inner class Pane<T : Entry<T>> : VBox() {
+        private val sourceConfig = SimpleObjectProperty<SourceConfig>().apply {
+            onChange {
+                it?.let {
+                    @Suppress("UNCHECKED_CAST")
+                    source.value = it.newSource() as Source<T>
+                }
+            }
+        }
         private val source = SimpleObjectProperty<Source<T>>().apply {
             onChange {
                 it?.let {
@@ -162,9 +170,9 @@ class MainView : View("Blit") {
             hgrow = Priority.ALWAYS
 
             hbox {
-                combobox(source) {
+                combobox(sourceConfig) {
                     @Suppress("UNCHECKED_CAST")
-                    items = configModel.sources as ObservableList<Source<T>>
+                    items = _config.sources
                 }
                 add(CustomTextField().apply {
                     bind(name)
@@ -245,7 +253,7 @@ class MainView : View("Blit") {
                 }
                 column(locale["main.tree.column.size.title"], Entry<T>::self) {
                     tableColumnBaseSetWidth(this, 75.0)
-                    cellFormat { text = if (it.directory) "" else configModel.dataSizeUnit.value.format(it.size) }
+                    cellFormat { text = if (it.directory) "" else _config.dataSizeUnit.format(it.size) }
                     setComparator { a, b -> a.size.compareTo(b.size) }
                 }
                 column(locale["main.tree.column.modified.title"], Entry<T>::modifyTime) {
@@ -261,9 +269,9 @@ class MainView : View("Blit") {
                                     setContent {
                                         taskManager.runBlocking(locale["main.tree.task.download.name"]) {
                                             suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
-                                                File(configModel.temporaryPath.value, entry.name).mkdir()
+                                                File(_config.temporaryPath, entry.name).mkdir()
                                                 entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
-                                            } else listOf(File(configModel.temporaryPath.value, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
+                                            } else listOf(File(_config.temporaryPath, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
 
                                             putFiles(selectionModel.selectedItems.flatMap { flatten(it.value) })
                                         }
@@ -302,9 +310,9 @@ class MainView : View("Blit") {
                         KeyCode.C -> if (it.isControlDown) Clipboard.getSystemClipboard().setContent {
                             taskManager.runBlocking(locale["main.tree.task.download.name"]) {
                                 suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
-                                    File(configModel.temporaryPath.value, entry.name).mkdir()
+                                    File(_config.temporaryPath, entry.name).mkdir()
                                     entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
-                                } else listOf(File(configModel.temporaryPath.value, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
+                                } else listOf(File(_config.temporaryPath, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
 
                                 putFiles(selectionModel.selectedItems.flatMap { flatten(it.value) })
 
@@ -333,7 +341,7 @@ class MainView : View("Blit") {
             private fun open(item: TreeItem<Entry<T>>) {
                 if (Desktop.isDesktopSupported()) {
                     val entry = item.value
-                    taskManager.launch(locale["main.tree.task.download.name", entry]) { Desktop.getDesktop().open(File(configModel.temporaryPath.value, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }) } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
+                    taskManager.launch(locale["main.tree.task.download.name", entry]) { Desktop.getDesktop().open(File(_config.temporaryPath, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }) } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
                 }
             }
 

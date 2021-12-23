@@ -38,13 +38,13 @@ import tornadofx.vgrow
  */
 class ConfigViewSources : Fragment("Sources") {
     private val locale by di<Locale>()
-    private val configModel by di<Config.Model>()
+    private val _config by di<Config>()
 
     private val source = SimpleObjectProperty<SourceConfig>()
 
     override val root = hbox {
         vbox {
-            add(listview(configModel.sources) {
+            add(listview(_config.sources) {
                 bindSelected(source)
 
                 vgrow = Priority.ALWAYS

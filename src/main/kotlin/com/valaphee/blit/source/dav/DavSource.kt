@@ -44,11 +44,11 @@ import javax.net.ssl.X509TrustManager
  */
 class DavSource(
     name: String,
-    private val url: String,
-    private val username: String,
+    internal val url: String,
+    internal val username: String,
     private val password: String,
-    private val nextcloud: Boolean,
-    private val nextcloudUploadChunkSize: Long
+    internal val nextcloud: Boolean,
+    internal val nextcloudUploadChunkSize: Long
 ) : AbstractSource<DavEntry>(name) {
     internal val httpClient by lazy {
         HttpClient(OkHttp) {

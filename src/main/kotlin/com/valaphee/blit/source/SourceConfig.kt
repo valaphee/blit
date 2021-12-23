@@ -16,16 +16,39 @@
 
 package com.valaphee.blit.source
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.valaphee.blit.source.dav.DavSourceConfig
+import com.valaphee.blit.source.k8scp.K8scpSourceConfig
+import com.valaphee.blit.source.local.LocalSourceConfig
+import com.valaphee.blit.source.scp.ScpSourceConfig
+import com.valaphee.blit.source.sftp.SftpSourceConfig
 import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventTarget
+import tornadofx.getValue
+import tornadofx.setValue
 
 /**
  * @author Kevin Ludwig
  */
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "type"
+)
+@JsonSubTypes(
+    JsonSubTypes.Type(DavSourceConfig::class),
+    JsonSubTypes.Type(K8scpSourceConfig::class),
+    JsonSubTypes.Type(LocalSourceConfig::class),
+    JsonSubTypes.Type(ScpSourceConfig::class),
+    JsonSubTypes.Type(SftpSourceConfig::class)
+)
 abstract class SourceConfig(
     name: String
 ) {
-    val nameProperty = SimpleStringProperty(name)
+    @get:JsonIgnore protected val nameProperty = SimpleStringProperty(name)
+    var name by nameProperty
 
     abstract fun newUi(eventTarget: EventTarget)
 
