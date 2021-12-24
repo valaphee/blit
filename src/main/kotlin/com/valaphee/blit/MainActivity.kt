@@ -30,7 +30,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import tornadofx.onChange
 import tornadofx.runLater
-import tornadofx.warning
 import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.Executors
 import kotlin.coroutines.AbstractCoroutineContextElement
@@ -39,7 +38,7 @@ import kotlin.coroutines.CoroutineContext
 /**
  * @author Kevin Ludwig
  */
-class TaskManager {
+class MainActivity {
     private val coroutineScope = CoroutineScope(Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), ThreadFactoryBuilder().setNameFormat("blit-%d").setDaemon(true).build()).asCoroutineDispatcher() + SupervisorJob())
     private val tasks = ConcurrentLinkedDeque<Task>()
 
@@ -59,7 +58,7 @@ class TaskManager {
             try {
                 block()
             } catch (ex: NotFoundException) {
-                runLater { warning("Not found", ex.path, title = name) }
+                runLater { ErrorView("Not found", "${ex.path} not found").openModal(resizable = false) }
             }
         }
         tasks -= task
@@ -78,7 +77,7 @@ class TaskManager {
 }
 
 var CoroutineContext.progress: Double
-    get() = get(TaskManager.Task)!!.progress.value
+    get() = get(MainActivity.Task)!!.progress.value
     set(value) {
-        get(TaskManager.Task)!!.progress.value = value
+        get(MainActivity.Task)!!.progress.value = value
     }

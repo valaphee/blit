@@ -17,8 +17,8 @@
 package com.valaphee.blit.source.dav
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.valaphee.blit.source.AbstractSource
 import com.valaphee.blit.source.NotFoundException
+import com.valaphee.blit.source.Source
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.features.HttpTimeout
@@ -34,6 +34,7 @@ import io.ktor.client.statement.readBytes
 import io.ktor.client.statement.request
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.URLBuilder
 import java.security.cert.X509Certificate
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
@@ -43,13 +44,12 @@ import javax.net.ssl.X509TrustManager
  * @author Kevin Ludwig
  */
 class DavSource(
-    name: String,
     internal val url: String,
     internal val username: String,
     private val password: String,
     internal val nextcloud: Boolean,
     internal val nextcloudUploadChunkSize: Long
-) : AbstractSource<DavEntry>(name) {
+) : Source<DavEntry> {
     internal val httpClient by lazy {
         HttpClient(OkHttp) {
             engine {
@@ -73,7 +73,8 @@ class DavSource(
             }
         }
     }
-    internal val _url get() = if (nextcloud) "${url}/files/${username}" else url
+    internal val _url = if (nextcloud) "${url}/files/${username}" else url
+    internal val path = URLBuilder(_url).encodedPath
 
     override val home get() = "/"
 
@@ -88,6 +89,10 @@ class DavSource(
             HttpStatusCode.NotFound -> throw NotFoundException(path)
             else -> TODO()
         }
+    }
+
+    override fun close() {
+        httpClient.close()
     }
 
     companion object {

@@ -19,17 +19,18 @@ package com.valaphee.blit.data.config
 import com.valaphee.blit.data.locale.Locale
 import com.valaphee.blit.source.SourceConfig
 import javafx.beans.property.SimpleObjectProperty
+import javafx.scene.control.ContextMenu
 import javafx.scene.layout.Priority
 import tornadofx.Fragment
 import tornadofx.action
 import tornadofx.bindSelected
-import tornadofx.button
 import tornadofx.dynamicContent
-import tornadofx.fieldset
 import tornadofx.form
 import tornadofx.hbox
 import tornadofx.hgrow
+import tornadofx.item
 import tornadofx.listview
+import tornadofx.onChange
 import tornadofx.vbox
 import tornadofx.vgrow
 
@@ -49,33 +50,13 @@ class ConfigViewSources : Fragment("Sources") {
 
                 vgrow = Priority.ALWAYS
 
-                selectionModel.selectFirst()
+                selectionModel.selectedItems.onChange { contextMenu = ContextMenu().apply { it.list.firstOrNull()?.let { item(locale["config.sources.delete.text"]) { action { configModel.sources.remove(it) } } } ?: item(locale["config.sources.new.text"]) { action {} } } }
             })
-            hbox {
-                spacing = 8.0
-
-                button(locale["config.sources.new.text"]) {
-                    action {
-                    }
-                }
-                button(locale["config.sources.save.text"]) {
-                    action {
-                    }
-                }
-                button(locale["config.sources.delete.text"]) {
-                    action {
-                    }
-                }
-            }
         }
         form {
             hgrow = Priority.ALWAYS
 
-            fieldset {
-                dynamicContent(source) {
-                    source.value?.newUi(this)
-                }
-            }
+            dynamicContent(source) { source.value?.newUi(this) }
         }
     }
 }

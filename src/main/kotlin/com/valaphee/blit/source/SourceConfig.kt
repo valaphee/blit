@@ -53,4 +53,6 @@ abstract class SourceConfig(
     abstract fun newUi(eventTarget: EventTarget)
 
     abstract fun newSource(): Source<*>
+
+    override fun toString() = name
 }

@@ -16,11 +16,13 @@
 
 package com.valaphee.blit.source
 
+import javafx.util.StringConverter
+
 /**
  * @author Kevin Ludwig
  */
-abstract class AbstractSource<T : Entry<T>>(
-    override val name: String
-) : Source<T> {
-    override fun toString() = name
+object IntStringConverter : StringConverter<Number>() {
+    override fun toString(`object`: Number?) = `object`?.toString() ?: ""
+
+    override fun fromString(string: String?) =  string?.toIntOrNull()
 }

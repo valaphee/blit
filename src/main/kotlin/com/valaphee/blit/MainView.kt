@@ -88,7 +88,7 @@ class MainView : View("Blit") {
     private val iconManifest by di<IconManifest>()
     private val _config by di<Config>()
 
-    private val taskManager = TaskManager().apply {
+    private val activity = MainActivity().apply {
         val version = System.getProperty("os.version").toFloatOrNull()
         if (System.getProperty("os.name").startsWith("Windows") && version != null && version >= 6.1f) {
             val iTaskbarList3 = CompletableFuture.supplyAsync({ COMRuntime.newInstance(ITaskbarList3::class.java) }, comExecutor).join()
@@ -140,28 +140,26 @@ class MainView : View("Blit") {
             @Suppress("UPPER_BOUND_VIOLATED_WARNING") add(Pane<Entry<*>>())
             @Suppress("UPPER_BOUND_VIOLATED_WARNING") add(Pane<Entry<*>>())
         }
-        label(taskManager.name)
-        progressbar(taskManager.progress)
+        label(activity.name)
+        progressbar(activity.progress)
     }
 
     inner class Pane<T : Entry<T>> : VBox() {
         private val sourceConfig = SimpleObjectProperty<SourceConfig>().apply {
             onChange {
                 it?.let {
+                    source?.close()
+
                     @Suppress("UNCHECKED_CAST")
-                    source.value = it.newSource() as Source<T>
-                }
-            }
-        }
-        private val source = SimpleObjectProperty<Source<T>>().apply {
-            onChange {
-                it?.let {
+                    source = (it.newSource() as Source<T>)
+
                     _path = null
                     tree.root = null
-                    navigate(it.home)
+                    navigate(source!!.home)
                 }
             }
         }
+        private var source: Source<T>? = null
         private var _path: String? = null
         private val name = SimpleStringProperty()
         private val tree = Tree<T>()
@@ -170,10 +168,7 @@ class MainView : View("Blit") {
             hgrow = Priority.ALWAYS
 
             hbox {
-                combobox(sourceConfig) {
-                    @Suppress("UNCHECKED_CAST")
-                    items = _config.sources
-                }
+                combobox(sourceConfig, _config.sources)
                 add(CustomTextField().apply {
                     bind(name)
 
@@ -218,8 +213,8 @@ class MainView : View("Blit") {
 
             if (canonicalPath == _path) return
 
-            source.value?.let {
-                taskManager.launch(locale["main.navigator.task.navigate.name", canonicalPath]) {
+            source?.let {
+                activity.launch(locale["main.navigator.task.navigate.name", canonicalPath]) {
                     val item = it.get(canonicalPath).item
                     _path = canonicalPath
                     runLater {
@@ -267,7 +262,7 @@ class MainView : View("Blit") {
                             setOnDragDetected {
                                 startDragAndDrop(TransferMode.MOVE).apply {
                                     setContent {
-                                        taskManager.runBlocking(locale["main.tree.task.download.name"]) {
+                                        activity.runBlocking(locale["main.tree.task.download.name"]) {
                                             suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
                                                 File(_config.temporaryPath, entry.name).mkdir()
                                                 entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
@@ -308,7 +303,7 @@ class MainView : View("Blit") {
                         KeyCode.ENTER -> selectionModel.selectedItems.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.toString()) } ?: selectionModel.selectedItems.forEach(::open)
                         KeyCode.BACK_SPACE -> navigateRelative("..")
                         KeyCode.C -> if (it.isControlDown) Clipboard.getSystemClipboard().setContent {
-                            taskManager.runBlocking(locale["main.tree.task.download.name"]) {
+                            activity.runBlocking(locale["main.tree.task.download.name"]) {
                                 suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
                                     File(_config.temporaryPath, entry.name).mkdir()
                                     entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
@@ -325,7 +320,7 @@ class MainView : View("Blit") {
                                 val item = selectionModel.selectedItem ?: root
                                 val entry = item.value
                                 if (!entry.directory) TODO()
-                                files.forEach { file -> taskManager.launch(locale["main.tree.task.upload.name", file.name]) { FileInputStream(file).use { entry.transferFrom(file.name, it, file.length()) } } }
+                                files.forEach { file -> activity.launch(locale["main.tree.task.upload.name", file.name]) { FileInputStream(file).use { entry.transferFrom(file.name, it, file.length()) } } }
                             }
                         }
                         KeyCode.DELETE -> selectionModel.selectedItems.forEach(::delete)
@@ -341,22 +336,22 @@ class MainView : View("Blit") {
             private fun open(item: TreeItem<Entry<T>>) {
                 if (Desktop.isDesktopSupported()) {
                     val entry = item.value
-                    taskManager.launch(locale["main.tree.task.download.name", entry]) { Desktop.getDesktop().open(File(_config.temporaryPath, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }) } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
+                    activity.launch(locale["main.tree.task.download.name", entry]) { Desktop.getDesktop().open(File(_config.temporaryPath, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }) } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
                 }
             }
 
             private fun rename(item: TreeItem<Entry<T>>) {
                 val entry = item.value
-                RenameView(entry.name) { taskManager.launch(locale["main.tree.task.rename.name", entry, it]) { entry.rename(it) } }.openModal(resizable = false)
+                RenameView(entry.name) { activity.launch(locale["main.tree.task.rename.name", entry, it]) { entry.rename(it) } }.openModal(resizable = false)
             }
 
             private fun delete(item: TreeItem<Entry<T>>) {
                 val entry = item.value
-                taskManager.launch(locale["main.tree.task.delete.name", entry]) { entry.delete() }
+                activity.launch(locale["main.tree.task.delete.name", entry]) { entry.delete() }
             }
 
             internal fun populate(item: TreeItem<Entry<T>>) {
-                taskManager.launch(locale["main.tree.task.populate.name", item.value]) {
+                activity.launch(locale["main.tree.task.populate.name", item.value]) {
                     val children = item.value!!.list()
                     runLater {
                         populateTree(item, { entry ->

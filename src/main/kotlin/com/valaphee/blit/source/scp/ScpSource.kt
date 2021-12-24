@@ -16,8 +16,8 @@
 
 package com.valaphee.blit.source.scp
 
-import com.valaphee.blit.source.AbstractSource
 import com.valaphee.blit.source.NotFoundException
+import com.valaphee.blit.source.Source
 import com.valaphee.blit.source.sftp.SftpSource
 import io.ktor.utils.io.pool.DefaultPool
 import io.ktor.utils.io.pool.useInstance
@@ -33,14 +33,13 @@ import java.nio.file.Paths
  * @author Kevin Ludwig
  */
 class ScpSource(
-    name: String,
     private val host: String,
     private val port: Int,
     private val username: String,
     private val password: String,
     private val privateKey: String,
     private val connectionPoolSize: Int
-) : AbstractSource<ScpEntry>(name) {
+) : Source<ScpEntry> {
     internal val semaphore = Semaphore(connectionPoolSize)
     internal val pool = object : DefaultPool<ScpClient>(connectionPoolSize) {
         override fun produceInstance(): ScpClient {
@@ -61,7 +60,11 @@ class ScpSource(
         }
     }
 
-    override val home: String get() = runBlocking { semaphore.withPermit { pool.useInstance { it.session.executeRemoteCommand("pwd").lines().first() } } }
+    override val home get() = runBlocking { semaphore.withPermit { pool.useInstance { it.session.executeRemoteCommand("pwd").lines().first() } } }
 
     override suspend fun get(path: String) = parseLsEntry(semaphore.withPermit { pool.useInstance { it.session.executeRemoteCommand("""stat --format "%A 0 %U %G %s %y %n" "$path"""").lines().first() } })?.second?.let { ScpEntry(this, path, it) } ?: throw NotFoundException(path)
+
+    override fun close() {
+        pool.close()
+    }
 }

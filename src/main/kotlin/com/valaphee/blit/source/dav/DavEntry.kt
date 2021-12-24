@@ -60,9 +60,9 @@ class DavEntry(
         when (httpResponse.status) {
             HttpStatusCode.MultiStatus -> {
                 val href = httpResponse.request.url.encodedPath
-                xmlMapper.readValue<Multistatus>(httpResponse.readBytes()).response.filter { !it.href.equals(href, true) }.mapNotNull {
-                    val name = URLDecoder.decode(it.href.removeSuffix("/").split('/').last(), "UTF-8")
-                    it.propstat.find { it.status == "HTTP/1.1 200 OK" }?.prop?.let { DavEntry(source, "$path/$name", it) }
+                xmlMapper.readValue<Multistatus>(httpResponse.readBytes()).response.filter { it.href != href }.mapNotNull {
+                    val subPath = URLDecoder.decode(it.href.removePrefix(source.path), "UTF-8")
+                    it.propstat.find { it.status == "HTTP/1.1 200 OK" }?.prop?.let { DavEntry(source, subPath, it) }
                 }
             }
             HttpStatusCode.NotFound -> throw NotFoundException(path)

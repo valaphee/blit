@@ -17,7 +17,6 @@
 package com.valaphee.blit
 
 import com.valaphee.blit.data.locale.Locale
-import javafx.beans.property.SimpleStringProperty
 import javafx.stage.Stage
 import jfxtras.styles.jmetro.JMetro
 import jfxtras.styles.jmetro.JMetroStyleClass
@@ -26,22 +25,19 @@ import tornadofx.View
 import tornadofx.action
 import tornadofx.button
 import tornadofx.buttonbar
-import tornadofx.enableWhen
 import tornadofx.field
 import tornadofx.fieldset
 import tornadofx.form
-import tornadofx.textfield
+import tornadofx.label
 
 /**
  * @author Kevin Ludwig
  */
-class RenameView(
-    name: String,
-    action: (String) -> Unit
-) : View("Rename $name") {
+class ErrorView(
+    error: String,
+    errorMessage: String,
+) : View(error) {
     private val locale by di<Locale>()
-
-    private val name = SimpleStringProperty(name)
 
     override val root = form {
         JMetro(this, Style.DARK)
@@ -49,16 +45,7 @@ class RenameView(
 
         prefWidth = 300.0
 
-        fieldset { field { textfield(this@RenameView.name) } }
-        buttonbar {
-            button(locale["rename.ok.text"]) {
-                enableWhen(this@RenameView.name.isNotEmpty)
-                action {
-                    action(this@RenameView.name.value)
-                    (scene.window as Stage).close()
-                }
-            }
-            button(locale["rename.cancel.text"]) { action { (scene.window as Stage).close() } }
-        }
+        fieldset { field { label(errorMessage) } }
+        buttonbar { button(locale["rename.ok.text"]) { action { (scene.window as Stage).close() } } }
     }
 }

@@ -16,8 +16,8 @@
 
 package com.valaphee.blit.source.sftp
 
-import com.valaphee.blit.source.AbstractSource
 import com.valaphee.blit.source.NotFoundException
+import com.valaphee.blit.source.Source
 import io.ktor.utils.io.pool.DefaultPool
 import io.ktor.utils.io.pool.useInstance
 import kotlinx.coroutines.runBlocking
@@ -35,14 +35,13 @@ import java.nio.file.Paths
  * @author Kevin Ludwig
  */
 class SftpSource(
-    name: String,
     private val host: String,
     private val port: Int,
     private val username: String,
     private val password: String,
     private val privateKey: String,
     private val connectionPoolSize: Int
-) : AbstractSource<SftpEntry>(name) {
+) : Source<SftpEntry> {
     internal val semaphore = Semaphore(connectionPoolSize)
     internal val pool = object : DefaultPool<SftpClient>(connectionPoolSize) {
         override fun produceInstance(): SftpClient {
@@ -63,7 +62,7 @@ class SftpSource(
         }
     }
 
-    override val home: String get() = runBlocking { semaphore.withPermit { pool.useInstance { it.session.executeRemoteCommand("pwd").lines().first() } } }
+    override val home get() = runBlocking { semaphore.withPermit { pool.useInstance { it.session.executeRemoteCommand("pwd").lines().first() } } }
 
     override suspend fun get(path: String) = try {
         semaphore.withPermit { pool.useInstance { SftpEntry(this, path, it.stat(path)) } }
@@ -72,6 +71,10 @@ class SftpSource(
             SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundException(path)
             else -> throw ex
         }
+    }
+
+    override fun close() {
+        pool.close()
     }
 
     companion object {

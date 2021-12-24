@@ -16,8 +16,8 @@
 
 package com.valaphee.blit.source.k8scp
 
-import com.valaphee.blit.source.AbstractSource
 import com.valaphee.blit.source.NotFoundException
+import com.valaphee.blit.source.Source
 import com.valaphee.blit.source.scp.parseLsEntry
 import io.kubernetes.client.Copy
 import io.kubernetes.client.openapi.apis.CoreV1Api
@@ -29,10 +29,9 @@ import java.io.InputStreamReader
  * @author Kevin Ludwig
  */
 class K8scpSource(
-    name: String,
     private val namespace: String,
     private val pod: String
-) : AbstractSource<K8scpEntry>(name) {
+) : Source<K8scpEntry> {
     override val home: String
         get() = if (namespace.isNotEmpty() && pod.isNotEmpty()) {
             val process = copy.exec(namespace, pod, arrayOf("pwd", toString()), false)
@@ -66,6 +65,8 @@ class K8scpSource(
             Triple(if (namespace.isNullOrEmpty()) null else namespace, if (pod.isNullOrEmpty()) null else pod, "/${namespacePodAndPath.getOrNull(3) ?: ""}")
         }
     }
+
+    override fun close() = Unit
 
     companion object {
         private val apiClient = Config.defaultClient()

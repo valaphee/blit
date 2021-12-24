@@ -17,18 +17,25 @@
 package com.valaphee.blit.source.scp
 
 import com.fasterxml.jackson.annotation.JsonTypeName
+import com.valaphee.blit.source.IntStringConverter
 import com.valaphee.blit.source.SourceConfig
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventTarget
+import javafx.scene.layout.Priority
 import tornadofx.action
+import tornadofx.bind
 import tornadofx.button
 import tornadofx.chooseFile
 import tornadofx.field
+import tornadofx.fieldset
 import tornadofx.filterInput
 import tornadofx.getValue
+import tornadofx.hgrow
 import tornadofx.isInt
+import tornadofx.label
 import tornadofx.passwordfield
+import tornadofx.separator
 import tornadofx.setValue
 import tornadofx.textfield
 import java.io.File
@@ -66,50 +73,42 @@ class ScpSourceConfig(
 
     override fun newUi(eventTarget: EventTarget) {
         with(eventTarget) {
-            field("Name") { textfield(nameProperty) }
-            field("Host") { textfield(hostProperty) }
-            field("Port") { textfield(portProperty) { filterInput { it.controlNewText.isInt() } } }
-            field("Username") { textfield(usernameProperty) }
-            field("Password") { passwordfield(passwordProperty) }
-            field("Private Key") {
-                val path = textfield(privateKeyProperty)
-                button("...") {
-                    action {
-                        val parentPath = if (path.text.isEmpty()) null else File(path.text).parentFile
-                        chooseFile("Select Private Key", emptyArray(), if (parentPath?.isDirectory == true) parentPath else null).firstOrNull()?.let { path.text = it.absolutePath }
+            fieldset("General") {
+                field("Name") { textfield(nameProperty) }
+                field("Host") {
+                    textfield(hostProperty) { hgrow = Priority.ALWAYS }
+                    label("Port")
+                    textfield {
+                        bind(portProperty, converter = IntStringConverter)
+
+                        minWidth = 65.0
+                        maxWidth = 65.0
+
+                        filterInput { it.controlNewText.isInt() }
+                    }
+                }
+                field("Connection Pool Size") {
+                    textfield {
+                        bind(connectionPoolSizeProperty, converter = IntStringConverter)
+
+                        filterInput { it.controlNewText.isInt() }
+                    }
+                }
+                separator()
+                field("Username") { textfield(usernameProperty) }
+                field("Password") { passwordfield(passwordProperty) }
+                field("Private Key") {
+                    textfield(privateKeyProperty)
+                    button("...") {
+                        action {
+                            val parentPath = if (privateKey.isEmpty()) null else File(privateKey).parentFile
+                            chooseFile("Select Private Key", emptyArray(), if (parentPath?.isDirectory == true) parentPath else null).firstOrNull()?.let { privateKey = it.absolutePath }
+                        }
                     }
                 }
             }
         }
     }
 
-    override fun newSource() = ScpSource(nameProperty.value, hostProperty.value, portProperty.value, usernameProperty.value, passwordProperty.value, privateKeyProperty.value, connectionPoolSizeProperty.value)
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as ScpSourceConfig
-
-        if (name != other.name) return false
-        if (host != other.host) return false
-        if (port != other.port) return false
-        if (username != other.username) return false
-        if (password != other.password) return false
-        if (privateKey != other.privateKey) return false
-        if (connectionPoolSize != other.connectionPoolSize) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = name.hashCode()
-        result = 31 * result + host.hashCode()
-        result = 31 * result + port.hashCode()
-        result = 31 * result + username.hashCode()
-        result = 31 * result + password.hashCode()
-        result = 31 * result + privateKey.hashCode()
-        result = 31 * result + connectionPoolSize.hashCode()
-        return result
-    }
+    override fun newSource() = ScpSource(hostProperty.value, portProperty.value, usernameProperty.value, passwordProperty.value, privateKeyProperty.value, connectionPoolSizeProperty.value)
 }

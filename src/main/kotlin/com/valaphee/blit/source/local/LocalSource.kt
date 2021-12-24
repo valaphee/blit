@@ -16,20 +16,20 @@
 
 package com.valaphee.blit.source.local
 
-import com.valaphee.blit.source.AbstractSource
 import com.valaphee.blit.source.NotFoundException
+import com.valaphee.blit.source.Source
 import java.io.File
 
 /**
  * @author Kevin Ludwig
  */
-class LocalSource(
-    name: String
-) : AbstractSource<LocalEntry>(name) {
+class LocalSource : Source<LocalEntry> {
     override val home: String get() = File(System.getProperty("user.home")).absolutePath
 
     override suspend fun get(path: String): LocalEntry {
         val file = File(path)
         return if (file.exists()) LocalEntry(file) else throw NotFoundException(path)
     }
+
+    override fun close() = Unit
 }

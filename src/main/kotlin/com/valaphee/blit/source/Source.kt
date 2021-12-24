@@ -16,11 +16,12 @@
 
 package com.valaphee.blit.source
 
+import java.io.Closeable
+
 /**
  * @author Kevin Ludwig
  */
-interface Source<T : Entry<T>> {
-    val name: String
+interface Source<T : Entry<T>> : Closeable {
     val home: String
 
     suspend fun get(path: String): T

@@ -17,17 +17,21 @@
 package com.valaphee.blit.source.dav
 
 import com.fasterxml.jackson.annotation.JsonTypeName
+import com.valaphee.blit.source.LongStringConverter
 import com.valaphee.blit.source.SourceConfig
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleLongProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventTarget
+import tornadofx.bind
 import tornadofx.checkbox
 import tornadofx.field
+import tornadofx.fieldset
 import tornadofx.filterInput
 import tornadofx.getValue
 import tornadofx.isLong
 import tornadofx.passwordfield
+import tornadofx.separator
 import tornadofx.setValue
 import tornadofx.textfield
 
@@ -60,40 +64,24 @@ class DavSourceConfig(
 
     override fun newUi(eventTarget: EventTarget) {
         with(eventTarget) {
-            field("Name") { textfield(nameProperty) }
-            field("Url") { textfield(urlProperty) }
-            field("Username") { textfield(usernameProperty) }
-            field("Password") { passwordfield(passwordProperty) }
-            field("Nextcloud") { checkbox(property = nextcloudProperty) }
-            field("Nextcloud Upload Chunk Size") { textfield(nextcloudUploadChunkSizeProperty) { filterInput { it.controlNewText.isLong() } } }
+            fieldset("General") {
+                field("Name") { textfield(nameProperty) }
+                field("URL") { textfield(urlProperty) }
+                separator()
+                field("Username") { textfield(usernameProperty) }
+                field("Password") { passwordfield(passwordProperty) }
+            }
+            fieldset("Nextcloud") {
+                field("Use") { checkbox(property = nextcloudProperty) }
+                field("Upload Chunk Size") {
+                    textfield {
+                        bind(nextcloudUploadChunkSizeProperty, converter = LongStringConverter)
+                        filterInput { it.controlNewText.isLong() }
+                    }
+                }
+            }
         }
     }
 
-    override fun newSource() = DavSource(nameProperty.value, urlProperty.value, usernameProperty.value, passwordProperty.value, nextcloudProperty.value, nextcloudUploadChunkSizeProperty.value)
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as DavSourceConfig
-
-        if (name != other.name) return false
-        if (url != other.url) return false
-        if (username != other.username) return false
-        if (password != other.password) return false
-        if (nextcloud != other.nextcloud) return false
-        if (nextcloudUploadChunkSize != other.nextcloudUploadChunkSize) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = name.hashCode()
-        result = 31 * result + url.hashCode()
-        result = 31 * result + username.hashCode()
-        result = 31 * result + password.hashCode()
-        result = 31 * result + nextcloud.hashCode()
-        result = 31 * result + nextcloudUploadChunkSize.hashCode()
-        return result
-    }
+    override fun newSource() = DavSource(urlProperty.value, usernameProperty.value, passwordProperty.value, nextcloudProperty.value, nextcloudUploadChunkSizeProperty.value)
 }

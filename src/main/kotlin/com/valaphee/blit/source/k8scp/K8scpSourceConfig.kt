@@ -21,6 +21,7 @@ import com.valaphee.blit.source.SourceConfig
 import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventTarget
 import tornadofx.field
+import tornadofx.fieldset
 import tornadofx.getValue
 import tornadofx.setValue
 import tornadofx.textfield
@@ -42,31 +43,13 @@ class K8scpSourceConfig(
 
     override fun newUi(eventTarget: EventTarget) {
         with(eventTarget) {
-            field("Name") { textfield(nameProperty) }
-            field("Namespace") { textfield(namespaceProperty) }
-            field("Pod") { textfield(podProperty) }
+            fieldset("General") {
+                field("Name") { textfield(nameProperty) }
+                field("Namespace") { textfield(namespaceProperty) }
+                field("Pod") { textfield(podProperty) }
+            }
         }
     }
 
-    override fun newSource() = K8scpSource(nameProperty.value, namespaceProperty.value, podProperty.value)
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as K8scpSourceConfig
-
-        if (name != other.name) return false
-        if (namespace != other.namespace) return false
-        if (pod != other.pod) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = name.hashCode()
-        result = 31 * result + namespace.hashCode()
-        result = 31 * result + pod.hashCode()
-        return result
-    }
+    override fun newSource() = K8scpSource(namespaceProperty.value, podProperty.value)
 }
