@@ -16,12 +16,11 @@
 
 package com.valaphee.blit
 
+import com.valaphee.blit.data.config.Config
 import com.valaphee.blit.data.locale.Locale
 import javafx.beans.property.SimpleStringProperty
 import javafx.stage.Stage
-import jfxtras.styles.jmetro.JMetro
 import jfxtras.styles.jmetro.JMetroStyleClass
-import jfxtras.styles.jmetro.Style
 import tornadofx.View
 import tornadofx.action
 import tornadofx.button
@@ -40,11 +39,12 @@ class RenameView(
     action: (String) -> Unit
 ) : View("Rename $name") {
     private val locale by di<Locale>()
+    private val _config by di<Config>()
 
     private val name = SimpleStringProperty(name)
 
     override val root = form {
-        JMetro(this, Style.DARK)
+        _config.theme.apply(this)
         styleClass.add(JMetroStyleClass.BACKGROUND)
 
         prefWidth = 300.0

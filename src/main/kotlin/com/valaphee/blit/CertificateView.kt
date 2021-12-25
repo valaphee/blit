@@ -25,15 +25,19 @@ import tornadofx.action
 import tornadofx.button
 import tornadofx.buttonbar
 import tornadofx.form
-import tornadofx.label
+import tornadofx.readonlyColumn
+import tornadofx.smartResize
+import tornadofx.tableview
+import tornadofx.toObservable
+import java.security.cert.X509Certificate
 
 /**
  * @author Kevin Ludwig
  */
-class ErrorView(
-    error: String,
-    errorMessage: String,
-) : View(error) {
+class CertificateView(
+    private val chain: Array<out X509Certificate>,
+    private val valid: Boolean
+) : View("Certificate${if (!valid) " (Invalid)" else ""}") {
     private val locale by di<Locale>()
     private val _config by di<Config>()
 
@@ -41,9 +45,24 @@ class ErrorView(
         _config.theme.apply(this)
         styleClass.add(JMetroStyleClass.BACKGROUND)
 
-        prefWidth = 300.0
+        prefWidth = 500.0
 
-        label(errorMessage)
+        val certificate = chain.first()
+        tableview(listOf(
+            "Version" to "V${certificate.version}",
+            "Serial number" to certificate.serialNumber.toString(16),
+            "Signature algorithm" to certificate.sigAlgName,
+            "Issuer" to certificate.issuerDN,
+            "Valid from" to certificate.notBefore,
+            "Valid to" to certificate.notAfter,
+            "Subject" to certificate.subjectDN
+        ).toObservable()) {
+            readonlyColumn("Field", Pair<String, Any>::first)
+            readonlyColumn("Value", Pair<String, Any>::second)
+            smartResize()
+
+            setSortPolicy { false }
+        }
         buttonbar { button(locale["rename.ok.text"]) { action { (scene.window as Stage).close() } } }
     }
 }

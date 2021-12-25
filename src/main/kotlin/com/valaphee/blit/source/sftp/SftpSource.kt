@@ -78,6 +78,9 @@ class SftpSource(
     }
 
     companion object {
-        internal val sshClient = SshClient.setUpDefaultClient().apply(SshClient::start)
+        internal val sshClient = SshClient.setUpDefaultClient().apply {
+            /*NamedFactory.setUpBuiltinFactories(false, BuiltinCompressions.VALUES)*/
+            start()
+        }
     }
 }

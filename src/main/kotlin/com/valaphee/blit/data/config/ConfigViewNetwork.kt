@@ -14,36 +14,21 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit
+package com.valaphee.blit.data.config
 
-import com.valaphee.blit.data.config.Config
 import com.valaphee.blit.data.locale.Locale
-import javafx.stage.Stage
-import jfxtras.styles.jmetro.JMetroStyleClass
-import tornadofx.View
-import tornadofx.action
-import tornadofx.button
-import tornadofx.buttonbar
+import tornadofx.Fragment
+import tornadofx.fieldset
 import tornadofx.form
-import tornadofx.label
 
 /**
  * @author Kevin Ludwig
  */
-class ErrorView(
-    error: String,
-    errorMessage: String,
-) : View(error) {
+class ConfigViewNetwork : Fragment("Network") {
     private val locale by di<Locale>()
-    private val _config by di<Config>()
 
     override val root = form {
-        _config.theme.apply(this)
-        styleClass.add(JMetroStyleClass.BACKGROUND)
-
-        prefWidth = 300.0
-
-        label(errorMessage)
-        buttonbar { button(locale["rename.ok.text"]) { action { (scene.window as Stage).close() } } }
+        fieldset(locale["config.network.proxy.text"]) {
+        }
     }
 }

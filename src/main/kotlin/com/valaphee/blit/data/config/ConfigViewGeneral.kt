@@ -20,6 +20,9 @@ import com.google.inject.Injector
 import com.google.inject.Key
 import com.valaphee.blit.data.locale.Locale
 import tornadofx.Fragment
+import tornadofx.action
+import tornadofx.button
+import tornadofx.chooseDirectory
 import tornadofx.combobox
 import tornadofx.field
 import tornadofx.fieldset
@@ -37,13 +40,26 @@ class ConfigViewGeneral : Fragment("General") {
     private val injector by di<Injector>()
 
     override val root = form {
-        fieldset {
+        fieldset(locale["config.general.appearance.text"]) {
+            field(locale["config.general.theme.text"]) {
+                combobox(configModel.theme, Config.Theme.values().toList()) { cellFormat { text = locale["config.general.theme.${it.key}"] } }
+            }
             field(locale["config.general.locale.text"]) {
                 val locales = injector.getInstance(object : Key<Map<String, @JvmSuppressWildcards Locale>>() {})
                 combobox(configModel.locale, locales.keys.toList()) { cellFormat { text = locales[it]!!["name"] } }
             }
             field(locale["config.general.data_size_unit.text"]) { combobox(configModel.dataSizeUnit, Config.DataSizeUnit.values().toList()) { cellFormat { text = locale["config.general.data_size_unit.${it.key}"] } } }
-            field(locale["config.general.temporary_path.text"]) { textfield(configModel.temporaryPath) { validator { if (it.isNullOrBlank() || !File(it).isDirectory) error(locale["config.general.temporary_path.invalid"]) else null } } }
+        }
+        fieldset(locale["config.general.path.text"]) {
+            field(locale["config.general.temporary_path.text"]) {
+                textfield(configModel.temporaryPath) { validator { if (it.isNullOrBlank() || !File(it).isDirectory) error(locale["config.general.temporary_path.invalid"]) else null } }
+                button("...") {
+                    action {
+                        val parentPath = if (configModel.temporaryPath.value.isEmpty()) null else File(configModel.temporaryPath.value).parentFile
+                        chooseDirectory("Select Private Key", if (parentPath?.isDirectory == true) parentPath else null)?.let { configModel.temporaryPath.value = it.absolutePath }
+                    }
+                }
+            }
         }
     }
 }

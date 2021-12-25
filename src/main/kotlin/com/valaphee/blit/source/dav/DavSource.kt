@@ -17,6 +17,7 @@
 package com.valaphee.blit.source.dav
 
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.valaphee.blit.CertificateView
 import com.valaphee.blit.source.NotFoundException
 import com.valaphee.blit.source.Source
 import io.ktor.client.HttpClient
@@ -35,9 +36,14 @@ import io.ktor.client.statement.request
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.URLBuilder
+import tornadofx.runLater
+import java.security.KeyStore
+import java.security.SecureRandom
+import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
+import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
 
 /**
@@ -54,7 +60,7 @@ class DavSource(
         HttpClient(OkHttp) {
             engine {
                 config {
-                    sslSocketFactory(SSLContext.getInstance("SSL").apply { init(null, trustManagers, java.security.SecureRandom()) }.socketFactory, trustManagers[0] as X509TrustManager)
+                    sslSocketFactory(socketFactory, trustManagers[0] as X509TrustManager)
                     hostnameVerifier { _, _ -> true }
                 }
             }
@@ -97,11 +103,20 @@ class DavSource(
 
     companion object {
         private val trustManagers = arrayOf<TrustManager>(object : X509TrustManager {
-            override fun checkClientTrusted(chain: Array<out X509Certificate>, authType: String) = Unit
+            private val parent = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply { init(null as KeyStore?) }.trustManagers.find { it is X509TrustManager } as X509TrustManager
 
-            override fun checkServerTrusted(chain: Array<out X509Certificate>, authType: String) = Unit
+            override fun checkClientTrusted(chain: Array<out X509Certificate>, authType: String) = parent.checkClientTrusted(chain, authType)
 
-            override fun getAcceptedIssuers() = arrayOf<X509Certificate>()
+            override fun checkServerTrusted(chain: Array<out X509Certificate>, authType: String) {
+                try {
+                    parent.checkClientTrusted(chain, authType)
+                } catch (ex: CertificateException) {
+                    runLater { CertificateView(chain, false).openModal(resizable = false) }
+                }
+            }
+
+            override fun getAcceptedIssuers() = parent.acceptedIssuers
         })
+        private val socketFactory = SSLContext.getInstance("TLS").apply { init(null, trustManagers, SecureRandom()) }.socketFactory
     }
 }

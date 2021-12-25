@@ -19,6 +19,7 @@ package com.valaphee.blit
 import com.valaphee.blit.data.config.Config
 import com.valaphee.blit.data.config.ConfigView
 import com.valaphee.blit.data.config.ConfigViewGeneral
+import com.valaphee.blit.data.config.ConfigViewNetwork
 import com.valaphee.blit.data.config.ConfigViewSources
 import com.valaphee.blit.data.locale.Locale
 import com.valaphee.blit.data.manifest.IconManifest
@@ -28,6 +29,7 @@ import com.valaphee.blit.source.SourceConfig
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.control.ContextMenu
+import javafx.scene.control.Label
 import javafx.scene.control.SelectionMode
 import javafx.scene.control.TableColumnBase
 import javafx.scene.control.TreeItem
@@ -41,9 +43,7 @@ import javafx.scene.input.TransferMode
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
-import jfxtras.styles.jmetro.JMetro
 import jfxtras.styles.jmetro.JMetroStyleClass
-import jfxtras.styles.jmetro.Style
 import org.bridj.cpp.com.COMRuntime
 import org.bridj.cpp.com.shell.ITaskbarList3
 import org.controlsfx.control.BreadCrumbBar
@@ -77,6 +77,7 @@ import java.awt.Desktop
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.IOException
 import java.text.DateFormat
 import java.util.concurrent.CompletableFuture
 
@@ -105,7 +106,7 @@ class MainView : View("Blit") {
     private val dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, locale.toJavaLocale())
 
     override val root = vbox {
-        JMetro(this, Style.DARK)
+        _config.theme.apply(this)
         styleClass.add(JMetroStyleClass.BACKGROUND)
 
         prefWidth = 1000.0
@@ -125,6 +126,14 @@ class MainView : View("Blit") {
                     action {
                         find<ConfigView> {
                             select<ConfigViewSources>()
+                            openModal()
+                        }
+                    }
+                }
+                item(locale["main.menu.file.network.name"]) {
+                    action {
+                        find<ConfigView> {
+                            select<ConfigViewNetwork>()
                             openModal()
                         }
                     }
@@ -234,6 +243,8 @@ class MainView : View("Blit") {
                 isShowRoot = false
                 selectionModel.selectionMode = SelectionMode.MULTIPLE
 
+                placeholder = Label("")
+
                 column(locale["main.tree.column.name.title"], Entry<T>::self) {
                     tableColumnBaseSetWidth(this, 250.0)
                     cellFormat {
@@ -291,10 +302,19 @@ class MainView : View("Blit") {
 
                 selectionModel.selectedItems.onChange {
                     contextMenu = ContextMenu().apply {
-                        item(locale["main.tree.menu.open.name"]) { action { it.list.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.toString()) } ?: it.list.forEach(::open) } }
-                        separator()
-                        item(locale["main.tree.menu.rename.name"]) { action { it.list.forEach(::rename) } }
-                        item(locale["main.tree.menu.delete.name"]) { action { it.list.forEach(::delete) } }
+                        if (it.list.isEmpty()) {
+                            item(locale["main.tree.menu.parent.name"]) { action { navigateRelative("..") } }
+                            separator()
+                            item(locale["main.tree.menu.new_directory.name"]) { action {} }
+                            item(locale["main.tree.menu.new_file.name"]) { action {} }
+                            separator()
+                            item(locale["main.tree.menu.refresh.name"]) { action { populate(root) } }
+                        } else {
+                            item(locale["main.tree.menu.open.name"]) { action { it.list.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.toString()) } ?: it.list.forEach(::open) } }
+                            separator()
+                            item(locale["main.tree.menu.rename.name"]) { action { it.list.forEach(::rename) } }
+                            item(locale["main.tree.menu.delete.name"]) { action { it.list.forEach(::delete) } }
+                        }
                     }
                 }
 
@@ -328,15 +348,18 @@ class MainView : View("Blit") {
                         KeyCode.F5 -> populate(root)
                     }
                 }
-                setOnMousePressed {
-                    if (it.isPrimaryButtonDown && it.clickCount == 2) selectionModel.selectedItem?.let { if (!it.value.directory) open(it) }
-                }
+                setOnMousePressed { if (it.isPrimaryButtonDown && it.clickCount == 2) selectionModel.selectedItem?.let { if (!it.value.directory) open(it) } }
             }
 
             private fun open(item: TreeItem<Entry<T>>) {
                 if (Desktop.isDesktopSupported()) {
                     val entry = item.value
-                    activity.launch(locale["main.tree.task.download.name", entry]) { Desktop.getDesktop().open(File(_config.temporaryPath, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }) } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
+                    activity.launch(locale["main.tree.task.download.name", entry]) {
+                        val file = File(_config.temporaryPath, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }
+                        try {
+                            Desktop.getDesktop().open(file)
+                        } catch (_: IOException) {}
+                    }
                 }
             }
 

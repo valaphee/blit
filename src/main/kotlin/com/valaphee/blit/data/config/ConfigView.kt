@@ -21,9 +21,7 @@ import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import javafx.scene.layout.Priority
 import javafx.stage.Stage
-import jfxtras.styles.jmetro.JMetro
 import jfxtras.styles.jmetro.JMetroStyleClass
-import jfxtras.styles.jmetro.Style
 import tornadofx.Component
 import tornadofx.Fragment
 import tornadofx.View
@@ -43,12 +41,13 @@ import kotlin.reflect.KClass
  */
 class ConfigView : View("Configure Blit") {
     private val locale by di<Locale>()
+    private val _config by di<Config>()
     private val configModel by di<Config.Model>()
 
     private var tabs = mutableMapOf<KClass<out Component>, Tab>()
 
     override val root = vbox {
-        JMetro(this, Style.DARK)
+        _config.theme.apply(this)
         styleClass.add(JMetroStyleClass.BACKGROUND)
 
         prefWidth = 800.0
@@ -60,6 +59,7 @@ class ConfigView : View("Configure Blit") {
 
             this@ConfigView.tabs[ConfigViewGeneral::class] = tab(ConfigViewGeneral::class)
             this@ConfigView.tabs[ConfigViewSources::class] = tab(ConfigViewSources::class)
+            this@ConfigView.tabs[ConfigViewNetwork::class] = tab(ConfigViewNetwork::class)
         }
         buttonbar {
             button(locale["config.ok.text"]) {

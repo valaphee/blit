@@ -18,19 +18,25 @@ package com.valaphee.blit.data.config
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonValue
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import com.valaphee.blit.data.Data
 import com.valaphee.blit.data.DataType
 import com.valaphee.blit.source.SourceConfig
+import com.valaphee.blit.source.local.LocalSourceConfig
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.ObservableList
+import javafx.scene.Parent
+import jfxtras.styles.jmetro.JMetro
+import jfxtras.styles.jmetro.Style
 import tornadofx.ItemViewModel
 import tornadofx.asObservable
 import tornadofx.getValue
 import tornadofx.setValue
+import java.io.File
 import java.text.StringCharacterIterator
 import kotlin.math.abs
 
@@ -40,16 +46,26 @@ import kotlin.math.abs
 @Singleton
 @DataType("config")
 class Config(
-    locale: String,
-    dataSizeUnit: DataSizeUnit,
-    temporaryPath: String,
-    sources: List<SourceConfig>
+    theme: Theme = Theme.Light,
+    locale: String = "en_US",
+    dataSizeUnit: DataSizeUnit = DataSizeUnit.IEC,
+    temporaryPath: String = System.getProperty("java.tmpdir"),
+    sources: List<SourceConfig> = listOf(LocalSourceConfig("local"))
 ) : Data {
+    enum class Theme(
+        @get:JsonValue val key: String,
+        val apply: (Parent) -> Unit
+    ) {
+        SystemDefault("system_default", { JMetro(it, Style.DARK) }),
+        Light("light", { JMetro(it, Style.LIGHT) }),
+        Dark("dark", { JMetro(it, Style.DARK) })
+    }
+
     enum class DataSizeUnit(
         @get:JsonValue val key: String,
         val format: (Long) -> String
     ) {
-        BYTES("bytes", { it.toString() }),
+        Bytes("bytes", { it.toString() }),
         IEC("iec", {
             val sizeAbs = if (it == Long.MIN_VALUE) Long.MAX_VALUE else abs(it)
             if (sizeAbs < 1024) "$it B" else {
@@ -78,6 +94,9 @@ class Config(
         })
     }
 
+    @get:JsonIgnore internal val themeProperty = SimpleObjectProperty(theme)
+    var theme: Theme by themeProperty
+
     @get:JsonIgnore internal val localeProperty = SimpleStringProperty(locale)
     var locale: String by localeProperty
 
@@ -94,9 +113,16 @@ class Config(
     class Model @Inject constructor(
         config: Config
     ) : ItemViewModel<Config>(config) {
+        private val objectMapper by di<ObjectMapper>()
+
+        val theme = bind(Config::themeProperty)
         val locale = bind(Config::localeProperty)
         val dataSizeUnit = bind(Config::dataSizeUnitProperty)
         val temporaryPath = bind(Config::temporaryPathProperty)
         val sources = bind(Config::sourcesProperty)
+
+        override fun onCommit() {
+            objectMapper.writeValue(File(File("data").also(File::mkdir), "config.json"), Config(theme.value, locale.value, dataSizeUnit.value, temporaryPath.value, sources))
+        }
     }
 }
