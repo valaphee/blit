@@ -42,7 +42,7 @@ fun main(arguments: Array<String>) {
     val injector = Guice.createInjector(DataModule(), object : AbstractModule() {
         @Singleton
         @Provides
-        fun locale(config: Config, locales: Map<String, @JvmSuppressWildcards Locale>) = locales[config.locale] ?: locales["en_us"]
+        fun locale(config: Config, locales: Map<String, @JvmSuppressWildcards Locale>) = locales[config.locale] ?: locales["en_US"]
     })
 
     FX.dicontainer = object : DIContainer {

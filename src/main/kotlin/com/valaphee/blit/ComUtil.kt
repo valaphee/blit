@@ -25,17 +25,18 @@ import kotlin.concurrent.thread
 
 val comExecutor: ExecutorService by lazy { Executors.newSingleThreadExecutor { thread(false, true, block = it::run) } }
 
-val Stage.hWnd: Pointer<Int>? get() {
-    return try {
-        val tkStage = try {
-            javaClass.superclass.getDeclaredMethod("getPeer")
-        } catch (_: NoSuchMethodException) {
-            javaClass.getMethod("impl_getPeer")
-        }.apply { isAccessible = true }.invoke(this) as TKStage
-        val platformWindow = tkStage.javaClass.getDeclaredMethod("getPlatformWindow").apply { isAccessible = true }.invoke(tkStage)
-        Pointer.pointerToAddress(platformWindow.javaClass.getMethod("getNativeHandle").apply { isAccessible = true }.invoke(platformWindow) as Long) as Pointer<Int>
-    } catch (ex: Throwable) {
-        ex.printStackTrace()
-        null
+val Stage.hWnd: Pointer<Int>?
+    get() {
+        return try {
+            val tkStage = try {
+                javaClass.superclass.getDeclaredMethod("getPeer")
+            } catch (_: NoSuchMethodException) {
+                javaClass.getMethod("impl_getPeer")
+            }.apply { isAccessible = true }.invoke(this) as TKStage
+            val platformWindow = tkStage.javaClass.getDeclaredMethod("getPlatformWindow").apply { isAccessible = true }.invoke(tkStage)
+            Pointer.pointerToAddress(platformWindow.javaClass.getMethod("getNativeHandle").apply { isAccessible = true }.invoke(platformWindow) as Long) as Pointer<Int>
+        } catch (ex: Throwable) {
+            ex.printStackTrace()
+            null
+        }
     }
-}

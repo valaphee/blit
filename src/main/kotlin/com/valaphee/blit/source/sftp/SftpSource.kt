@@ -16,47 +16,56 @@
 
 package com.valaphee.blit.source.sftp
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonTypeName
-import com.valaphee.blit.source.AbstractSource
 import com.valaphee.blit.source.NotFoundException
+import com.valaphee.blit.source.Source
+import io.ktor.utils.io.pool.DefaultPool
+import io.ktor.utils.io.pool.useInstance
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import org.apache.sshd.client.SshClient
-import org.apache.sshd.client.session.ClientSession
 import org.apache.sshd.common.config.keys.loader.openssh.OpenSSHKeyPairResourceParser
-import org.apache.sshd.core.CoreModuleProperties
 import org.apache.sshd.sftp.client.SftpClient
 import org.apache.sshd.sftp.client.SftpClientFactory
 import org.apache.sshd.sftp.common.SftpConstants
 import org.apache.sshd.sftp.common.SftpException
 import java.nio.file.Paths
-import java.time.Duration
 
 /**
  * @author Kevin Ludwig
  */
-@JsonTypeName("sftp")
 class SftpSource(
-    name: String  = "",
-    @get:JsonProperty("host") val host: String  = "",
-    @get:JsonProperty("port") val port: Int = 22,
-    @get:JsonProperty("username") val username: String  = "",
-    @get:JsonProperty("password") val password: String = "",
-    @get:JsonProperty("private_key") val privateKey: String = ""
-) : AbstractSource<SftpEntry>(name) {
-    @get:JsonIgnore private val sshSession: ClientSession by lazy {
-        val sshSession = sshClient.connect(username, host, port).verify().session
-        if (password.isNotEmpty()) sshSession.addPasswordIdentity(password)
-        if (privateKey.isNotEmpty()) OpenSSHKeyPairResourceParser.INSTANCE.loadKeyPairs(null, Paths.get(privateKey), { _, _, _ -> TODO() }).firstOrNull()?.let { sshSession.addPublicKeyIdentity(it) }
-        sshSession.auth().verify()
-        sshSession
-    }
-    @get:JsonIgnore internal val sftpClient: SftpClient by lazy { SftpClientFactory.instance().createSftpClient(sshSession) }
+    private val host: String,
+    private val port: Int,
+    private val username: String,
+    private val password: String,
+    private val privateKey: String,
+    private val connectionPoolSize: Int
+) : Source<SftpEntry> {
+    internal val semaphore = Semaphore(connectionPoolSize)
+    internal val pool = object : DefaultPool<SftpClient>(connectionPoolSize) {
+        override fun produceInstance(): SftpClient {
+            val sshSession = sshClient.connect(username, host, port).verify().session
+            if (password.isNotEmpty()) sshSession.addPasswordIdentity(password)
+            if (privateKey.isNotEmpty()) OpenSSHKeyPairResourceParser.INSTANCE.loadKeyPairs(null, Paths.get(privateKey), { _, _, _ -> TODO() }).firstOrNull()?.let { sshSession.addPublicKeyIdentity(it) }
+            sshSession.auth().verify()
+            return SftpClientFactory.instance().createSftpClient(sshSession)
+        }
 
-    override val home: String get() = sshSession.executeRemoteCommand("pwd").lines().first()
+        override fun clearInstance(instance: SftpClient) = if (instance.isOpen) instance else {
+            disposeInstance(instance)
+            produceInstance()
+        }
+
+        override fun disposeInstance(instance: SftpClient) {
+            instance.session.close()
+        }
+    }
+
+    override val home get() = runBlocking { semaphore.withPermit { pool.useInstance { it.session.executeRemoteCommand("pwd").lines().first() } } }
 
     override suspend fun get(path: String) = try {
-        SftpEntry(this, path, sftpClient.stat(path))
+        semaphore.withPermit { pool.useInstance { SftpEntry(this, path, it.stat(path)) } }
     } catch (ex: SftpException) {
         when (ex.status) {
             SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundException(path)
@@ -64,9 +73,13 @@ class SftpSource(
         }
     }
 
+    override fun close() {
+        pool.close()
+    }
+
     companion object {
         internal val sshClient = SshClient.setUpDefaultClient().apply {
-            CoreModuleProperties.HEARTBEAT_INTERVAL.set(this, Duration.ofSeconds(2))
+            /*NamedFactory.setUpBuiltinFactories(false, BuiltinCompressions.VALUES)*/
             start()
         }
     }

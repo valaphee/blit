@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit.source.local
+package com.valaphee.blit.data.config
 
-import com.valaphee.blit.source.NotFoundException
-import com.valaphee.blit.source.Source
-import java.io.File
+import com.valaphee.blit.data.locale.Locale
+import tornadofx.Fragment
+import tornadofx.fieldset
+import tornadofx.form
 
 /**
  * @author Kevin Ludwig
  */
-class LocalSource : Source<LocalEntry> {
-    override val home: String get() = File(System.getProperty("user.home")).absolutePath
+class ConfigViewNetwork : Fragment("Network") {
+    private val locale by di<Locale>()
 
-    override suspend fun get(path: String): LocalEntry {
-        val file = File(path)
-        return if (file.exists()) LocalEntry(file) else throw NotFoundException(path)
+    override val root = form {
+        fieldset(locale["config.network.proxy.text"]) {
+        }
     }
-
-    override fun close() = Unit
 }

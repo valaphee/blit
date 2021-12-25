@@ -9,6 +9,7 @@
             "name": "File",
             "general.name": "General",
             "sources.name": "Sources",
+            "network.name": "Network",
             "exit.name": "Exit"
           },
           "help": {
@@ -46,6 +47,13 @@
       },
       "config": {
         "general": {
+          "appearance.text": "Appearance",
+          "theme": {
+            "text": "Theme",
+            "system_default": "System default",
+            "light": "Light",
+            "dark": "Dark"
+          },
           "locale.text": "Locale",
           "data_size_unit": {
             "text": "Data Size Unit",
@@ -53,6 +61,7 @@
             "iec": "IEC",
             "si": "SI"
           },
+          "path.text": "Path",
           "temporary_path": {
             "text": "Temporary Path",
             "invalid": "Invalid Path"
@@ -69,6 +78,9 @@
             "scp": "SCP",
             "sftp": "SFTP"
           }
+        },
+        "network": {
+          "proxy.text": "Proxy"
         },
         "ok.text": "Ok",
         "cancel.text": "Cancel",

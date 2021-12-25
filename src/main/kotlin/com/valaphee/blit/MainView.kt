@@ -19,15 +19,17 @@ package com.valaphee.blit
 import com.valaphee.blit.data.config.Config
 import com.valaphee.blit.data.config.ConfigView
 import com.valaphee.blit.data.config.ConfigViewGeneral
+import com.valaphee.blit.data.config.ConfigViewNetwork
 import com.valaphee.blit.data.config.ConfigViewSources
 import com.valaphee.blit.data.locale.Locale
 import com.valaphee.blit.data.manifest.IconManifest
 import com.valaphee.blit.source.Entry
 import com.valaphee.blit.source.Source
+import com.valaphee.blit.source.SourceConfig
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
-import javafx.collections.ObservableList
 import javafx.scene.control.ContextMenu
+import javafx.scene.control.Label
 import javafx.scene.control.SelectionMode
 import javafx.scene.control.TableColumnBase
 import javafx.scene.control.TreeItem
@@ -41,9 +43,7 @@ import javafx.scene.input.TransferMode
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
-import jfxtras.styles.jmetro.JMetro
 import jfxtras.styles.jmetro.JMetroStyleClass
-import jfxtras.styles.jmetro.Style
 import org.bridj.cpp.com.COMRuntime
 import org.bridj.cpp.com.shell.ITaskbarList3
 import org.controlsfx.control.BreadCrumbBar
@@ -77,6 +77,7 @@ import java.awt.Desktop
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.IOException
 import java.text.DateFormat
 import java.util.concurrent.CompletableFuture
 
@@ -86,9 +87,9 @@ import java.util.concurrent.CompletableFuture
 class MainView : View("Blit") {
     private val locale by di<Locale>()
     private val iconManifest by di<IconManifest>()
-    private val configModel by di<Config.Model>()
+    private val _config by di<Config>()
 
-    private val taskManager = TaskManager().apply {
+    private val activity = MainActivity().apply {
         val version = System.getProperty("os.version").toFloatOrNull()
         if (System.getProperty("os.name").startsWith("Windows") && version != null && version >= 6.1f) {
             val iTaskbarList3 = CompletableFuture.supplyAsync({ COMRuntime.newInstance(ITaskbarList3::class.java) }, comExecutor).join()
@@ -105,7 +106,7 @@ class MainView : View("Blit") {
     private val dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, locale.toJavaLocale())
 
     override val root = vbox {
-        JMetro(this, Style.DARK)
+        _config.theme.apply(this)
         styleClass.add(JMetroStyleClass.BACKGROUND)
 
         prefWidth = 1000.0
@@ -129,6 +130,14 @@ class MainView : View("Blit") {
                         }
                     }
                 }
+                item(locale["main.menu.file.network.name"]) {
+                    action {
+                        find<ConfigView> {
+                            select<ConfigViewNetwork>()
+                            openModal()
+                        }
+                    }
+                }
                 separator()
                 item(locale["main.menu.file.exit.name"]) { action { (scene.window as Stage).close() } }
             }
@@ -140,19 +149,26 @@ class MainView : View("Blit") {
             @Suppress("UPPER_BOUND_VIOLATED_WARNING") add(Pane<Entry<*>>())
             @Suppress("UPPER_BOUND_VIOLATED_WARNING") add(Pane<Entry<*>>())
         }
-        label(taskManager.name)
-        progressbar(taskManager.progress)
+        label(activity.name)
+        progressbar(activity.progress)
     }
 
     inner class Pane<T : Entry<T>> : VBox() {
-        private val source = SimpleObjectProperty<Source<T>>().apply {
+        private val sourceConfig = SimpleObjectProperty<SourceConfig>().apply {
             onChange {
                 it?.let {
+                    source?.close()
+
+                    @Suppress("UNCHECKED_CAST")
+                    source = (it.newSource() as Source<T>)
+
                     _path = null
-                    navigate(it.home)
+                    tree.root = null
+                    navigate(source!!.home)
                 }
             }
         }
+        private var source: Source<T>? = null
         private var _path: String? = null
         private val name = SimpleStringProperty()
         private val tree = Tree<T>()
@@ -161,10 +177,7 @@ class MainView : View("Blit") {
             hgrow = Priority.ALWAYS
 
             hbox {
-                combobox(source) {
-                    @Suppress("UNCHECKED_CAST")
-                    items = configModel.sources as ObservableList<Source<T>>
-                }
+                combobox(sourceConfig, _config.sources)
                 add(CustomTextField().apply {
                     bind(name)
 
@@ -209,8 +222,8 @@ class MainView : View("Blit") {
 
             if (canonicalPath == _path) return
 
-            source.value?.let {
-                taskManager.launch(locale["main.navigator.task.navigate.name", canonicalPath]) {
+            source?.let {
+                activity.launch(locale["main.navigator.task.navigate.name", canonicalPath]) {
                     val item = it.get(canonicalPath).item
                     _path = canonicalPath
                     runLater {
@@ -230,6 +243,8 @@ class MainView : View("Blit") {
                 isShowRoot = false
                 selectionModel.selectionMode = SelectionMode.MULTIPLE
 
+                placeholder = Label("")
+
                 column(locale["main.tree.column.name.title"], Entry<T>::self) {
                     tableColumnBaseSetWidth(this, 250.0)
                     cellFormat {
@@ -244,7 +259,7 @@ class MainView : View("Blit") {
                 }
                 column(locale["main.tree.column.size.title"], Entry<T>::self) {
                     tableColumnBaseSetWidth(this, 75.0)
-                    cellFormat { text = if (it.directory) "" else configModel.dataSizeUnit.value.format(it.size) }
+                    cellFormat { text = if (it.directory) "" else _config.dataSizeUnit.format(it.size) }
                     setComparator { a, b -> a.size.compareTo(b.size) }
                 }
                 column(locale["main.tree.column.modified.title"], Entry<T>::modifyTime) {
@@ -258,11 +273,11 @@ class MainView : View("Blit") {
                             setOnDragDetected {
                                 startDragAndDrop(TransferMode.MOVE).apply {
                                     setContent {
-                                        taskManager.runBlocking(locale["main.tree.task.download.name"]) {
+                                        activity.runBlocking(locale["main.tree.task.download.name"]) {
                                             suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
-                                                File(configModel.temporaryPath.value, entry.name).mkdir()
+                                                File(_config.temporaryPath, entry.name).mkdir()
                                                 entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
-                                            } else listOf(File(configModel.temporaryPath.value, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
+                                            } else listOf(File(_config.temporaryPath, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
 
                                             putFiles(selectionModel.selectedItems.flatMap { flatten(it.value) })
                                         }
@@ -287,10 +302,19 @@ class MainView : View("Blit") {
 
                 selectionModel.selectedItems.onChange {
                     contextMenu = ContextMenu().apply {
-                        item(locale["main.tree.menu.open.name"]) { action { it.list.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.toString()) } ?: it.list.forEach(::open) } }
-                        separator()
-                        item(locale["main.tree.menu.rename.name"]) { action { it.list.forEach(::rename) } }
-                        item(locale["main.tree.menu.delete.name"]) { action { it.list.forEach(::delete) } }
+                        if (it.list.isEmpty()) {
+                            item(locale["main.tree.menu.parent.name"]) { action { navigateRelative("..") } }
+                            separator()
+                            item(locale["main.tree.menu.new_directory.name"]) { action {} }
+                            item(locale["main.tree.menu.new_file.name"]) { action {} }
+                            separator()
+                            item(locale["main.tree.menu.refresh.name"]) { action { populate(root) } }
+                        } else {
+                            item(locale["main.tree.menu.open.name"]) { action { it.list.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.toString()) } ?: it.list.forEach(::open) } }
+                            separator()
+                            item(locale["main.tree.menu.rename.name"]) { action { it.list.forEach(::rename) } }
+                            item(locale["main.tree.menu.delete.name"]) { action { it.list.forEach(::delete) } }
+                        }
                     }
                 }
 
@@ -299,11 +323,11 @@ class MainView : View("Blit") {
                         KeyCode.ENTER -> selectionModel.selectedItems.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.toString()) } ?: selectionModel.selectedItems.forEach(::open)
                         KeyCode.BACK_SPACE -> navigateRelative("..")
                         KeyCode.C -> if (it.isControlDown) Clipboard.getSystemClipboard().setContent {
-                            taskManager.runBlocking(locale["main.tree.task.download.name"]) {
+                            activity.runBlocking(locale["main.tree.task.download.name"]) {
                                 suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
-                                    File(configModel.temporaryPath.value, entry.name).mkdir()
+                                    File(_config.temporaryPath, entry.name).mkdir()
                                     entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
-                                } else listOf(File(configModel.temporaryPath.value, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
+                                } else listOf(File(_config.temporaryPath, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
 
                                 putFiles(selectionModel.selectedItems.flatMap { flatten(it.value) })
 
@@ -316,7 +340,7 @@ class MainView : View("Blit") {
                                 val item = selectionModel.selectedItem ?: root
                                 val entry = item.value
                                 if (!entry.directory) TODO()
-                                files.forEach { file -> taskManager.launch(locale["main.tree.task.upload.name", file.name]) { FileInputStream(file).use { entry.transferFrom(file.name, it, file.length()) } } }
+                                files.forEach { file -> activity.launch(locale["main.tree.task.upload.name", file.name]) { FileInputStream(file).use { entry.transferFrom(file.name, it, file.length()) } } }
                             }
                         }
                         KeyCode.DELETE -> selectionModel.selectedItems.forEach(::delete)
@@ -324,30 +348,33 @@ class MainView : View("Blit") {
                         KeyCode.F5 -> populate(root)
                     }
                 }
-                setOnMousePressed {
-                    if (it.isPrimaryButtonDown && it.clickCount == 2) selectionModel.selectedItem?.let { if (!it.value.directory) open(it) }
-                }
+                setOnMousePressed { if (it.isPrimaryButtonDown && it.clickCount == 2) selectionModel.selectedItem?.let { if (!it.value.directory) open(it) } }
             }
 
             private fun open(item: TreeItem<Entry<T>>) {
                 if (Desktop.isDesktopSupported()) {
                     val entry = item.value
-                    taskManager.launch(locale["main.tree.task.download.name", entry]) { Desktop.getDesktop().open(File(configModel.temporaryPath.value, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }) } // TODO: Desktop.open throws IOException (No application is associated with the specific file for this operation.)
+                    activity.launch(locale["main.tree.task.download.name", entry]) {
+                        val file = File(_config.temporaryPath, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }
+                        try {
+                            Desktop.getDesktop().open(file)
+                        } catch (_: IOException) {}
+                    }
                 }
             }
 
             private fun rename(item: TreeItem<Entry<T>>) {
                 val entry = item.value
-                RenameView(entry.name) { taskManager.launch(locale["main.tree.task.rename.name", entry, it]) { entry.rename(it) } }.openModal(resizable = false)
+                RenameView(entry.name) { activity.launch(locale["main.tree.task.rename.name", entry, it]) { entry.rename(it) } }.openModal(resizable = false)
             }
 
             private fun delete(item: TreeItem<Entry<T>>) {
                 val entry = item.value
-                taskManager.launch(locale["main.tree.task.delete.name", entry]) { entry.delete() }
+                activity.launch(locale["main.tree.task.delete.name", entry]) { entry.delete() }
             }
 
             internal fun populate(item: TreeItem<Entry<T>>) {
-                taskManager.launch(locale["main.tree.task.populate.name", item.value]) {
+                activity.launch(locale["main.tree.task.populate.name", item.value]) {
                     val children = item.value!!.list()
                     runLater {
                         populateTree(item, { entry ->

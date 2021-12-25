@@ -16,13 +16,14 @@
 
 package com.valaphee.blit.source.scp
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonTypeName
-import com.valaphee.blit.source.AbstractSource
 import com.valaphee.blit.source.NotFoundException
+import com.valaphee.blit.source.Source
 import com.valaphee.blit.source.sftp.SftpSource
-import org.apache.sshd.client.session.ClientSession
+import io.ktor.utils.io.pool.DefaultPool
+import io.ktor.utils.io.pool.useInstance
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import org.apache.sshd.common.config.keys.loader.openssh.OpenSSHKeyPairResourceParser
 import org.apache.sshd.scp.client.ScpClient
 import org.apache.sshd.scp.client.ScpClientCreator
@@ -31,25 +32,39 @@ import java.nio.file.Paths
 /**
  * @author Kevin Ludwig
  */
-@JsonTypeName("scp")
 class ScpSource(
-    name: String  = "",
-    @get:JsonProperty("host") val host: String  = "",
-    @get:JsonProperty("port") val port: Int = 22,
-    @get:JsonProperty("username") val username: String  = "",
-    @get:JsonProperty("password") val password: String = "",
-    @get:JsonProperty("private_key") val privateKey: String = ""
-) : AbstractSource<ScpEntry>(name) {
-    @get:JsonIgnore internal val sshSession: ClientSession by lazy {
-        val sshSession = SftpSource.sshClient.connect(username, host, port).verify().session
-        if (password.isNotEmpty()) sshSession.addPasswordIdentity(password)
-        if (privateKey.isNotEmpty()) OpenSSHKeyPairResourceParser.INSTANCE.loadKeyPairs(null, Paths.get(privateKey), { _, _, _ -> TODO() }).firstOrNull()?.let { sshSession.addPublicKeyIdentity(it) }
-        sshSession.auth().verify()
-        sshSession
+    private val host: String,
+    private val port: Int,
+    private val username: String,
+    private val password: String,
+    private val privateKey: String,
+    private val connectionPoolSize: Int
+) : Source<ScpEntry> {
+    internal val semaphore = Semaphore(connectionPoolSize)
+    internal val pool = object : DefaultPool<ScpClient>(connectionPoolSize) {
+        override fun produceInstance(): ScpClient {
+            val sshSession = SftpSource.sshClient.connect(username, host, port).verify().session
+            if (password.isNotEmpty()) sshSession.addPasswordIdentity(password)
+            if (privateKey.isNotEmpty()) OpenSSHKeyPairResourceParser.INSTANCE.loadKeyPairs(null, Paths.get(privateKey), { _, _, _ -> TODO() }).firstOrNull()?.let { sshSession.addPublicKeyIdentity(it) }
+            sshSession.auth().verify()
+            return ScpClientCreator.instance().createScpClient(sshSession)
+        }
+
+        override fun clearInstance(instance: ScpClient) = if (instance.session.isOpen) instance else {
+            disposeInstance(instance)
+            produceInstance()
+        }
+
+        override fun disposeInstance(instance: ScpClient) {
+            instance.session.close()
+        }
     }
-    @get:JsonIgnore internal val scpClient: ScpClient by lazy { ScpClientCreator.instance().createScpClient(sshSession) }
 
-    override val home: String get() = sshSession.executeRemoteCommand("pwd").lines().first()
+    override val home get() = runBlocking { semaphore.withPermit { pool.useInstance { it.session.executeRemoteCommand("pwd").lines().first() } } }
 
-    override suspend fun get(path: String) = parseLsEntry(sshSession.executeRemoteCommand("""stat --format "%A 0 %U %G %s %y %n" "$path"""").lines().first())?.second?.let { ScpEntry(this, path, it) } ?: throw NotFoundException(path)
+    override suspend fun get(path: String) = parseLsEntry(semaphore.withPermit { pool.useInstance { it.session.executeRemoteCommand("""stat --format "%A 0 %U %G %s %y %n" "$path"""").lines().first() } })?.second?.let { ScpEntry(this, path, it) } ?: throw NotFoundException(path)
+
+    override fun close() {
+        pool.close()
+    }
 }

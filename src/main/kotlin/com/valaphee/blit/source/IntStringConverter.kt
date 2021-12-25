@@ -16,20 +16,13 @@
 
 package com.valaphee.blit.source
 
-import javafx.event.EventTarget
-import tornadofx.Field
-import kotlin.reflect.KClass
+import javafx.util.StringConverter
 
 /**
  * @author Kevin Ludwig
  */
-interface SourceUi {
-    val key: String
-    val `class`: KClass<out Source<*>>
+object IntStringConverter : StringConverter<Number>() {
+    override fun toString(`object`: Number?) = `object`?.toString() ?: ""
 
-    @Deprecated("")
-    fun getConfigureUi(eventTarget: EventTarget, source: Source<*>?): List<Field>
-
-    @Deprecated("")
-    fun getConfigurationFromUi(fields: List<Field>): Source<*>?
+    override fun fromString(string: String?) =  string?.toIntOrNull()
 }

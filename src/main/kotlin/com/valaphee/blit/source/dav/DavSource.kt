@@ -16,12 +16,10 @@
 
 package com.valaphee.blit.source.dav
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonTypeName
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.valaphee.blit.source.AbstractSource
+import com.valaphee.blit.CertificateView
 import com.valaphee.blit.source.NotFoundException
+import com.valaphee.blit.source.Source
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.features.HttpTimeout
@@ -37,28 +35,32 @@ import io.ktor.client.statement.readBytes
 import io.ktor.client.statement.request
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.URLBuilder
+import tornadofx.runLater
+import java.security.KeyStore
+import java.security.SecureRandom
+import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
+import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
 
 /**
  * @author Kevin Ludwig
  */
-@JsonTypeName("dav")
 class DavSource(
-    name: String = "",
-    @get:JsonProperty("url") val url: String = "",
-    @get:JsonProperty("username") val username: String = "",
-    @get:JsonProperty("password") val password: String = "",
-    @get:JsonProperty("nextcloud") val nextcloud: Boolean = false,
-    @get:JsonProperty("nextcloud-upload-chunk-size") val nextcloudUploadChunkSize: Long = 10L * 1024 * 1024
-) : AbstractSource<DavEntry>(name) {
-    @get:JsonIgnore internal val httpClient by lazy {
+    internal val url: String,
+    internal val username: String,
+    private val password: String,
+    internal val nextcloud: Boolean,
+    internal val nextcloudUploadChunkSize: Long
+) : Source<DavEntry> {
+    internal val httpClient by lazy {
         HttpClient(OkHttp) {
             engine {
                 config {
-                    sslSocketFactory(SSLContext.getInstance("SSL").apply { init(null, trustManagers, java.security.SecureRandom()) }.socketFactory, trustManagers[0] as X509TrustManager)
+                    sslSocketFactory(socketFactory, trustManagers[0] as X509TrustManager)
                     hostnameVerifier { _, _ -> true }
                 }
             }
@@ -77,7 +79,8 @@ class DavSource(
             }
         }
     }
-    @get:JsonIgnore internal val _url get() = if (nextcloud) "${url}/files/${username}" else url
+    internal val _url = if (nextcloud) "${url}/files/${username}" else url
+    internal val path = URLBuilder(_url).encodedPath
 
     override val home get() = "/"
 
@@ -94,13 +97,26 @@ class DavSource(
         }
     }
 
+    override fun close() {
+        httpClient.close()
+    }
+
     companion object {
         private val trustManagers = arrayOf<TrustManager>(object : X509TrustManager {
-            override fun checkClientTrusted(chain: Array<out X509Certificate>, authType: String) = Unit
+            private val parent = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply { init(null as KeyStore?) }.trustManagers.find { it is X509TrustManager } as X509TrustManager
 
-            override fun checkServerTrusted(chain: Array<out X509Certificate>, authType: String) = Unit
+            override fun checkClientTrusted(chain: Array<out X509Certificate>, authType: String) = parent.checkClientTrusted(chain, authType)
 
-            override fun getAcceptedIssuers() = arrayOf<X509Certificate>()
+            override fun checkServerTrusted(chain: Array<out X509Certificate>, authType: String) {
+                try {
+                    parent.checkClientTrusted(chain, authType)
+                } catch (ex: CertificateException) {
+                    runLater { CertificateView(chain, false).openModal(resizable = false) }
+                }
+            }
+
+            override fun getAcceptedIssuers() = parent.acceptedIssuers
         })
+        private val socketFactory = SSLContext.getInstance("TLS").apply { init(null, trustManagers, SecureRandom()) }.socketFactory
     }
 }

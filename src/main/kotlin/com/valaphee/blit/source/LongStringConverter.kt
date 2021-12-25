@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit.source.local
+package com.valaphee.blit.source
 
-import com.valaphee.blit.source.NotFoundException
-import com.valaphee.blit.source.Source
-import java.io.File
+import javafx.util.StringConverter
 
 /**
  * @author Kevin Ludwig
  */
-class LocalSource : Source<LocalEntry> {
-    override val home: String get() = File(System.getProperty("user.home")).absolutePath
+object LongStringConverter : StringConverter<Number>() {
+    override fun toString(`object`: Number?) = `object`?.toString() ?: ""
 
-    override suspend fun get(path: String): LocalEntry {
-        val file = File(path)
-        return if (file.exists()) LocalEntry(file) else throw NotFoundException(path)
-    }
-
-    override fun close() = Unit
+    override fun fromString(string: String?) =  string?.toLongOrNull()
 }

@@ -16,7 +16,6 @@
 
 package com.valaphee.blit.data.locale
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.valaphee.blit.data.DataType
 import com.valaphee.blit.data.KeyedData
@@ -31,8 +30,8 @@ class Locale(
     @get:JsonProperty("key") override val key: String,
     @get:JsonProperty("entries") val entries: Map<String, Any>
 ) : KeyedData() {
-    @JsonIgnore private val entriesFlat = entries.flatMap { flatten(it.key, it.value) }.toMap()
-    @JsonIgnore private val entryFormats = mutableMapOf<String, MessageFormat>()
+    private val entriesFlat = entries.flatMap { flatten(it.key, it.value) }.toMap()
+    private val entryFormats = mutableMapOf<String, MessageFormat>()
 
     operator fun get(key: String, vararg arguments: Any?) = entriesFlat[key]?.let {
         (entryFormats[key] ?: (try {

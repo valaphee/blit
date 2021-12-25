@@ -19,6 +19,8 @@ package com.valaphee.blit.source.sftp
 import com.valaphee.blit.source.AbstractEntry
 import com.valaphee.blit.source.NotFoundException
 import com.valaphee.blit.source.transferToWithProgress
+import io.ktor.utils.io.pool.useInstance
+import kotlinx.coroutines.sync.withPermit
 import org.apache.sshd.sftp.client.SftpClient
 import org.apache.sshd.sftp.common.SftpConstants
 import org.apache.sshd.sftp.common.SftpException
@@ -39,9 +41,13 @@ class SftpEntry(
     override val directory get() = attributes.isDirectory
 
     override suspend fun list() = if (directory) try {
-        source.sftpClient.readDir(path).mapNotNull {
-            val name = it.filename
-            if (name != "." && name != "..") SftpEntry(source, "${if (path == "/") "" else path}/$name", it.attributes) else null
+        source.semaphore.withPermit {
+            source.pool.useInstance {
+                it.readDir(path).mapNotNull {
+                    val name = it.filename
+                    if (name != "." && name != "..") SftpEntry(source, "${if (path == "/") "" else path}/$name", it.attributes) else null
+                }
+            }
         }
     } catch (_: RuntimeException) {
         emptyList()
@@ -49,7 +55,7 @@ class SftpEntry(
 
     override suspend fun transferTo(stream: OutputStream) {
         try {
-            source.sftpClient.read(path).use { it.transferToWithProgress(stream, size) }
+            source.semaphore.withPermit { source.pool.useInstance { it.read(path).use { it.transferToWithProgress(stream, size) } } }
         } catch (ex: SftpException) {
             when (ex.status) {
                 SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundException(path)
@@ -58,11 +64,13 @@ class SftpEntry(
         }
     }
 
-    override suspend fun transferFrom(name: String, stream: InputStream, length: Long) = TODO()
+    override suspend fun transferFrom(name: String, stream: InputStream, length: Long) {
+        source.semaphore.withPermit { source.pool.useInstance { it.write("$path/$name").use { stream.transferToWithProgress(it, length) } } }
+    }
 
     override suspend fun rename(name: String) {
         try {
-            source.sftpClient.rename(path, "${path.substringBeforeLast('/', "")}/$name")
+            source.semaphore.withPermit { source.pool.useInstance { it.rename(path, "${path.substringBeforeLast('/', "")}/$name") } }
         } catch (ex: SftpException) {
             when (ex.status) {
                 SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundException(path)
@@ -73,7 +81,7 @@ class SftpEntry(
 
     override suspend fun delete() {
         try {
-            source.sftpClient.remove(path)
+            source.semaphore.withPermit { source.pool.useInstance { it.remove(path) } }
         } catch (ex: SftpException) {
             when (ex.status) {
                 SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundException(path)

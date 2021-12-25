@@ -9,6 +9,7 @@
             "name": "Datei",
             "general.name": "Allgemein",
             "sources.name": "Quellen",
+            "network.name": "Netzwerk",
             "exit.name": "Beenden"
           },
           "help": {
@@ -46,6 +47,13 @@
       },
       "config": {
         "general": {
+          "appearance.text": "Aussehen",
+          "theme": {
+            "text": "Theme",
+            "system_default": "Automatisch",
+            "light": "Hell",
+            "dark": "Dunkel"
+          },
           "locale.text": "Sprache",
           "data_size_unit": {
             "text": "Datengrößeneinheit",
@@ -53,6 +61,7 @@
             "iec": "IEC",
             "si": "SI"
           },
+          "path.text": "Pfade",
           "temporary_path": {
             "text": "Temporärer Pfad",
             "invalid": "Ungültiger Pfad"
@@ -69,6 +78,9 @@
             "scp": "SCP",
             "sftp": "SFTP"
           }
+        },
+        "network": {
+          "proxy.text": "Proxy"
         },
         "ok.text": "Ok",
         "cancel.text": "Abbrechen",

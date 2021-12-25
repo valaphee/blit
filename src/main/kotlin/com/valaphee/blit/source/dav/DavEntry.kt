@@ -34,7 +34,7 @@ import io.ktor.http.URLBuilder
 import io.ktor.http.content.OutgoingContent
 import io.ktor.http.contentLength
 import io.ktor.utils.io.ByteWriteChannel
-import io.ktor.utils.io.jvm.javaio.copyTo
+import io.ktor.utils.io.pool.ByteArrayPool
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.URLDecoder
@@ -60,9 +60,9 @@ class DavEntry(
         when (httpResponse.status) {
             HttpStatusCode.MultiStatus -> {
                 val href = httpResponse.request.url.encodedPath
-                xmlMapper.readValue<Multistatus>(httpResponse.readBytes()).response.filter { !it.href.equals(href, true) }.mapNotNull {
-                    val name = URLDecoder.decode(it.href.removeSuffix("/").split('/').last(), "UTF-8")
-                    it.propstat.find { it.status == "HTTP/1.1 200 OK" }?.prop?.let { DavEntry(source, "$path/$name", it) }
+                xmlMapper.readValue<Multistatus>(httpResponse.readBytes()).response.filter { it.href != href }.mapNotNull {
+                    val subPath = URLDecoder.decode(it.href.removePrefix(source.path), "UTF-8")
+                    it.propstat.find { it.status == "HTTP/1.1 200 OK" }?.prop?.let { DavEntry(source, subPath, it) }
                 }
             }
             HttpStatusCode.NotFound -> throw NotFoundException(path)
@@ -83,21 +83,43 @@ class DavEntry(
             val id = "blit-${UUID.randomUUID()}"
             source.httpClient.request<Unit>("${source.url}/uploads/${source.username}/$id") { method = httpMethodMkcol }
 
-            /*val jobs = mutableListOf<Job>()*/
+            val coroutineContext = coroutineContext
             val chunkCount = ceil(length / source.nextcloudUploadChunkSize.toDouble())
             for (i in 0..chunkCount) {
-                /*jobs += ioScope.launch { */
                 source.httpClient.put<Unit>("${source.url}/uploads/${source.username}/$id/${i * source.nextcloudUploadChunkSize}") { body = stream.readNBytes(source.nextcloudUploadChunkSize.toInt()) }
-                coroutineContext.progress = i / chunkCount.toDouble() // TODO: more precise progress
-                /*}*/
+                coroutineContext.progress = i / chunkCount.toDouble()
             }
-            /*jobs.joinAll()*/
 
             source.httpClient.request<Unit>("${source.url}/uploads/${source.username}/$id/.file") {
                 method = httpMethodMove
                 headers { this["Destination"] = URLBuilder("${source._url}/$path/$name").buildString() }
             }
-        } else source.httpClient.put<Unit>("${source._url}/$path/$name") { body = InputStreamContent(stream, length) } // TODO: set progress
+        } else {
+            val coroutineContext = coroutineContext
+            source.httpClient.put<Unit>("${source._url}/$path/$name") {
+                body = object : OutgoingContent.WriteChannelContent() {
+                    override val contentLength get() = length
+
+                    override suspend fun writeTo(channel: ByteWriteChannel) {
+                        val buffer = ByteArrayPool.borrow()
+                        try {
+                            var readSum = 0L
+                            while (true) {
+                                val read = stream.read(buffer, 0, buffer.size)
+                                if (read == -1) break
+                                if (read > 0) {
+                                    channel.writeFully(buffer, 0, read)
+                                    readSum += read
+                                }
+                                coroutineContext.progress = (readSum / length.toDouble())
+                            }
+                        } finally {
+                            ByteArrayPool.recycle(buffer)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override suspend fun rename(name: String) {
@@ -112,17 +134,6 @@ class DavEntry(
     }
 
     override fun toString() = path
-
-    private class InputStreamContent(
-        private val stream: InputStream,
-        private val length: Long
-    ) : OutgoingContent.WriteChannelContent() {
-        override val contentLength get() = length
-
-        override suspend fun writeTo(channel: ByteWriteChannel) {
-            stream.copyTo(channel, length)
-        }
-    }
 
     companion object {
         private fun ceil(value: Double): Int {

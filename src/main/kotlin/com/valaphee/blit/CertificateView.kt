@@ -18,47 +18,51 @@ package com.valaphee.blit
 
 import com.valaphee.blit.data.config.Config
 import com.valaphee.blit.data.locale.Locale
-import javafx.beans.property.SimpleStringProperty
 import javafx.stage.Stage
 import jfxtras.styles.jmetro.JMetroStyleClass
 import tornadofx.View
 import tornadofx.action
 import tornadofx.button
 import tornadofx.buttonbar
-import tornadofx.enableWhen
-import tornadofx.field
-import tornadofx.fieldset
 import tornadofx.form
-import tornadofx.textfield
+import tornadofx.readonlyColumn
+import tornadofx.smartResize
+import tornadofx.tableview
+import tornadofx.toObservable
+import java.security.cert.X509Certificate
 
 /**
  * @author Kevin Ludwig
  */
-class RenameView(
-    name: String,
-    action: (String) -> Unit
-) : View("Rename $name") {
+class CertificateView(
+    private val chain: Array<out X509Certificate>,
+    private val valid: Boolean
+) : View("Certificate${if (!valid) " (Invalid)" else ""}") {
     private val locale by di<Locale>()
     private val _config by di<Config>()
-
-    private val name = SimpleStringProperty(name)
 
     override val root = form {
         _config.theme.apply(this)
         styleClass.add(JMetroStyleClass.BACKGROUND)
 
-        prefWidth = 300.0
+        prefWidth = 500.0
 
-        fieldset { field { textfield(this@RenameView.name) } }
-        buttonbar {
-            button(locale["rename.ok.text"]) {
-                enableWhen(this@RenameView.name.isNotEmpty)
-                action {
-                    action(this@RenameView.name.value)
-                    (scene.window as Stage).close()
-                }
-            }
-            button(locale["rename.cancel.text"]) { action { (scene.window as Stage).close() } }
+        val certificate = chain.first()
+        tableview(listOf(
+            "Version" to "V${certificate.version}",
+            "Serial number" to certificate.serialNumber.toString(16),
+            "Signature algorithm" to certificate.sigAlgName,
+            "Issuer" to certificate.issuerDN,
+            "Valid from" to certificate.notBefore,
+            "Valid to" to certificate.notAfter,
+            "Subject" to certificate.subjectDN
+        ).toObservable()) {
+            readonlyColumn("Field", Pair<String, Any>::first)
+            readonlyColumn("Value", Pair<String, Any>::second)
+            smartResize()
+
+            setSortPolicy { false }
         }
+        buttonbar { button(locale["rename.ok.text"]) { action { (scene.window as Stage).close() } } }
     }
 }

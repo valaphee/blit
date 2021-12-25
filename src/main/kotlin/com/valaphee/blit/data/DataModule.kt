@@ -61,7 +61,9 @@ class DataModule(
                             }
                             else -> null
                         }
-                    } catch (_: Throwable) {}
+                    } catch (e: Throwable) {
+                        e.printStackTrace()
+                    }
                 }
                 .partition { it is KeyedData }
             keyed.filterIsInstance<KeyedData>()

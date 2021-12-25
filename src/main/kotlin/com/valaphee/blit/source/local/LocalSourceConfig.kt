@@ -14,13 +14,25 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit.source
+package com.valaphee.blit.source.local
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+import com.valaphee.blit.source.SourceConfig
+import javafx.event.EventTarget
+import tornadofx.field
+import tornadofx.fieldset
+import tornadofx.textfield
 
 /**
  * @author Kevin Ludwig
  */
-abstract class AbstractSource<T : Entry<T>>(
-    override val name: String
-) : Source<T> {
-    override fun toString() = name
+@JsonTypeName("local")
+class LocalSourceConfig(
+    name: String
+) : SourceConfig(name) {
+    override fun newUi(eventTarget: EventTarget) {
+        with(eventTarget) { fieldset("General") { field("Name") { textfield(nameProperty) } } }
+    }
+
+    override fun newSource() = LocalSource()
 }

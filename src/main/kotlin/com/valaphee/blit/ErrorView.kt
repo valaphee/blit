@@ -17,35 +17,33 @@
 package com.valaphee.blit
 
 import com.valaphee.blit.data.config.Config
-import javafx.geometry.Pos
-import javafx.scene.image.Image
-import javafx.scene.text.TextAlignment
+import com.valaphee.blit.data.locale.Locale
+import javafx.stage.Stage
 import jfxtras.styles.jmetro.JMetroStyleClass
 import tornadofx.View
-import tornadofx.hbox
-import tornadofx.imageview
+import tornadofx.action
+import tornadofx.button
+import tornadofx.buttonbar
+import tornadofx.form
 import tornadofx.label
 
 /**
  * @author Kevin Ludwig
  */
-class AboutView : View("About Blit") {
+class ErrorView(
+    error: String,
+    errorMessage: String,
+) : View(error) {
+    private val locale by di<Locale>()
     private val _config by di<Config>()
 
-    override val root = hbox {
+    override val root = form {
         _config.theme.apply(this)
         styleClass.add(JMetroStyleClass.BACKGROUND)
 
         prefWidth = 300.0
-        prefHeight = 100.0
-        alignment = Pos.CENTER
 
-        imageview(Image(AboutView::class.java.getResourceAsStream("/app.png")))
-        label(
-            """
-                Blit${AboutView::class.java.`package`.implementationVersion?.let { " $it" } ?: ""}
-                Copyright (c) 2021, Valaphee.
-            """.trimIndent()
-        ) { textAlignment = TextAlignment.CENTER }
+        label(errorMessage)
+        buttonbar { button(locale["rename.ok.text"]) { action { (scene.window as Stage).close() } } }
     }
 }
