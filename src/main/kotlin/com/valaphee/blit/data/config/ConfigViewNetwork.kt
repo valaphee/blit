@@ -17,18 +17,59 @@
 package com.valaphee.blit.data.config
 
 import com.valaphee.blit.data.locale.Locale
+import com.valaphee.blit.source.IntStringConverter
+import javafx.scene.control.ToggleGroup
+import javafx.scene.layout.Priority
 import tornadofx.Fragment
+import tornadofx.bind
+import tornadofx.enableWhen
+import tornadofx.field
 import tornadofx.fieldset
+import tornadofx.filterInput
 import tornadofx.form
+import tornadofx.hgrow
+import tornadofx.isInt
+import tornadofx.label
+import tornadofx.passwordfield
+import tornadofx.radiobutton
+import tornadofx.selectedValueProperty
+import tornadofx.textfield
 
 /**
  * @author Kevin Ludwig
  */
 class ConfigViewNetwork : Fragment("Network") {
     private val locale by di<Locale>()
+    private val configModel by di<Config.Model>()
 
     override val root = form {
         fieldset(locale["config.network.proxy.text"]) {
+            val proxyMode = ToggleGroup()
+            radiobutton("None", proxyMode, Config.ProxyMode.None)
+            radiobutton("System", proxyMode, Config.ProxyMode.System)
+            val manualProxyMode = radiobutton("Manual", proxyMode, Config.ProxyMode.Manual)
+            proxyMode.selectedValueProperty<Config.ProxyMode>().bindBidirectional(configModel.proxyMode)
+            field("Host") {
+                enableWhen(manualProxyMode.selectedProperty())
+                textfield(configModel.proxyHost) { hgrow = Priority.ALWAYS }
+                label("Port")
+                textfield {
+                    bind(configModel.proxyPort, converter = IntStringConverter)
+
+                    minWidth = 65.0
+                    maxWidth = 65.0
+
+                    filterInput { it.controlNewText.isInt() }
+                }
+            }
+            field("Username") {
+                enableWhen(manualProxyMode.selectedProperty())
+                textfield(configModel.proxyUsername)
+            }
+            field("Password") {
+                enableWhen(manualProxyMode.selectedProperty())
+                passwordfield(configModel.proxyPassword)
+            }
         }
     }
 }

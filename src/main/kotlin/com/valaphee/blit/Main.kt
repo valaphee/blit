@@ -30,6 +30,7 @@ import tornadofx.DIContainer
 import tornadofx.FX
 import tornadofx.launch
 import kotlin.reflect.KClass
+import kotlin.system.exitProcess
 
 /**
  * @author Kevin Ludwig
@@ -50,4 +51,6 @@ fun main(arguments: Array<String>) {
     }
 
     launch<Main>(arguments)
+
+    exitProcess(0)
 }

@@ -20,6 +20,9 @@ import com.valaphee.blit.data.config.Config
 import com.valaphee.blit.data.locale.Locale
 import javafx.stage.Stage
 import jfxtras.styles.jmetro.JMetroStyleClass
+import org.bouncycastle.asn1.x500.X500Name
+import org.bouncycastle.asn1.x500.style.BCStyle
+import org.controlsfx.control.BreadCrumbBar
 import tornadofx.View
 import tornadofx.action
 import tornadofx.button
@@ -47,15 +50,16 @@ class CertificateView(
 
         prefWidth = 500.0
 
-        val certificate = chain.first()
-        tableview(listOf(
+        add(BreadCrumbBar(BreadCrumbBar.buildTreeModel(*chain.map { X500Name(it.subjectX500Principal.name).getRDNs(BCStyle.CN)[0].first.value }.toTypedArray())))
+        val certificate = chain.last()
+        tableview(listOf<Pair<String, Any>>(
             "Version" to "V${certificate.version}",
             "Serial number" to certificate.serialNumber.toString(16),
             "Signature algorithm" to certificate.sigAlgName,
-            "Issuer" to certificate.issuerDN,
+            "Issuer" to certificate.issuerX500Principal,
             "Valid from" to certificate.notBefore,
             "Valid to" to certificate.notAfter,
-            "Subject" to certificate.subjectDN
+            "Subject" to certificate.subjectX500Principal
         ).toObservable()) {
             readonlyColumn("Field", Pair<String, Any>::first)
             readonlyColumn("Value", Pair<String, Any>::second)

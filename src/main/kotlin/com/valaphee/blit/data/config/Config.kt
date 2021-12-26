@@ -25,6 +25,7 @@ import com.valaphee.blit.data.Data
 import com.valaphee.blit.data.DataType
 import com.valaphee.blit.source.SourceConfig
 import com.valaphee.blit.source.local.LocalSourceConfig
+import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
@@ -46,19 +47,24 @@ import kotlin.math.abs
 @Singleton
 @DataType("config")
 class Config(
-    theme: Theme = Theme.Light,
+    theme: Theme = Theme.JMetroDark,
     locale: String = "en_US",
     dataSizeUnit: DataSizeUnit = DataSizeUnit.IEC,
     temporaryPath: String = System.getProperty("java.tmpdir"),
-    sources: List<SourceConfig> = listOf(LocalSourceConfig("local"))
+    sources: List<SourceConfig> = listOf(LocalSourceConfig("local")),
+    proxyMode: ProxyMode = ProxyMode.System,
+    proxyHost: String = "",
+    proxyPort: Int = 0,
+    proxyUsername: String = "",
+    proxyPassword: String = ""
 ) : Data {
     enum class Theme(
         @get:JsonValue val key: String,
         val apply: (Parent) -> Unit
     ) {
-        SystemDefault("system_default", { JMetro(it, Style.DARK) }),
-        Light("light", { JMetro(it, Style.LIGHT) }),
-        Dark("dark", { JMetro(it, Style.DARK) })
+        JavaFX("javafx", {}),
+        JMetroLight("jmetro_light", { JMetro(it, Style.LIGHT) }),
+        JMetroDark("jmetro_dark", { JMetro(it, Style.DARK) })
     }
 
     enum class DataSizeUnit(
@@ -94,6 +100,12 @@ class Config(
         })
     }
 
+    enum class ProxyMode {
+        None,
+        System,
+        Manual
+    }
+
     @get:JsonIgnore internal val themeProperty = SimpleObjectProperty(theme)
     var theme: Theme by themeProperty
 
@@ -109,6 +121,21 @@ class Config(
     @get:JsonIgnore internal val sourcesProperty = SimpleListProperty(sources.asObservable())
     var sources: ObservableList<SourceConfig> by sourcesProperty
 
+    @get:JsonIgnore internal val proxyModeProperty = SimpleObjectProperty(proxyMode)
+    var proxyMode: ProxyMode by proxyModeProperty
+
+    @get:JsonIgnore internal val proxyHostProperty = SimpleStringProperty(proxyHost)
+    var proxyHost: String by proxyHostProperty
+
+    @get:JsonIgnore internal val proxyPortProperty = SimpleIntegerProperty(proxyPort)
+    var proxyPort: Int by proxyPortProperty
+
+    @get:JsonIgnore internal val proxyUsernameProperty = SimpleStringProperty(proxyUsername)
+    var proxyUsername: String by proxyUsernameProperty
+
+    @get:JsonIgnore internal val proxyPasswordProperty = SimpleStringProperty(proxyPassword)
+    var proxyPassword: String by proxyPasswordProperty
+
     @Singleton
     class Model @Inject constructor(
         config: Config
@@ -120,9 +147,14 @@ class Config(
         val dataSizeUnit = bind(Config::dataSizeUnitProperty)
         val temporaryPath = bind(Config::temporaryPathProperty)
         val sources = bind(Config::sourcesProperty)
+        val proxyMode = bind(Config::proxyModeProperty)
+        val proxyHost = bind(Config::proxyHostProperty)
+        val proxyPort = bind(Config::proxyPortProperty)
+        val proxyUsername = bind(Config::proxyUsernameProperty)
+        val proxyPassword = bind(Config::proxyPasswordProperty)
 
         override fun onCommit() {
-            objectMapper.writeValue(File(File("data").also(File::mkdir), "config.json"), Config(theme.value, locale.value, dataSizeUnit.value, temporaryPath.value, sources))
+            objectMapper.writeValue(File(File("data").also(File::mkdir), "config.json"), Config(theme.value, locale.value, dataSizeUnit.value, temporaryPath.value, sources, proxyMode.value, proxyHost.value, proxyPort.value, proxyUsername.value, proxyPassword.value))
         }
     }
 }

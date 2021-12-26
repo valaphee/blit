@@ -50,9 +50,9 @@
           "appearance.text": "Aussehen",
           "theme": {
             "text": "Theme",
-            "system_default": "Automatisch",
-            "light": "Hell",
-            "dark": "Dunkel"
+            "javafx": "JavaFX",
+            "jmetro_light": "JMetro Hell",
+            "jmetro_dark": "JMetro Dunkel"
           },
           "locale.text": "Sprache",
           "data_size_unit": {
