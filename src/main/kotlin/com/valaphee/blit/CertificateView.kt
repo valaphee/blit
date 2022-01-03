@@ -67,6 +67,6 @@ class CertificateView(
 
             setSortPolicy { false }
         }
-        buttonbar { button(locale["rename.ok.text"]) { action { (scene.window as Stage).close() } } }
+        buttonbar { button(locale["certificate.ok.text"]) { action { (scene.window as Stage).close() } } }
     }
 }

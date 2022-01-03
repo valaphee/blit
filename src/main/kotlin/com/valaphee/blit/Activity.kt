@@ -17,20 +17,21 @@
 package com.valaphee.blit
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder
+import com.google.inject.Singleton
 import com.valaphee.blit.source.NotFoundException
 import javafx.beans.property.DoubleProperty
 import javafx.beans.property.SimpleDoubleProperty
-import javafx.beans.property.SimpleStringProperty
-import javafx.beans.property.StringProperty
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import tornadofx.onChange
+import tornadofx.getValue
 import tornadofx.runLater
-import java.util.concurrent.ConcurrentLinkedDeque
+import tornadofx.setValue
+import tornadofx.toObservable
 import java.util.concurrent.Executors
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
@@ -38,22 +39,27 @@ import kotlin.coroutines.CoroutineContext
 /**
  * @author Kevin Ludwig
  */
-class MainActivity {
+@Singleton
+class Activity {
     private val coroutineScope = CoroutineScope(Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), ThreadFactoryBuilder().setNameFormat("blit-%d").setDaemon(true).build()).asCoroutineDispatcher() + SupervisorJob())
-    private val tasks = ConcurrentLinkedDeque<Task>()
 
-    val name: StringProperty = SimpleStringProperty("")
+    val tasks = mutableListOf<Task>().toObservable()
     val progress: DoubleProperty = SimpleDoubleProperty(0.0)
+    private var update = false
 
     fun runBlocking(name: String, block: suspend () -> Unit) = runBlocking { run(name, block) }
 
     fun launch(name: String, block: suspend () -> Unit) = coroutineScope.launch { run(name, block) }
 
     private suspend fun run(name: String, block: suspend () -> Unit) {
-        val task = Task(name, SimpleDoubleProperty().apply { onChange { runLater { progress.value = tasks.map { it.progress.value }.average() } } })
-        tasks += task
-        task.progress.value = 0.0
-        runLater { this.name.value = tasks.joinToString(" | ") { it.name } }
+        val task = Task(name, System.currentTimeMillis())
+
+        runLater {
+            tasks += task
+
+            run()
+        }
+
         withContext(task) {
             try {
                 block()
@@ -61,23 +67,37 @@ class MainActivity {
                 runLater { ErrorView("Not found", "${ex.path} not found").openModal(resizable = false) }
             }
         }
-        tasks -= task
-        runLater {
-            progress.value = tasks.map { it.progress.value }.average()
-            this.name.value = tasks.joinToString(" | ") { it.name }
+
+        runLater { tasks -= task }
+    }
+
+    private fun run() {
+        if (update) return
+
+        update = true
+        coroutineScope.launch {
+            while (tasks.isNotEmpty()) {
+                runLater { progress.value = tasks.map { it.progress }.average() }
+                delay(1000)
+            }
         }
+        progress.value = 0.0
+        update = false
     }
 
     class Task(
         val name: String,
-        val progress: DoubleProperty
+        val time: Long,
     ) : AbstractCoroutineContextElement(Task) {
         companion object Key : CoroutineContext.Key<Task>
+
+        val progressProperty: DoubleProperty = SimpleDoubleProperty(0.0)
+        var progress by progressProperty
     }
 }
 
 var CoroutineContext.progress: Double
-    get() = get(MainActivity.Task)!!.progress.value
+    get() = get(Activity.Task)!!.progress
     set(value) {
-        get(MainActivity.Task)!!.progress.value = value
+        get(Activity.Task)!!.progress = value
     }

@@ -44,8 +44,6 @@ import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import jfxtras.styles.jmetro.JMetroStyleClass
-import org.bridj.cpp.com.COMRuntime
-import org.bridj.cpp.com.shell.ITaskbarList3
 import org.controlsfx.control.BreadCrumbBar
 import org.controlsfx.control.textfield.CustomTextField
 import tornadofx.Dimension
@@ -59,11 +57,11 @@ import tornadofx.combobox
 import tornadofx.hbox
 import tornadofx.hgrow
 import tornadofx.item
-import tornadofx.label
 import tornadofx.menu
 import tornadofx.menubar
 import tornadofx.onChange
 import tornadofx.paddingTop
+import tornadofx.pane
 import tornadofx.populateTree
 import tornadofx.progressbar
 import tornadofx.runLater
@@ -78,8 +76,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
-import java.text.DateFormat
-import java.util.concurrent.CompletableFuture
 
 /**
  * @author Kevin Ludwig
@@ -89,21 +85,7 @@ class MainView : View("Blit") {
     private val iconManifest by di<IconManifest>()
     private val _config by di<Config>()
 
-    private val activity = MainActivity().apply {
-        val version = System.getProperty("os.version").toFloatOrNull()
-        if (System.getProperty("os.name").startsWith("Windows") && version != null && version >= 6.1f) {
-            val iTaskbarList3 = CompletableFuture.supplyAsync({ COMRuntime.newInstance(ITaskbarList3::class.java) }, comExecutor).join()
-            val hWnd by lazy { primaryStage.hWnd }
-            progress.onChange {
-                val _hWnd = hWnd
-                comExecutor.execute {
-                    iTaskbarList3.SetProgressState(_hWnd, ITaskbarList3.TbpFlag.TBPF_NORMAL)
-                    iTaskbarList3.SetProgressValue(_hWnd, (it * 100).toLong(), 100)
-                }
-            }
-        }
-    }
-    private val dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, locale.toJavaLocale())
+    private val activity by di<Activity>()
 
     override val root = vbox {
         _config.theme.apply(this)
@@ -149,7 +131,10 @@ class MainView : View("Blit") {
             @Suppress("UPPER_BOUND_VIOLATED_WARNING") add(Pane<Entry<*>>())
             @Suppress("UPPER_BOUND_VIOLATED_WARNING") add(Pane<Entry<*>>())
         }
-        label(activity.name)
+        hbox {
+            pane { hgrow = Priority.ALWAYS }
+            button("...") { action { find<ActivityView>().openWindow() } }
+        }
         progressbar(activity.progress)
     }
 
@@ -264,7 +249,7 @@ class MainView : View("Blit") {
                 }
                 column(locale["main.tree.column.modified.title"], Entry<T>::modifyTime) {
                     tableColumnBaseSetWidth(this, 125.0)
-                    cellFormat { text = if (it != 0L) dateFormat.format(it) else "" }
+                    cellFormat { text = if (it != 0L) locale.dateFormat.format(it) else "" }
                 }
 
                 setRowFactory {
@@ -394,7 +379,7 @@ class MainView : View("Blit") {
 
     companion object {
         private val windowsRootPath = "^[a-zA-Z]:[\\\\/].*\$".toRegex()
-        private val tableColumnBaseSetWidth = TableColumnBase::class.java.getDeclaredMethod("setWidth", Double::class.java).apply { isAccessible = true }
+        internal val tableColumnBaseSetWidth = TableColumnBase::class.java.getDeclaredMethod("setWidth", Double::class.java).apply { isAccessible = true }
 
         internal fun String.toCanonicalPath(): List<String> {
             replace('\\', '/').apply {

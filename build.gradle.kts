@@ -31,9 +31,9 @@ repositories {
 }
 
 dependencies {
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.0")
-    implementation("com.fasterxml.jackson.module:jackson-module-afterburner:2.13.0")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.1")
+    implementation("com.fasterxml.jackson.module:jackson-module-afterburner:2.13.1")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
     implementation("com.google.inject:guice:5.0.1")
     implementation("com.michael-bull.kotlin-retry:kotlin-retry:1.0.9")
     implementation("com.nativelibs4java:bridj:0.7.0")
@@ -50,7 +50,7 @@ dependencies {
     implementation("org.apache.sshd:sshd-scp:2.8.0")
     implementation("org.apache.sshd:sshd-sftp:2.8.0")
     implementation("org.controlsfx:controlsfx:11.1.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.0-RC2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.0")
     implementation("org.jfxtras:jmetro:11.6.15")
 }
 

@@ -19,6 +19,7 @@ package com.valaphee.blit.data.locale
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.valaphee.blit.data.DataType
 import com.valaphee.blit.data.KeyedData
+import java.text.DateFormat
 import java.text.MessageFormat
 import java.util.regex.Pattern
 
@@ -33,6 +34,8 @@ class Locale(
     private val entriesFlat = entries.flatMap { flatten(it.key, it.value) }.toMap()
     private val entryFormats = mutableMapOf<String, MessageFormat>()
 
+    val dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, toJavaLocale())
+
     operator fun get(key: String, vararg arguments: Any?) = entriesFlat[key]?.let {
         (entryFormats[key] ?: (try {
             MessageFormat(it)
@@ -41,7 +44,7 @@ class Locale(
         }).also { entryFormats[key] = it }).format(arguments)
     } ?: key
 
-    fun toJavaLocale(): java.util.Locale = java.util.Locale.forLanguageTag(key.replace('_', '-'))
+    private fun toJavaLocale(): java.util.Locale = java.util.Locale.forLanguageTag(key.replace('_', '-'))
 
     companion object {
         private val pattern = Pattern.compile("\\{(\\D*?)}")

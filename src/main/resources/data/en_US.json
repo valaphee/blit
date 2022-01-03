@@ -41,10 +41,6 @@
           }
         }
       },
-      "rename": {
-        "ok.text": "Ok",
-        "cancel.text": "Cancel"
-      },
       "config": {
         "general": {
           "appearance.text": "Appearance",
@@ -85,6 +81,13 @@
         "ok.text": "Ok",
         "cancel.text": "Cancel",
         "apply.text": "Apply"
+      },
+      "certificate": {
+        "ok.text": "Ok"
+      },
+      "rename": {
+        "ok.text": "Ok",
+        "cancel.text": "Cancel"
       }
     }
   }
