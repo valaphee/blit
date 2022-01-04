@@ -65,6 +65,8 @@ class SftpEntry(
     }
 
     override suspend fun transferFrom(name: String, stream: InputStream, length: Long) {
+        check(directory)
+
         source.semaphore.withPermit { source.pool.useInstance { it.write("$path/$name").use { stream.transferToWithProgress(it, length) } } }
     }
 

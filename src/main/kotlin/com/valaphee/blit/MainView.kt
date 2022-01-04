@@ -262,6 +262,11 @@ class MainView : View("Blit") {
 
                 setRowFactory {
                     TreeTableRow<Entry<T>>().apply {
+                        setOnMouseClicked {
+                            if (isEmpty) selectionModel.clearSelection()
+
+                            it.consume()
+                        }
                         setOnDragDetected {
                             if (source != null) startDragAndDrop(TransferMode.COPY).apply {
                                 dragView = snapshot(null, null)
@@ -287,16 +292,16 @@ class MainView : View("Blit") {
                                         val target = treeItem?.value ?: runBlocking { source.get(source.home) }
 
                                         fun flatten(entry: Entry<*>, path: String? = null) {
-                                            if (entry.directory) activity.launch(locale["main.tree.task.populate.name", entry.name]) { entry.list().forEach { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") } } else {
+                                            if (entry.directory) activity.launch(locale["main.tree.task.populate.name", entry]) { entry.list().forEach { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") } } else {
                                                 val outStream = PipedOutputStream()
                                                 val inStream = PipedInputStream(outStream)
-                                                activity.launch(locale["main.tree.task.download.name", entry.name]) {
+                                                activity.launch(locale["main.tree.task.download.name", entry]) {
                                                     outStream.use {
                                                         entry.transferTo(outStream)
                                                         outStream.flush()
                                                     }
                                                 }
-                                                activity.launch(locale["main.tree.task.upload.name", entry.name]) { inStream.use { target.transferFrom("${path?.let { "$path/" } ?: ""}${entry.name}", inStream, entry.size) } }
+                                                activity.launch(locale["main.tree.task.upload.name", entry]) { inStream.use { target.transferFrom("${path?.let { "$path/" } ?: ""}${entry.name}", inStream, entry.size) } }
                                             }
                                         }
 
@@ -382,7 +387,7 @@ class MainView : View("Blit") {
 
             private fun delete(item: TreeItem<Entry<T>>) {
                 val entry = item.value
-                activity.launch(locale["main.tree.task.delete.name", entry]) { entry.delete() }
+                activity.launch(locale["main.tree.task.delete.name", entry.name]) { entry.delete() }
             }
 
             internal fun populate(item: TreeItem<Entry<T>>) {

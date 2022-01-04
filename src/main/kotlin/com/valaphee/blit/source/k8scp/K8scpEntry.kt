@@ -59,6 +59,8 @@ class K8scpEntry(
     }
 
     override suspend fun transferFrom(name: String, stream: InputStream, length: Long) {
+        check(directory)
+
         val (namespace, pod, path) = source.getNamespacePodAndPath(path)
         K8scpSource.copy.copyFileToPod(namespace, pod, null, stream.readNBytes(length.toInt()), Path.of("$path/$name"))
     }

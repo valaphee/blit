@@ -50,6 +50,16 @@ class ConfigViewSources : Fragment("Sources") {
 
                 vgrow = Priority.ALWAYS
 
+                /*setCellFactory {
+                    ListCell<SourceConfig>().apply {
+                        setOnMouseClicked {
+                            if (isEmpty) selectionModel.clearSelection()
+
+                            it.consume()
+                        }
+                    }
+                }*/
+
                 selectionModel.selectedItems.onChange { contextMenu = ContextMenu().apply { it.list.firstOrNull()?.let { item(locale["config.sources.delete.text"]) { action { configModel.sources.remove(it) } } } ?: item(locale["config.sources.new.text"]) { action {} } } }
             })
         }

@@ -48,6 +48,8 @@ class LocalEntry(
     }
 
     override suspend fun transferFrom(name: String, stream: InputStream, length: Long) {
+        check(directory)
+
         FileOutputStream("$file/$name").use { stream.transferToWithProgress(it, size) }
     }
 

@@ -30,7 +30,11 @@
           "menu": {
             "open.name": "Öffnen",
             "rename.name": "Umbenennen",
-            "delete.name": "Löschen"
+            "delete.name": "Löschen",
+            "parent.name": "..",
+            "new_directory.name": "Neuer Ordner",
+            "new_file.name": "Neue Datei",
+            "refresh.name": "Aktualisieren"
           },
           "task": {
             "populate.name": "Erweitere {0}",

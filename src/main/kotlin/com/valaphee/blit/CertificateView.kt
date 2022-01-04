@@ -29,7 +29,6 @@ import tornadofx.action
 import tornadofx.button
 import tornadofx.buttonbar
 import tornadofx.readonlyColumn
-import tornadofx.smartResize
 import tornadofx.tab
 import tornadofx.tableview
 import tornadofx.tabpane
@@ -69,9 +68,8 @@ class CertificateView(
                         "Valid to" to it.notAfter,
                         "Subject" to it.subjectX500Principal
                     ).toObservable()) {
-                        readonlyColumn("Field", Pair<String, Any>::first)
-                        readonlyColumn("Value", Pair<String, Any>::second)
-                        smartResize()
+                        readonlyColumn("Field", Pair<String, Any>::first) { isReorderable = false }
+                        readonlyColumn("Value", Pair<String, Any>::second) { isReorderable = false }
 
                         setSortPolicy { false }
                     }

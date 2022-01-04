@@ -22,6 +22,7 @@ import javafx.scene.control.Label
 import javafx.scene.layout.Priority
 import jfxtras.styles.jmetro.JMetroStyleClass
 import tornadofx.View
+import tornadofx.fixedWidth
 import tornadofx.onChange
 import tornadofx.progressbar
 import tornadofx.readonlyColumn
@@ -52,9 +53,14 @@ class ActivityView : View("Activity") {
 
             placeholder = Label("")
 
-            readonlyColumn("", Activity.Task::name) { MainView.tableColumnBaseSetWidth(this, 250.0) }
+            readonlyColumn("", Activity.Task::name) {
+                fixedWidth(250)
+                isReorderable = false
+            }
             readonlyColumn("Progress", Activity.Task::progressProperty) {
-                MainView.tableColumnBaseSetWidth(this, 125.0)
+                fixedWidth(125)
+                isReorderable = false
+
                 cellFormat {
                     graphic = stackpane {
                         progressbar(it)
@@ -62,6 +68,8 @@ class ActivityView : View("Activity") {
                     }
                 }
             }
+
+            setSortPolicy { false }
         }
     }
 

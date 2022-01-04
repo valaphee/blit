@@ -30,7 +30,11 @@
           "menu": {
             "open.name": "Open",
             "rename.name": "Rename",
-            "delete.name": "Delete"
+            "delete.name": "Delete",
+            "parent.name": "..",
+            "new_directory.name": "New Directory",
+            "new_file.name": "New File",
+            "refresh.name": "Refresh"
           },
           "task": {
             "populate.name": "Populating {0}",

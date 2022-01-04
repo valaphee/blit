@@ -19,6 +19,7 @@ package com.valaphee.blit.source.scp
 import com.valaphee.blit.progress
 import com.valaphee.blit.source.AbstractEntry
 import com.valaphee.blit.source.TransferInputStream
+import com.valaphee.blit.source.TransferOutputStream
 import io.ktor.utils.io.pool.useInstance
 import kotlinx.coroutines.sync.withPermit
 import org.apache.sshd.scp.common.helpers.ScpTimestampCommandDetails
@@ -44,13 +45,16 @@ class ScpEntry(
     override suspend fun list() = if (directory) source.semaphore.withPermit { source.pool.useInstance { it.session.executeRemoteCommand("""ls -al --full-time "$path"""").lines().mapNotNull { parseLsEntry(it)?.let { (name, attributes) -> if (name != "." && name != "..") ScpEntry(source, "${if (this.path == "/") "" else this.path}/$name", attributes) else null } } } } else emptyList()
 
     override suspend fun transferTo(stream: OutputStream) {
-        source.semaphore.withPermit { source.pool.useInstance { it.download(path, stream) } }
+        val coroutineContext = coroutineContext
+        source.semaphore.withPermit { source.pool.useInstance { it.download(path, TransferOutputStream(stream) { coroutineContext.progress = it / size.toDouble() }) } }
     }
 
     override suspend fun transferFrom(name: String, stream: InputStream, length: Long) {
+        check(directory)
+
         val coroutineContext = coroutineContext
         val time = System.currentTimeMillis()
-        source.semaphore.withPermit { source.pool.useInstance { it.upload(TransferInputStream(stream) { coroutineContext.progress = it / length.toDouble()}, "$path/$name", length, permissions, ScpTimestampCommandDetails(time, time)) } }
+        source.semaphore.withPermit { source.pool.useInstance { it.upload(TransferInputStream(stream) { coroutineContext.progress = it / length.toDouble() }, "$path/$name", length, permissions, ScpTimestampCommandDetails(time, time)) } }
     }
 
     override suspend fun rename(name: String) {

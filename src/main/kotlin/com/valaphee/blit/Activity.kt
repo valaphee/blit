@@ -28,9 +28,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import tornadofx.getValue
 import tornadofx.runLater
-import tornadofx.setValue
 import tornadofx.toObservable
 import java.util.concurrent.Executors
 import kotlin.coroutines.AbstractCoroutineContextElement
@@ -79,8 +77,8 @@ class Activity {
         update = true
         coroutineScope.launch {
             while (tasks.isNotEmpty()) {
-                runLater { progress.value = tasks.map { it.progress }.average() }
-                delay(1000)
+                runLater { progress.value = tasks.onEach { if (it.progressProperty.value != it.progress) it.progressProperty.value = it.progress }.map { it.progress }.average() }
+                delay(50)
             }
         }
         progress.value = 0.0
@@ -94,7 +92,7 @@ class Activity {
         companion object Key : CoroutineContext.Key<Task>
 
         val progressProperty: DoubleProperty = SimpleDoubleProperty(0.0)
-        var progress by progressProperty
+        var progress = 0.0
     }
 }
 

@@ -79,6 +79,8 @@ class DavEntry(
     }
 
     override suspend fun transferFrom(name: String, stream: InputStream, length: Long) {
+        check(directory)
+
         if (source.nextcloud && length > source.nextcloudUploadChunkSize) {
             val id = "blit-${UUID.randomUUID()}"
             source.httpClient.request<Unit>("${source.url}/uploads/${source.username}/$id") { method = httpMethodMkcol }
