@@ -301,7 +301,7 @@ class MainView : View("Blit") {
                                                         outStream.flush()
                                                     }
                                                 }
-                                                activity.launch(locale["main.tree.task.upload.name", entry]) { inStream.use { target.transferFrom("${path?.let { "$path/" } ?: ""}${entry.name}", inStream, entry.size) } }
+                                                activity.launch(locale["main.tree.task.upload.name", entry.name]) { inStream.use { target.transferFrom("${path?.let { "$path/" } ?: ""}${entry.name}", inStream, entry.size) } }
                                             }
                                         }
 

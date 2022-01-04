@@ -42,37 +42,37 @@ class K8scpEntry(
     override val directory get() = attributes.isDirectory
 
     override suspend fun list() = if (directory) {
-        val (namespace, pod, path) = source.getNamespacePodAndPath(path)
+        val (namespace, pod, podPath) = source.getNamespacePodAndPath(path)
         if (namespace != null) {
             if (pod != null) {
-                val process = K8scpSource.copy.exec(namespace, pod, arrayOf("ls", "-al", "--full-time", path!!), false)
-                val list = BufferedReader(InputStreamReader(process.inputStream)).use { it.readLines().mapNotNull { parseLsEntry(it)?.let { (name, attributes) -> if (name != "." && name != "..") K8scpEntry(source, "${if (this.path == "/") "" else this.path}/$name", attributes) else null } } }
+                val process = K8scpSource.copy.exec(namespace, pod, arrayOf("ls", "-al", "--full-time", podPath), false)
+                val list = BufferedReader(InputStreamReader(process.inputStream)).use { it.readLines().mapNotNull { parseLsEntry(it)?.let { (name, attributes) -> if (name != "." && name != "..") K8scpEntry(source, "${if (path == "/") "" else path}/$name", attributes) else null } } }
                 process.waitFor()
                 list
-            } else K8scpSource.coreV1Api.listNamespacedPod(namespace, null, null, null, null, null, null, null, null, null, null).items.map { K8scpEntry(source, "${if (this.path == "/") "" else this.path}/${it.metadata!!.name!!}", namespaceOrPodAttributes) }
+            } else K8scpSource.coreV1Api.listNamespacedPod(namespace, null, null, null, null, null, null, null, null, null, null).items.map { K8scpEntry(source, "${if (path == "/") "" else path}/${it.metadata!!.name!!}", namespaceOrPodAttributes) }
         } else emptyList()
     } else emptyList()
 
     override suspend fun transferTo(stream: OutputStream) {
-        val (namespace, pod, path) = source.getNamespacePodAndPath(path)
-        K8scpSource.copy.copyFileFromPod(namespace, pod, path!!).use { it.transferToWithProgress(stream, size) }
+        val (namespace, pod, podPath) = source.getNamespacePodAndPath(path)
+        K8scpSource.copy.copyFileFromPod(namespace, pod, podPath).use { it.transferToWithProgress(stream, size) }
     }
 
     override suspend fun transferFrom(name: String, stream: InputStream, length: Long) {
         check(directory)
 
-        val (namespace, pod, path) = source.getNamespacePodAndPath(path)
-        K8scpSource.copy.copyFileToPod(namespace, pod, null, stream.readNBytes(length.toInt()), Path.of("$path/$name"))
+        val (namespace, pod, podPath) = source.getNamespacePodAndPath(path)
+        K8scpSource.copy.copyFileToPod(namespace, pod, null, stream.readNBytes(length.toInt()), Path.of("$podPath/$name"))
     }
 
     override suspend fun rename(name: String) {
-        val (namespace, pod, path) = source.getNamespacePodAndPath(path)
-        if (K8scpSource.copy.exec(namespace, pod, arrayOf("mv", path!!, "${path.substringBeforeLast('/', "")}/$name"), false).waitFor() != 0) throw NotFoundException(name)
+        val (namespace, pod, podPath) = source.getNamespacePodAndPath(path)
+        if (K8scpSource.copy.exec(namespace, pod, arrayOf("mv", podPath, "${podPath.substringBeforeLast('/', "")}/$name"), false).waitFor() != 0) throw NotFoundException(name)
     }
 
     override suspend fun delete() {
-        val (namespace, pod, path) = source.getNamespacePodAndPath(path)
-        if (K8scpSource.copy.exec(namespace, pod, arrayOf("rm", "-rf", path!!), false).waitFor() != 0) throw NotFoundException(name)
+        val (namespace, pod, podPath) = source.getNamespacePodAndPath(path)
+        if (K8scpSource.copy.exec(namespace, pod, arrayOf("rm", "-rf", podPath), false).waitFor() != 0) throw NotFoundException(name)
     }
 
     override fun toString() = path

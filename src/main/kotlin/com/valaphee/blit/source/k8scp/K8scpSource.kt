@@ -41,29 +41,26 @@ class K8scpSource(
         } else "/"
 
     override suspend fun get(path: String): K8scpEntry {
-        val (namespace, pod, path) = getNamespacePodAndPath(path)
+        val (namespace, pod, podPath) = getNamespacePodAndPath(path)
         return if (namespace != null && pod != null) {
-            val process = copy.exec(namespace, pod, arrayOf("stat", "--format", "%A 0 %U %G %s %y %n", path), false)
-            val attributes = BufferedReader(InputStreamReader(process.inputStream)).use { parseLsEntry(it.readText())?.second }
-            if (process.waitFor() == 0) attributes?.let { K8scpEntry(this, path!!, it) } ?: throw NotFoundException(path!!) else throw NotFoundException(path!!)
-        } else K8scpEntry(this, path!!, K8scpEntry.namespaceOrPodAttributes)
+            val process = copy.exec(namespace, pod, arrayOf("stat", "--format", "%A 0 %U %G %s %y %n", podPath), false)
+            BufferedReader(InputStreamReader(process.inputStream)).use { parseLsEntry(it.readText())?.second }?.let { K8scpEntry(this, path, it) } ?: throw NotFoundException(path)
+        } else K8scpEntry(this, path, K8scpEntry.namespaceOrPodAttributes)
     }
 
-    internal fun getNamespacePodAndPath(path: String): Triple<String?, String?, String?> {
-        return if (namespace.isNotEmpty()) {
-            if (pod.isNotEmpty()) {
-                Triple(namespace, pod, path)
-            } else {
-                val podAndPath = path.split('/', limit = 3)
-                val pod = podAndPath.getOrNull(1)
-                Triple(namespace, if (pod.isNullOrEmpty()) null else pod, "/${podAndPath.getOrNull(2) ?: ""}")
-            }
+    internal fun getNamespacePodAndPath(path: String) = if (namespace.isNotEmpty()) {
+        if (pod.isNotEmpty()) {
+            Triple(namespace, pod, path)
         } else {
-            val namespacePodAndPath = path.split('/', limit = 4)
-            val namespace = namespacePodAndPath.getOrNull(1)
-            val pod = namespacePodAndPath.getOrNull(2)
-            Triple(if (namespace.isNullOrEmpty()) null else namespace, if (pod.isNullOrEmpty()) null else pod, "/${namespacePodAndPath.getOrNull(3) ?: ""}")
+            val podAndPath = path.split('/', limit = 3)
+            val pod = podAndPath.getOrNull(1)
+            Triple(namespace, if (pod.isNullOrEmpty()) null else pod, "/${podAndPath.getOrNull(2) ?: ""}")
         }
+    } else {
+        val namespacePodAndPath = path.split('/', limit = 4)
+        val namespace = namespacePodAndPath.getOrNull(1)
+        val pod = namespacePodAndPath.getOrNull(2)
+        Triple(if (namespace.isNullOrEmpty()) null else namespace, if (pod.isNullOrEmpty()) null else pod, "/${namespacePodAndPath.getOrNull(3) ?: ""}")
     }
 
     override fun close() = Unit

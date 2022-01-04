@@ -80,8 +80,8 @@ class Activity {
                 runLater { progress.value = tasks.onEach { if (it.progressProperty.value != it.progress) it.progressProperty.value = it.progress }.map { it.progress }.average() }
                 delay(50)
             }
+            runLater { progress.value = 0.0 }
         }
-        progress.value = 0.0
         update = false
     }
 
