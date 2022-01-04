@@ -65,16 +65,12 @@ class K8scpEntry(
 
     override suspend fun rename(name: String) {
         val (namespace, pod, path) = source.getNamespacePodAndPath(path)
-        if (K8scpSource.copy.exec(namespace, pod, arrayOf("mv", path!!, "${path.substringBeforeLast('/', "")}/$name"), false).waitFor() != 0) {
-            throw NotFoundException(name)
-        }
+        if (K8scpSource.copy.exec(namespace, pod, arrayOf("mv", path!!, "${path.substringBeforeLast('/', "")}/$name"), false).waitFor() != 0) throw NotFoundException(name)
     }
 
     override suspend fun delete() {
         val (namespace, pod, path) = source.getNamespacePodAndPath(path)
-        if (K8scpSource.copy.exec(namespace, pod, arrayOf("rm", "-rf", path!!), false).waitFor() != 0) {
-            throw NotFoundException(name)
-        }
+        if (K8scpSource.copy.exec(namespace, pod, arrayOf("rm", "-rf", path!!), false).waitFor() != 0) throw NotFoundException(name)
     }
 
     override fun toString() = path

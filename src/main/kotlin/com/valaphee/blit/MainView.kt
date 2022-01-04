@@ -37,6 +37,7 @@ import javafx.scene.control.TreeTableRow
 import javafx.scene.control.TreeTableView
 import javafx.scene.image.ImageView
 import javafx.scene.input.Clipboard
+import javafx.scene.input.DataFormat
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
 import javafx.scene.input.TransferMode
@@ -44,6 +45,7 @@ import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import jfxtras.styles.jmetro.JMetroStyleClass
+import kotlinx.coroutines.runBlocking
 import org.controlsfx.control.BreadCrumbBar
 import org.controlsfx.control.textfield.CustomTextField
 import tornadofx.Dimension
@@ -76,6 +78,9 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.PipedInputStream
+import java.io.PipedOutputStream
+import java.util.UUID
 
 /**
  * @author Kevin Ludwig
@@ -87,12 +92,13 @@ class MainView : View("Blit") {
 
     private val activity by di<Activity>()
 
+    private var dragEntries = HashMap<UUID, List<Entry<*>>>()
+
     override val root = vbox {
         _config.theme.apply(this)
         styleClass.add(JMetroStyleClass.BACKGROUND)
 
-        prefWidth = 1000.0
-        prefHeight = 800.0
+        setPrefSize(1000.0, 800.0)
 
         menubar {
             menu(locale["main.menu.file.name"]) {
@@ -125,12 +131,14 @@ class MainView : View("Blit") {
             }
             menu(locale["main.menu.help.name"]) { item(locale["main.menu.help.about.name"]) { action { find<AboutView>().openModal(resizable = false) } } }
         }
+
         splitpane {
             vgrow = Priority.ALWAYS
 
             @Suppress("UPPER_BOUND_VIOLATED_WARNING") add(Pane<Entry<*>>())
             @Suppress("UPPER_BOUND_VIOLATED_WARNING") add(Pane<Entry<*>>())
         }
+
         hbox {
             pane { hgrow = Priority.ALWAYS }
             button("...") { action { find<ActivityView>().openWindow() } }
@@ -253,34 +261,53 @@ class MainView : View("Blit") {
                 }
 
                 setRowFactory {
-                    object : TreeTableRow<Entry<T>>() {
-                        init {
-                            setOnDragDetected {
-                                startDragAndDrop(TransferMode.MOVE).apply {
-                                    setContent {
-                                        activity.runBlocking(locale["main.tree.task.download.name"]) {
-                                            suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
-                                                File(_config.temporaryPath, entry.name).mkdir()
-                                                entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
-                                            } else listOf(File(_config.temporaryPath, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
+                    TreeTableRow<Entry<T>>().apply {
+                        setOnDragDetected {
+                            if (source != null) startDragAndDrop(TransferMode.COPY).apply {
+                                dragView = snapshot(null, null)
 
-                                            putFiles(selectionModel.selectedItems.flatMap { flatten(it.value) })
-                                        }
-                                    }
+                                setContent {
+                                    val id = UUID.randomUUID()
+                                    this[dragEntriesFormat] = id
+                                    dragEntries[id] = selectionModel.selectedItems.map { it.value }
                                 }
-
-                                it.consume()
                             }
-                            setOnDragOver {
-                                if (it.gestureSource != this && it.dragboard.hasFiles()) it.acceptTransferModes(*TransferMode.COPY_OR_MOVE)
 
-                                it.consume()
-                            }
-                            setOnDragDropped {
-                                it.isDropCompleted = true
+                            it.consume()
+                        }
+                        setOnDragOver {
+                            if (source != null && (it.gestureSource != this && it.dragboard.hasFiles() || it.dragboard.hasContent(dragEntriesFormat))) it.acceptTransferModes(*TransferMode.COPY_OR_MOVE)
 
-                                it.consume()
+                            it.consume()
+                        }
+                        setOnDragDropped {
+                            source?.let { source ->
+                                if (it.dragboard.hasContent(dragEntriesFormat)) {
+                                    dragEntries.remove(it.dragboard.getContent(dragEntriesFormat))?.let { dragEntries ->
+                                        val target = treeItem?.value ?: runBlocking { source.get(source.home) }
+
+                                        fun flatten(entry: Entry<*>, path: String? = null) {
+                                            if (entry.directory) activity.launch(locale["main.tree.task.populate.name", entry.name]) { entry.list().forEach { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") } } else {
+                                                val outStream = PipedOutputStream()
+                                                val inStream = PipedInputStream(outStream)
+                                                activity.launch(locale["main.tree.task.download.name", entry.name]) {
+                                                    outStream.use {
+                                                        entry.transferTo(outStream)
+                                                        outStream.flush()
+                                                    }
+                                                }
+                                                activity.launch(locale["main.tree.task.upload.name", entry.name]) { inStream.use { target.transferFrom("${path?.let { "$path/" } ?: ""}${entry.name}", inStream, entry.size) } }
+                                            }
+                                        }
+
+                                        dragEntries.forEach(::flatten)
+
+                                        it.isDropCompleted = true
+                                    }
+                                } else TODO()
                             }
+
+                            it.consume()
                         }
                     }
                 }
@@ -380,6 +407,7 @@ class MainView : View("Blit") {
     companion object {
         private val windowsRootPath = "^[a-zA-Z]:[\\\\/].*\$".toRegex()
         internal val tableColumnBaseSetWidth = TableColumnBase::class.java.getDeclaredMethod("setWidth", Double::class.java).apply { isAccessible = true }
+        private val dragEntriesFormat = DataFormat("application/blit-entry-id")
 
         internal fun String.toCanonicalPath(): List<String> {
             replace('\\', '/').apply {

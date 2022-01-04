@@ -36,8 +36,7 @@ class AboutView : View("About Blit") {
         _config.theme.apply(this)
         styleClass.add(JMetroStyleClass.BACKGROUND)
 
-        prefWidth = 300.0
-        prefHeight = 100.0
+        setPrefSize(300.0, 100.0)
         alignment = Pos.CENTER
 
         imageview(Image(AboutView::class.java.getResourceAsStream("/app.png")))

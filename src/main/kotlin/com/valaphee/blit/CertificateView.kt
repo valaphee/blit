@@ -18,20 +18,24 @@ package com.valaphee.blit
 
 import com.valaphee.blit.data.config.Config
 import com.valaphee.blit.data.locale.Locale
+import javafx.scene.control.TabPane
+import javafx.scene.layout.Priority
 import javafx.stage.Stage
 import jfxtras.styles.jmetro.JMetroStyleClass
 import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.asn1.x500.style.BCStyle
-import org.controlsfx.control.BreadCrumbBar
 import tornadofx.View
 import tornadofx.action
 import tornadofx.button
 import tornadofx.buttonbar
-import tornadofx.form
 import tornadofx.readonlyColumn
 import tornadofx.smartResize
+import tornadofx.tab
 import tornadofx.tableview
+import tornadofx.tabpane
 import tornadofx.toObservable
+import tornadofx.vbox
+import tornadofx.vgrow
 import java.security.cert.X509Certificate
 
 /**
@@ -40,32 +44,39 @@ import java.security.cert.X509Certificate
 class CertificateView(
     private val chain: Array<out X509Certificate>,
     private val valid: Boolean
-) : View("Certificate${if (!valid) " (Invalid)" else ""}") {
+) : View("Certificate") {
     private val locale by di<Locale>()
     private val _config by di<Config>()
 
-    override val root = form {
+    override val root = vbox {
         _config.theme.apply(this)
         styleClass.add(JMetroStyleClass.BACKGROUND)
 
-        prefWidth = 500.0
+        setPrefSize(500.0, 600.0)
 
-        add(BreadCrumbBar(BreadCrumbBar.buildTreeModel(*chain.map { X500Name(it.subjectX500Principal.name).getRDNs(BCStyle.CN)[0].first.value }.toTypedArray())))
-        val certificate = chain.last()
-        tableview(listOf<Pair<String, Any>>(
-            "Version" to "V${certificate.version}",
-            "Serial number" to certificate.serialNumber.toString(16),
-            "Signature algorithm" to certificate.sigAlgName,
-            "Issuer" to certificate.issuerX500Principal,
-            "Valid from" to certificate.notBefore,
-            "Valid to" to certificate.notAfter,
-            "Subject" to certificate.subjectX500Principal
-        ).toObservable()) {
-            readonlyColumn("Field", Pair<String, Any>::first)
-            readonlyColumn("Value", Pair<String, Any>::second)
-            smartResize()
+        tabpane {
+            vgrow = Priority.ALWAYS
+            tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
 
-            setSortPolicy { false }
+            chain.forEach {
+                tab(X500Name(it.subjectX500Principal.name).getRDNs(BCStyle.CN)[0].first.value.toString()) {
+                    tableview(listOf<Pair<String, Any>>(
+                        "Version" to it.version,
+                        "Serial number" to it.serialNumber.toString(16),
+                        "Signature algorithm" to it.sigAlgName,
+                        "Issuer" to it.issuerX500Principal,
+                        "Valid from" to it.notBefore,
+                        "Valid to" to it.notAfter,
+                        "Subject" to it.subjectX500Principal
+                    ).toObservable()) {
+                        readonlyColumn("Field", Pair<String, Any>::first)
+                        readonlyColumn("Value", Pair<String, Any>::second)
+                        smartResize()
+
+                        setSortPolicy { false }
+                    }
+                }
+            }
         }
         buttonbar { button(locale["certificate.ok.text"]) { action { (scene.window as Stage).close() } } }
     }

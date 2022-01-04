@@ -50,8 +50,7 @@ class ConfigView : View("Configure Blit") {
         _config.theme.apply(this)
         styleClass.add(JMetroStyleClass.BACKGROUND)
 
-        prefWidth = 800.0
-        prefHeight = 600.0
+        setPrefSize(800.0, 600.0)
 
         tabpane {
             vgrow = Priority.ALWAYS

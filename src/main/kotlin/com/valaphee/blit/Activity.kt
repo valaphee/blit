@@ -65,6 +65,8 @@ class Activity {
                 block()
             } catch (ex: NotFoundException) {
                 runLater { ErrorView("Not found", "${ex.path} not found").openModal(resizable = false) }
+            } catch (ex: Throwable) {
+                ex.printStackTrace()
             }
         }
 

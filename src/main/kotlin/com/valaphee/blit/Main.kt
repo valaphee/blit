@@ -40,13 +40,13 @@ class Main : App(Image(Main::class.java.getResourceAsStream("/app.png")), MainVi
 fun main(arguments: Array<String>) {
     SvgImageLoaderFactory.install()
 
-    val injector = Guice.createInjector(DataModule(), object : AbstractModule() {
-        @Singleton
-        @Provides
-        fun locale(config: Config, locales: Map<String, @JvmSuppressWildcards Locale>) = locales[config.locale] ?: locales["en_US"]
-    })
-
     FX.dicontainer = object : DIContainer {
+        private val injector = Guice.createInjector(DataModule(), object : AbstractModule() {
+            @Singleton
+            @Provides
+            fun locale(config: Config, locales: Map<String, @JvmSuppressWildcards Locale>) = locales[config.locale] ?: locales["en_US"]
+        })
+
         override fun <T : Any> getInstance(type: KClass<T>) = injector.getInstance(type.java)
     }
 
