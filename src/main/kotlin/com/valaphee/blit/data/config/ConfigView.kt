@@ -37,6 +37,9 @@ import tornadofx.vgrow
 import kotlin.reflect.KClass
 
 /**
+ * Configuration view, used to modify the configuration data. Every option is grouped
+ * into a specific category like General, Sources or Network.
+ *
  * @author Kevin Ludwig
  */
 class ConfigView : View("Configure Blit") {
@@ -44,6 +47,7 @@ class ConfigView : View("Configure Blit") {
     private val _config by di<Config>()
     private val configModel by di<Config.Model>()
 
+    // Classes of tabs and their specific JavaFX counterpart, for selection
     private var tabs = mutableMapOf<KClass<out Component>, Tab>()
 
     override val root = vbox {
@@ -80,10 +84,20 @@ class ConfigView : View("Configure Blit") {
         }
     }
 
+    /**
+     * Used to select a specific tab.
+     *
+     * @param `class` Class of the tab to select
+     */
     fun <T : Fragment> select(`class`: KClass<out T>) {
         tabs[`class`]?.select()
     }
 
+    /**
+     * Used to select a specific tab.
+     *
+     * @param T Class of the tab to select
+     */
     inline fun <reified T> select() {
         @Suppress("UNCHECKED_CAST")
         select(T::class as KClass<Fragment>)

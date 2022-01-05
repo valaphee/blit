@@ -77,7 +77,7 @@ class Activity {
         update = true
         coroutineScope.launch {
             while (tasks.isNotEmpty()) {
-                runLater { progress.value = tasks.onEach { if (it.progressProperty.value != it.progress) it.progressProperty.value = it.progress }.map { it.progress }.average() }
+                runLater { progress.value = tasks.onEach { if (it.progressProperty.value != it.progress) it.progressProperty.value = it.progress }.map { if (it.progress == -1.0) 0.0 else it.progress }.average() }
                 delay(50)
             }
             runLater { progress.value = 0.0 }
@@ -91,8 +91,8 @@ class Activity {
     ) : AbstractCoroutineContextElement(Task) {
         companion object Key : CoroutineContext.Key<Task>
 
-        val progressProperty: DoubleProperty = SimpleDoubleProperty(0.0)
-        var progress = 0.0
+        val progressProperty: DoubleProperty = SimpleDoubleProperty(-1.0)
+        var progress = -1.0
     }
 }
 

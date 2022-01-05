@@ -32,6 +32,8 @@ import tornadofx.validator
 import java.io.File
 
 /**
+ * General configuration tab
+ *
  * @author Kevin Ludwig
  */
 class ConfigViewGeneral : Fragment("General") {

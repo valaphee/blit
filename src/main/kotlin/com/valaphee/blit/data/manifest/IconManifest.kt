@@ -24,6 +24,8 @@ import com.valaphee.blit.data.DataType
 import javafx.scene.image.Image
 
 /**
+ * Icon manifest data
+ *
  * @author Kevin Ludwig
  */
 @Singleton

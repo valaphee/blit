@@ -36,6 +36,8 @@ import tornadofx.selectedValueProperty
 import tornadofx.textfield
 
 /**
+ * Network configuration tab
+ *
  * @author Kevin Ludwig
  */
 class ConfigViewNetwork : Fragment("Network") {

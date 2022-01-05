@@ -17,6 +17,8 @@
 package com.valaphee.blit.data
 
 /**
+ * Thrown when a data type is not known
+ *
  * @author Kevin Ludwig
  */
 class UnknownDataTypeException : Exception {

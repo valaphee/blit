@@ -24,6 +24,8 @@ import java.text.MessageFormat
 import java.util.regex.Pattern
 
 /**
+ * Locale data
+ *
  * @author Kevin Ludwig
  */
 @DataType("locale")
@@ -34,8 +36,18 @@ class Locale(
     private val entriesFlat = entries.flatMap { flatten(it.key, it.value) }.toMap()
     private val entryFormats = mutableMapOf<String, MessageFormat>()
 
-    val dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, toJavaLocale())
+    /**
+     * Shortcut for getting the Locale-specific date format
+     */
+    val dateFormat: DateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, toJavaLocale())
 
+    /**
+     * Retrieve locale strings with formatting.
+     *
+     * @param key Key of the locale string
+     * @param arguments Arguments which are put into the specific placeholder (e.g. {0},...)
+     * @return Formatted locale string
+     */
     operator fun get(key: String, vararg arguments: Any?) = entriesFlat[key]?.let {
         (entryFormats[key] ?: (try {
             MessageFormat(it)
@@ -44,6 +56,9 @@ class Locale(
         }).also { entryFormats[key] = it }).format(arguments)
     } ?: key
 
+    /**
+     * Java Locale
+     */
     private fun toJavaLocale(): java.util.Locale = java.util.Locale.forLanguageTag(key.replace('_', '-'))
 
     companion object {

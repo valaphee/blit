@@ -25,6 +25,8 @@ import kotlin.reflect.KClass
 import kotlin.reflect.jvm.jvmName
 
 /**
+ * Keying data, to distinguish by content, not by location, name or extension.
+ *
  * @author Kevin Ludwig
  */
 @Target(AnnotationTarget.CLASS)
@@ -33,6 +35,8 @@ annotation class DataType(
 )
 
 /**
+ * Custom resolver for a more modular and dynamic data handling approach.
+ *
  * @author Kevin Ludwig
  */
 object DataTypeResolver : TypeIdResolverBase() {

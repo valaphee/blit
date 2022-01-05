@@ -54,11 +54,11 @@ class ActivityView : View("Activity") {
             placeholder = Label("")
 
             readonlyColumn("", Activity.Task::name) {
-                fixedWidth(250)
+                fixedWidth(400)
                 isReorderable = false
             }
-            readonlyColumn("Progress", Activity.Task::progressProperty) {
-                fixedWidth(125)
+            readonlyColumn("", Activity.Task::progressProperty) {
+                fixedWidth(200)
                 isReorderable = false
 
                 cellFormat {

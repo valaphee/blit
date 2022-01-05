@@ -42,6 +42,8 @@ import java.text.StringCharacterIterator
 import kotlin.math.abs
 
 /**
+ * Configuration data
+ *
  * @author Kevin Ludwig
  */
 @Singleton
@@ -50,7 +52,7 @@ class Config(
     theme: Theme = Theme.JMetroDark,
     locale: String = "en_US",
     dataSizeUnit: DataSizeUnit = DataSizeUnit.IEC,
-    temporaryPath: String = System.getProperty("java.tmpdir"),
+    temporaryPath: String = System.getProperty("java.io.tmpdir"),
     sources: List<SourceConfig> = listOf(LocalSourceConfig("local")),
     proxyMode: ProxyMode = ProxyMode.System,
     proxyHost: String = "",
@@ -58,6 +60,9 @@ class Config(
     proxyUsername: String = "",
     proxyPassword: String = ""
 ) : Data {
+    /**
+     * Themes are applied by calling the apply function in each JavaFX window.
+     */
     enum class Theme(
         @get:JsonValue val key: String,
         val apply: (Parent) -> Unit
@@ -67,6 +72,9 @@ class Config(
         JMetroDark("jmetro_dark", { JMetro(it, Style.DARK) })
     }
 
+    /**
+     * Data size unit, formatting works by calling the format function and returning the formatted string.
+     */
     enum class DataSizeUnit(
         @get:JsonValue val key: String,
         val format: (Long) -> String
@@ -100,6 +108,9 @@ class Config(
         })
     }
 
+    /**
+     * Proxy mode
+     */
     enum class ProxyMode {
         None,
         System,

@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.valaphee.blit.source.dav.DavSourceConfig
+import com.valaphee.blit.source.ftp.FtpSourceConfig
 import com.valaphee.blit.source.k8scp.K8scpSourceConfig
 import com.valaphee.blit.source.local.LocalSourceConfig
 import com.valaphee.blit.source.scp.ScpSourceConfig
@@ -39,6 +40,7 @@ import tornadofx.setValue
 )
 @JsonSubTypes(
     JsonSubTypes.Type(DavSourceConfig::class),
+    JsonSubTypes.Type(FtpSourceConfig::class),
     JsonSubTypes.Type(K8scpSourceConfig::class),
     JsonSubTypes.Type(LocalSourceConfig::class),
     JsonSubTypes.Type(ScpSourceConfig::class),

@@ -68,11 +68,12 @@
           }
         },
         "sources": {
-          "new.text": "New",
+          "new.text": "New {0}",
           "save.text": "Save",
           "delete.text": "Delete",
           "type": {
             "dav": "WebDAV",
+            "ftp": "FTP",
             "k8scp": "K8s CP",
             "local": "Local",
             "scp": "SCP",

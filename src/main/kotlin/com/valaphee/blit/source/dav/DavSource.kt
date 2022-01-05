@@ -65,7 +65,7 @@ class DavSource(
                 }
             }
             expectSuccess = false
-            install(HttpTimeout) { socketTimeoutMillis = 30 * 1000 }
+            install(HttpTimeout) { socketTimeoutMillis = 60_000L }
             install(HttpCookies)
             Auth {
                 basic {

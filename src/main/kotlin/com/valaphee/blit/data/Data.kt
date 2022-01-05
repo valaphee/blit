@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver
 
 /**
+ * Data
+ *
  * @author Kevin Ludwig
  */
 @JsonTypeInfo(

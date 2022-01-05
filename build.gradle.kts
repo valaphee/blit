@@ -18,17 +18,19 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     application
+    id("com.github.johnrengelman.shadow") version "7.0.0"
     id("com.palantir.git-version") version "0.12.3"
     id("edu.sc.seis.launch4j") version "2.5.0"
     kotlin("jvm") version "1.5.31"
     id("org.openjfx.javafxplugin") version "0.0.10"
+    id("com.gluonhq.gluonfx-gradle-plugin") version "1.0.10"
     signing
 }
 
-repositories {
-    mavenCentral()
-    mavenLocal()
-}
+group = "com.valaphee"
+val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDetails> by extra
+val details = versionDetails()
+version = "${details.lastTag}.${details.commitDistance}"
 
 dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.1")
@@ -39,6 +41,7 @@ dependencies {
     implementation("com.nativelibs4java:bridj:0.7.0")
     implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.3")
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.3")
+    implementation("commons-net:commons-net:3.8.0")
     implementation("de.codecentric.centerdevice:javafxsvg:1.3.0")
     implementation("io.github.classgraph:classgraph:4.8.138")
     implementation("io.ktor:ktor-client-auth:1.6.7")
@@ -53,11 +56,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.0")
     implementation("org.jfxtras:jmetro:11.6.15")
 }
-
-group = "com.valaphee"
-val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDetails> by extra
-val details = versionDetails()
-version = "${details.lastTag}.${details.commitDistance}"
 
 tasks {
     withType<JavaCompile> {
@@ -78,20 +76,27 @@ tasks {
             )
         }
     }
+
+    shadowJar {
+        archiveName = "blit.jar"
+    }
 }
+
+setProperty("mainClassName", "com.valaphee.blit.MainKt")
 
 application { mainClass.set("com.valaphee.blit.MainKt") }
 
 javafx { modules("javafx.controls", "javafx.graphics") }
 
 launch4j {
-    mainClassName = "com.valaphee.blit.MainKt"
+    jarTask = tasks.shadowJar.get()
     icon = "${projectDir}/app.ico"
     copyright = "Copyright (c) 2021, Valaphee"
     jvmOptions = setOf("--add-opens=java.base/java.nio=ALL-UNNAMED", "--add-opens java.base/jdk.internal.misc=ALL-UNNAMED", "-Dio.netty.tryReflectionSetAccessible=true")
     companyName = "Valaphee"
     fileDescription = "Blit is a free and open-source, cross-platform WebDAV, K8s CP and SFTP client with a vast list of features."
     productName = "Blit"
+    copyConfigurable = emptyArray<Any>()
 }
 
 signing { useGpgCmd() }

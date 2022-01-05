@@ -17,6 +17,8 @@
 package com.valaphee.blit.data
 
 /**
+ * Data which is keyed, like Locale data
+ *
  * @author Kevin Ludwig
  */
 abstract class KeyedData : Data {

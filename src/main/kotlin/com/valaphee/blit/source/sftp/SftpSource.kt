@@ -24,7 +24,10 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import org.apache.sshd.client.SshClient
+import org.apache.sshd.common.NamedFactory
+import org.apache.sshd.common.compression.BuiltinCompressions
 import org.apache.sshd.common.config.keys.loader.openssh.OpenSSHKeyPairResourceParser
+import org.apache.sshd.sftp.SftpModuleProperties
 import org.apache.sshd.sftp.client.SftpClient
 import org.apache.sshd.sftp.client.SftpClientFactory
 import org.apache.sshd.sftp.common.SftpConstants
@@ -49,6 +52,7 @@ class SftpSource(
             if (password.isNotEmpty()) sshSession.addPasswordIdentity(password)
             if (privateKey.isNotEmpty()) OpenSSHKeyPairResourceParser.INSTANCE.loadKeyPairs(null, Paths.get(privateKey), { _, _, _ -> TODO() }).firstOrNull()?.let { sshSession.addPublicKeyIdentity(it) }
             sshSession.auth().verify()
+            sshSession.properties[SftpModuleProperties.SFTP_CHANNEL_OPEN_TIMEOUT.name] = 60_000
             return SftpClientFactory.instance().createSftpClient(sshSession)
         }
 
@@ -79,7 +83,7 @@ class SftpSource(
 
     companion object {
         internal val sshClient = SshClient.setUpDefaultClient().apply {
-            /*NamedFactory.setUpBuiltinFactories(false, BuiltinCompressions.VALUES)*/
+            NamedFactory.setUpBuiltinFactories(false, BuiltinCompressions.VALUES)
             start()
         }
     }

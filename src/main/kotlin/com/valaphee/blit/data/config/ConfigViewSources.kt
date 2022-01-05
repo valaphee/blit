@@ -18,6 +18,11 @@ package com.valaphee.blit.data.config
 
 import com.valaphee.blit.data.locale.Locale
 import com.valaphee.blit.source.SourceConfig
+import com.valaphee.blit.source.dav.DavSourceConfig
+import com.valaphee.blit.source.k8scp.K8scpSourceConfig
+import com.valaphee.blit.source.local.LocalSourceConfig
+import com.valaphee.blit.source.scp.ScpSourceConfig
+import com.valaphee.blit.source.sftp.SftpSourceConfig
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.control.ContextMenu
 import javafx.scene.layout.Priority
@@ -35,6 +40,8 @@ import tornadofx.vbox
 import tornadofx.vgrow
 
 /**
+ * Sources configuration tab
+ *
  * @author Kevin Ludwig
  */
 class ConfigViewSources : Fragment("Sources") {
@@ -60,7 +67,42 @@ class ConfigViewSources : Fragment("Sources") {
                     }
                 }*/
 
-                selectionModel.selectedItems.onChange { contextMenu = ContextMenu().apply { it.list.firstOrNull()?.let { item(locale["config.sources.delete.text"]) { action { configModel.sources.remove(it) } } } ?: item(locale["config.sources.new.text"]) { action {} } } }
+                selectionModel.selectedItems.onChange {
+                    contextMenu = ContextMenu().apply {
+                        it.list.firstOrNull()?.let { item(locale["config.sources.delete.text"]) { action { configModel.sources.remove(it) } } } ?: run {
+                            item(locale["config.sources.new.text", locale["config.sources.type.dav"]]) {
+                                action {
+                                    configModel.sources.add(DavSourceConfig(locale["config.sources.new.text", locale["config.sources.type.dav"]]))
+                                    selectionModel.selectLast()
+                                }
+                            }
+                            item(locale["config.sources.new.text", locale["config.sources.type.k8scp"]]) {
+                                action {
+                                    configModel.sources.add(K8scpSourceConfig(locale["config.sources.new.text", locale["config.sources.type.k8scp"]]))
+                                    selectionModel.selectLast()
+                                }
+                            }
+                            item(locale["config.sources.new.text", locale["config.sources.type.local"]]) {
+                                action {
+                                    configModel.sources.add(LocalSourceConfig(locale["config.sources.new.text", locale["config.sources.type.local"]]))
+                                    selectionModel.selectLast()
+                                }
+                            }
+                            item(locale["config.sources.new.text", locale["config.sources.type.scp"]]) {
+                                action {
+                                    configModel.sources.add(ScpSourceConfig(locale["config.sources.new.text", locale["config.sources.type.scp"]]))
+                                    selectionModel.selectLast()
+                                }
+                            }
+                            item(locale["config.sources.new.text", locale["config.sources.type.sftp"]]) {
+                                action {
+                                    configModel.sources.add(SftpSourceConfig(locale["config.sources.new.text", locale["config.sources.type.sftp"]]))
+                                    selectionModel.selectLast()
+                                }
+                            }
+                        }
+                    }
+                }
             })
         }
         form {
