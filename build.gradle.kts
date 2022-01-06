@@ -23,7 +23,6 @@ plugins {
     id("edu.sc.seis.launch4j") version "2.5.0"
     kotlin("jvm") version "1.5.31"
     id("org.openjfx.javafxplugin") version "0.0.10"
-    id("com.gluonhq.gluonfx-gradle-plugin") version "1.0.10"
     signing
 }
 
@@ -77,9 +76,7 @@ tasks {
         }
     }
 
-    shadowJar {
-        archiveName = "blit.jar"
-    }
+    shadowJar { archiveName = "blit.jar" }
 }
 
 setProperty("mainClassName", "com.valaphee.blit.MainKt")

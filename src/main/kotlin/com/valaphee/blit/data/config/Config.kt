@@ -42,7 +42,8 @@ import java.text.StringCharacterIterator
 import kotlin.math.abs
 
 /**
- * Configuration data
+ * A [Config] is a kind of [Data] which stores user-given preferences and used by Jackson for persistence
+ * and will be injected.
  *
  * @author Kevin Ludwig
  */
@@ -61,7 +62,10 @@ class Config(
     proxyPassword: String = ""
 ) : Data {
     /**
-     * Themes are applied by calling the apply function in each JavaFX window.
+     * Themes can change the look and feel of the application.
+     *
+     * @property key the key used by jackson serialization, and locale-mapping.
+     * @property apply the function which applies the look and feel to each view.
      */
     enum class Theme(
         @get:JsonValue val key: String,
@@ -73,7 +77,10 @@ class Config(
     }
 
     /**
-     * Data size unit, formatting works by calling the format function and returning the formatted string.
+     * As there a different ways to display data sizes, they can be changed to the user preference.
+     *
+     * @property key the key used by jackson serialization, and locale-mapping.
+     * @property format the function which formats bytes-count into a (human-readable) text.
      */
     enum class DataSizeUnit(
         @get:JsonValue val key: String,
@@ -118,37 +125,71 @@ class Config(
     }
 
     @get:JsonIgnore internal val themeProperty = SimpleObjectProperty(theme)
+    @get:JsonIgnore internal val localeProperty = SimpleStringProperty(locale)
+    @get:JsonIgnore internal val dataSizeUnitProperty = SimpleObjectProperty(dataSizeUnit)
+    @get:JsonIgnore internal val temporaryPathProperty = SimpleStringProperty(temporaryPath)
+    @get:JsonIgnore internal val sourcesProperty = SimpleListProperty(sources.asObservable())
+    @get:JsonIgnore internal val proxyModeProperty = SimpleObjectProperty(proxyMode)
+    @get:JsonIgnore internal val proxyHostProperty = SimpleStringProperty(proxyHost)
+    @get:JsonIgnore internal val proxyPortProperty = SimpleIntegerProperty(proxyPort)
+    @get:JsonIgnore internal val proxyUsernameProperty = SimpleStringProperty(proxyUsername)
+    @get:JsonIgnore internal val proxyPasswordProperty = SimpleStringProperty(proxyPassword)
+
+    /**
+     * Theme
+     */
     var theme: Theme by themeProperty
 
-    @get:JsonIgnore internal val localeProperty = SimpleStringProperty(locale)
+    /**
+     * Locale
+     *
+     * In contrast to [java.util.Locale], they are formatted with an underscore separating
+     * language, country and variant, instead of a hyphen (e.g. de_DE instead of de-DE).
+     */
     var locale: String by localeProperty
 
-    @get:JsonIgnore internal val dataSizeUnitProperty = SimpleObjectProperty(dataSizeUnit)
+    /**
+     * Data size unit
+     */
     var dataSizeUnit: DataSizeUnit by dataSizeUnitProperty
 
-    @get:JsonIgnore internal val temporaryPathProperty = SimpleStringProperty(temporaryPath)
+    /**
+     * Temporary path
+     */
     var temporaryPath: String by temporaryPathProperty
 
-    @get:JsonIgnore internal val sourcesProperty = SimpleListProperty(sources.asObservable())
+    /**
+     * Sources
+     */
     var sources: ObservableList<SourceConfig> by sourcesProperty
 
-    @get:JsonIgnore internal val proxyModeProperty = SimpleObjectProperty(proxyMode)
+    /**
+     * Proxy mode
+     */
     var proxyMode: ProxyMode by proxyModeProperty
 
-    @get:JsonIgnore internal val proxyHostProperty = SimpleStringProperty(proxyHost)
+    /**
+     * Proxy host
+     */
     var proxyHost: String by proxyHostProperty
 
-    @get:JsonIgnore internal val proxyPortProperty = SimpleIntegerProperty(proxyPort)
+    /**
+     * Proxy port
+     */
     var proxyPort: Int by proxyPortProperty
 
-    @get:JsonIgnore internal val proxyUsernameProperty = SimpleStringProperty(proxyUsername)
+    /**
+     * Proxy username
+     */
     var proxyUsername: String by proxyUsernameProperty
 
-    @get:JsonIgnore internal val proxyPasswordProperty = SimpleStringProperty(proxyPassword)
+    /**
+     * Proxy password
+     */
     var proxyPassword: String by proxyPasswordProperty
 
     @Singleton
-    class Model @Inject constructor(
+    internal class Model @Inject constructor(
         config: Config
     ) : ItemViewModel<Config>(config) {
         private val objectMapper by di<ObjectMapper>()

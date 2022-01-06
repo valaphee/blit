@@ -24,7 +24,8 @@ import com.valaphee.blit.data.DataType
 import javafx.scene.image.Image
 
 /**
- * Icon manifest data
+ * A [IconManifest] is a kind of [Data] which is used to specify file icons to their respective file type or defined file/folder name.
+ * It is used by Jackson for persistence and will be injected.
  *
  * @author Kevin Ludwig
  */

@@ -32,7 +32,9 @@ import io.github.classgraph.ClassGraph
 import java.io.File
 
 /**
- * Loads the data when Guice is configured and makes them available for dependency injection.
+ * Responsible for finding, loading and making [Data] types available for dependency injection.
+ *
+ * @property path the path to search for data.
  *
  * @author Kevin Ludwig
  */

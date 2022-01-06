@@ -24,7 +24,14 @@ import java.text.MessageFormat
 import java.util.regex.Pattern
 
 /**
- * Locale data
+ * A [Locale] is a kind of [KeyedData] which is used for I18n to store texts which are translated into different
+ * languages, which the user can choose from. It is used by Jackson for persistence and will be injected
+ * as a map.
+ *
+ * Remind that Kotlin uses automatic wildcard types for JVM for this reason use Map<String, @JvmSuppressWildcards Locale>.
+ *
+ * @property key the key used by jackson serialization.
+ * @property entries the locale-specific entries (tree-structure)
  *
  * @author Kevin Ludwig
  */
@@ -33,20 +40,21 @@ class Locale(
     @get:JsonProperty("key") override val key: String,
     @get:JsonProperty("entries") val entries: Map<String, Any>
 ) : KeyedData() {
+    // To remove re-occurring parts of the key, entries are saved in a tree-structure, for retrieving a specific entry, they have to be flattened.
     private val entriesFlat = entries.flatMap { flatten(it.key, it.value) }.toMap()
     private val entryFormats = mutableMapOf<String, MessageFormat>()
 
     /**
-     * Shortcut for getting the Locale-specific date format
+     * Shorthand for accessing the locale-specific date format
      */
     val dateFormat: DateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, toJavaLocale())
 
     /**
-     * Retrieve locale strings with formatting.
+     * Get formatted texts
      *
-     * @param key Key of the locale string
-     * @param arguments Arguments which are put into the specific placeholder (e.g. {0},...)
-     * @return Formatted locale string
+     * @param key the key of the text, the tree hierarchy will be converted in a flat map and uses . as delimiter.
+     * @param arguments the arguments which are put into their respective placeholder (e.g. {0},...)
+     * @return the formatted text
      */
     operator fun get(key: String, vararg arguments: Any?) = entriesFlat[key]?.let {
         (entryFormats[key] ?: (try {
@@ -56,9 +64,6 @@ class Locale(
         }).also { entryFormats[key] = it }).format(arguments)
     } ?: key
 
-    /**
-     * Java Locale
-     */
     private fun toJavaLocale(): java.util.Locale = java.util.Locale.forLanguageTag(key.replace('_', '-'))
 
     companion object {

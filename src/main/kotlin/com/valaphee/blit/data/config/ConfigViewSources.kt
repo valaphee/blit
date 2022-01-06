@@ -65,7 +65,7 @@ class ConfigViewSources : Fragment("Sources") {
                             it.consume()
                         }
                     }
-                }*/
+                } FIXME: Text is invisible*/
 
                 selectionModel.selectedItems.onChange {
                     contextMenu = ContextMenu().apply {

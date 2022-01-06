@@ -17,7 +17,7 @@
 package com.valaphee.blit.data
 
 /**
- * Thrown when a data type is not known
+ * The [UnknownDataTypeException] is thrown when a data type is not known.
  *
  * @author Kevin Ludwig
  */

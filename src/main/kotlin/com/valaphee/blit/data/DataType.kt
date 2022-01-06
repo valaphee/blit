@@ -25,7 +25,8 @@ import kotlin.reflect.KClass
 import kotlin.reflect.jvm.jvmName
 
 /**
- * Keying data, to distinguish by content, not by location, name or extension.
+ * A [DataType] is used for keying data, and to not have them to distinguish by file name or location,
+ * only by its content.
  *
  * @author Kevin Ludwig
  */
@@ -35,7 +36,7 @@ annotation class DataType(
 )
 
 /**
- * Custom resolver for a more modular and dynamic data handling approach.
+ * The [DataTypeResolver] is responsible for ordering the specific data type key to a class.
  *
  * @author Kevin Ludwig
  */
@@ -43,6 +44,9 @@ object DataTypeResolver : TypeIdResolverBase() {
     private val classByType = mutableMapOf<String, KClass<*>>()
     private val typeByClass = mutableMapOf<KClass<*>, String>()
 
+    /**
+     * Scans the current classpath for any [DataType] annotation, and registers it.
+     */
     fun scan() {
         ClassGraph().enableClassInfo().enableAnnotationInfo().scan().use {
             val dataType = DataType::class.jvmName

@@ -17,7 +17,10 @@
 package com.valaphee.blit.data
 
 /**
- * Data which is keyed, like Locale data
+ * A [KeyedData] is a special kind of [Data] which will be available as a Map for dependency injection
+ * and doesn't have to be a singleton.
+ *
+ * Remind that Kotlin uses automatic wildcard types for JVM for this reason use Map<String, @JvmSuppressWildcards (subtype of KeyedData)>.
  *
  * @author Kevin Ludwig
  */

@@ -22,7 +22,13 @@ import java.io.Closeable
  * @author Kevin Ludwig
  */
 interface Source<T : Entry<T>> : Closeable {
+    /**
+     * Home path
+     */
     val home: String
 
+    /**
+     * Retrieving a path-specific entry of the source
+     */
     suspend fun get(path: String): T
 }

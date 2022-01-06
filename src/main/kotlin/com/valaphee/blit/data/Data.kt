@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver
 
 /**
- * Data
+ * A [Data] object is a Jackson serializable and injectable object
  *
  * @author Kevin Ludwig
  */
