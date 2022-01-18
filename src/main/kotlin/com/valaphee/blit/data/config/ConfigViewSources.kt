@@ -25,6 +25,7 @@ import com.valaphee.blit.source.scp.ScpSourceConfig
 import com.valaphee.blit.source.sftp.SftpSourceConfig
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.control.ContextMenu
+import javafx.scene.control.ListCell
 import javafx.scene.layout.Priority
 import tornadofx.Fragment
 import tornadofx.action
@@ -57,15 +58,23 @@ class ConfigViewSources : Fragment("Sources") {
 
                 vgrow = Priority.ALWAYS
 
-                /*setCellFactory {
-                    ListCell<SourceConfig>().apply {
-                        setOnMouseClicked {
-                            if (isEmpty) selectionModel.clearSelection()
+                setCellFactory {
+                    object : ListCell<SourceConfig>() {
+                        init {
+                            setOnMouseClicked {
+                                if (isEmpty) selectionModel.clearSelection()
 
-                            it.consume()
+                                it.consume()
+                            }
+                        }
+
+                        override fun updateItem(item: SourceConfig?, empty: Boolean) {
+                            super.updateItem(item, empty)
+
+                            text = if (empty || item == null) "" else item.name
                         }
                     }
-                } FIXME: Text is invisible*/
+                }
 
                 selectionModel.selectedItems.onChange {
                     contextMenu = ContextMenu().apply {
