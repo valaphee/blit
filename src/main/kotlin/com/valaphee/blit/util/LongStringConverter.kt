@@ -24,5 +24,5 @@ import javafx.util.StringConverter
 object LongStringConverter : StringConverter<Number>() {
     override fun toString(`object`: Number?) = `object`?.toString() ?: ""
 
-    override fun fromString(string: String?) =  string?.toLongOrNull()
+    override fun fromString(string: String?) = string?.toLongOrNull()
 }

@@ -59,15 +59,17 @@ class CertificateView(
 
             chain.forEach {
                 tab(X500Name(it.subjectX500Principal.name).getRDNs(BCStyle.CN)[0].first.value.toString()) {
-                    tableview(listOf<Pair<String, Any>>(
-                        "Version" to it.version,
-                        "Serial number" to it.serialNumber.toString(16),
-                        "Signature algorithm" to it.sigAlgName,
-                        "Issuer" to it.issuerX500Principal,
-                        "Valid from" to it.notBefore,
-                        "Valid to" to it.notAfter,
-                        "Subject" to it.subjectX500Principal
-                    ).toObservable()) {
+                    tableview(
+                        listOf<Pair<String, Any>>(
+                            "Version" to it.version,
+                            "Serial number" to it.serialNumber.toString(16),
+                            "Signature algorithm" to it.sigAlgName,
+                            "Issuer" to it.issuerX500Principal,
+                            "Valid from" to it.notBefore,
+                            "Valid to" to it.notAfter,
+                            "Subject" to it.subjectX500Principal
+                        ).toObservable()
+                    ) {
                         readonlyColumn("Field", Pair<String, Any>::first) { isReorderable = false }
                         readonlyColumn("Value", Pair<String, Any>::second) { isReorderable = false }
 

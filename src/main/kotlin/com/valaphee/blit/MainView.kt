@@ -374,7 +374,8 @@ class MainView : View("Blit") {
                         val file = File(_config.temporaryPath, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }
                         try {
                             Desktop.getDesktop().open(file)
-                        } catch (_: IOException) {}
+                        } catch (_: IOException) {
+                        }
                     }
                 }
             }

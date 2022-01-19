@@ -17,8 +17,8 @@
 package com.valaphee.blit.source.dav
 
 import com.fasterxml.jackson.annotation.JsonTypeName
-import com.valaphee.blit.util.LongStringConverter
 import com.valaphee.blit.source.SourceConfig
+import com.valaphee.blit.util.LongStringConverter
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleLongProperty
 import javafx.beans.property.SimpleStringProperty

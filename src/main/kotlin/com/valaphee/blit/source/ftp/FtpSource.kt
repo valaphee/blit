@@ -52,14 +52,15 @@ class FtpSource(
         }
     }
 
-    override val home: String get() = runBlocking {
-        semaphore.withPermit {
-            pool.useInstance {
-                it.pwd()
-                it.replyString
+    override val home: String
+        get() = runBlocking {
+            semaphore.withPermit {
+                pool.useInstance {
+                    it.pwd()
+                    it.replyString
+                }
             }
         }
-    }
 
     override suspend fun get(path: String) = semaphore.withPermit { pool.useInstance { FtpEntry(this, path, FTPFile()) } }
 
