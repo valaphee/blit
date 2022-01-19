@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit.data.config
+package com.valaphee.blit.config
 
 import com.google.inject.Injector
 import com.google.inject.Key
-import com.valaphee.blit.data.locale.Locale
+import com.valaphee.blit.locale.Locale
 import tornadofx.Fragment
 import tornadofx.action
 import tornadofx.button

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit.data.config
+package com.valaphee.blit.config
 
-import com.valaphee.blit.data.locale.Locale
+import com.valaphee.blit.locale.Locale
 import com.valaphee.blit.source.SourceConfig
 import com.valaphee.blit.source.dav.DavSourceConfig
 import com.valaphee.blit.source.k8scp.K8scpSourceConfig

@@ -18,7 +18,7 @@ package com.valaphee.blit.source.sftp
 
 import com.valaphee.blit.source.AbstractEntry
 import com.valaphee.blit.source.NotFoundException
-import com.valaphee.blit.source.transferToWithProgress
+import com.valaphee.blit.util.transferToWithProgress
 import io.ktor.utils.io.pool.useInstance
 import kotlinx.coroutines.sync.withPermit
 import org.apache.sshd.sftp.client.SftpClient

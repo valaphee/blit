@@ -16,13 +16,12 @@
 
 package com.valaphee.blit
 
-import com.valaphee.blit.data.config.Config
-import com.valaphee.blit.data.config.ConfigView
-import com.valaphee.blit.data.config.ConfigViewGeneral
-import com.valaphee.blit.data.config.ConfigViewNetwork
-import com.valaphee.blit.data.config.ConfigViewSources
-import com.valaphee.blit.data.locale.Locale
-import com.valaphee.blit.data.manifest.IconManifest
+import com.valaphee.blit.config.Config
+import com.valaphee.blit.config.ConfigView
+import com.valaphee.blit.config.ConfigViewGeneral
+import com.valaphee.blit.config.ConfigViewNetwork
+import com.valaphee.blit.config.ConfigViewSources
+import com.valaphee.blit.locale.Locale
 import com.valaphee.blit.source.Entry
 import com.valaphee.blit.source.Source
 import com.valaphee.blit.source.SourceConfig

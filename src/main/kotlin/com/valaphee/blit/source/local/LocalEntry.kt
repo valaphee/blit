@@ -18,7 +18,7 @@ package com.valaphee.blit.source.local
 
 import com.valaphee.blit.source.AbstractEntry
 import com.valaphee.blit.source.NotFoundException
-import com.valaphee.blit.source.transferToWithProgress
+import com.valaphee.blit.util.transferToWithProgress
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException

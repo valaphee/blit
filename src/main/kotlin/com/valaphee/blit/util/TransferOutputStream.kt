@@ -14,15 +14,29 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit.source
+package com.valaphee.blit.util
 
-import javafx.util.StringConverter
+import java.io.FilterOutputStream
+import java.io.OutputStream
 
 /**
  * @author Kevin Ludwig
  */
-object IntStringConverter : StringConverter<Number>() {
-    override fun toString(`object`: Number?) = `object`?.toString() ?: ""
+class TransferOutputStream(
+    private val stream: OutputStream,
+    private val onWrite: (Long) -> Unit
+) : FilterOutputStream(stream) {
+    private var writeSum = 0L
 
-    override fun fromString(string: String?) =  string?.toIntOrNull()
+    override fun write(b: Int) {
+        stream.write(b)
+        writeSum++
+        onWrite(writeSum)
+    }
+
+    override fun write(b: ByteArray, off: Int, len: Int) {
+        stream.write(b, off, len)
+        writeSum += len
+        onWrite(writeSum)
+    }
 }

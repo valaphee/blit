@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit.data.config
+package com.valaphee.blit.config
 
-import com.valaphee.blit.data.locale.Locale
-import com.valaphee.blit.source.IntStringConverter
+import com.valaphee.blit.locale.Locale
+import com.valaphee.blit.util.IntStringConverter
 import javafx.scene.control.ToggleGroup
 import javafx.scene.layout.Priority
 import tornadofx.Fragment

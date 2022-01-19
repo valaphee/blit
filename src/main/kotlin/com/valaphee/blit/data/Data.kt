@@ -16,8 +16,11 @@
 
 package com.valaphee.blit.data
 
+import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver
+import com.valaphee.blit.IconManifest
+import com.valaphee.blit.config.Config
+import com.valaphee.blit.locale.Locale
 
 /**
  * A [Data] object is a Jackson serializable and injectable object
@@ -28,5 +31,9 @@ import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.WRAPPER_OBJECT
 )
-@JsonTypeIdResolver(DataTypeResolver::class)
+@JsonSubTypes(
+    JsonSubTypes.Type(Config::class),
+    JsonSubTypes.Type(Locale::class),
+    JsonSubTypes.Type(IconManifest::class),
+)
 interface Data

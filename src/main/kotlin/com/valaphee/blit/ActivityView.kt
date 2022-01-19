@@ -16,8 +16,8 @@
 
 package com.valaphee.blit
 
-import com.valaphee.blit.data.config.Config
-import com.valaphee.blit.data.locale.Locale
+import com.valaphee.blit.config.Config
+import com.valaphee.blit.locale.Locale
 import javafx.scene.control.Label
 import javafx.scene.layout.Priority
 import jfxtras.styles.jmetro.JMetroStyleClass

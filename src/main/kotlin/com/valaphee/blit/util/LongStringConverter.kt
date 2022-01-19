@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit.data
+package com.valaphee.blit.util
+
+import javafx.util.StringConverter
 
 /**
- * The [UnknownDataTypeException] is thrown when a data type is not known.
- *
  * @author Kevin Ludwig
  */
-class UnknownDataTypeException : Exception {
-    constructor() : super()
+object LongStringConverter : StringConverter<Number>() {
+    override fun toString(`object`: Number?) = `object`?.toString() ?: ""
 
-    constructor(message: String) : super(message)
-
-    constructor(message: String, cause: Throwable) : super(message, cause)
-
-    constructor(cause: Throwable) : super(cause)
+    override fun fromString(string: String?) =  string?.toLongOrNull()
 }

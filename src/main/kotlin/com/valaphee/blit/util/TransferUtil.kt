@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit.source
+package com.valaphee.blit.util
 
 import com.valaphee.blit.progress
 import io.ktor.utils.io.ByteReadChannel

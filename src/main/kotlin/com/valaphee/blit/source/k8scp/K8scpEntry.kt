@@ -19,7 +19,7 @@ package com.valaphee.blit.source.k8scp
 import com.valaphee.blit.source.AbstractEntry
 import com.valaphee.blit.source.NotFoundException
 import com.valaphee.blit.source.scp.parseLsEntry
-import com.valaphee.blit.source.transferToWithProgress
+import com.valaphee.blit.util.transferToWithProgress
 import org.apache.sshd.sftp.client.SftpClient
 import org.apache.sshd.sftp.common.SftpConstants
 import java.io.BufferedReader

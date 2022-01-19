@@ -21,8 +21,8 @@ import com.google.inject.Guice
 import com.google.inject.Provides
 import com.google.inject.Singleton
 import com.valaphee.blit.data.DataModule
-import com.valaphee.blit.data.config.Config
-import com.valaphee.blit.data.locale.Locale
+import com.valaphee.blit.config.Config
+import com.valaphee.blit.locale.Locale
 import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory
 import javafx.scene.image.Image
 import tornadofx.App

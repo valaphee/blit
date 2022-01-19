@@ -52,8 +52,6 @@ class DataModule(
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
         }.also { bind(ObjectMapper::class.java).toInstance(it) }
 
-        DataTypeResolver.scan()
-
         ClassGraph().acceptPaths("data").scan().use {
             val (keyed, other) = (it.allResources.map { it.url } + path.walk().filter { it.isFile }.map { it.toURI().toURL() })
                 .mapNotNull {
@@ -71,7 +69,7 @@ class DataModule(
                 }
                 .partition { it is KeyedData }
             keyed.filterIsInstance<KeyedData>()
-                .groupBy { DataTypeResolver.typeByClass(it::class) }
+                .groupBy { it::class }
                 .forEach { (_, value) ->
                     @Suppress("UNCHECKED_CAST")
                     (bind(TypeLiteral.get(Types.mapOf(String::class.java, value.first()::class.java))) as AnnotatedBindingBuilder<Any>).toInstance(value.associateBy { it.key })

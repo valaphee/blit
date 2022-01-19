@@ -20,7 +20,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.valaphee.blit.progress
 import com.valaphee.blit.source.AbstractEntry
 import com.valaphee.blit.source.NotFoundException
-import com.valaphee.blit.source.transferToWithProgress
+import com.valaphee.blit.util.transferToWithProgress
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.headers

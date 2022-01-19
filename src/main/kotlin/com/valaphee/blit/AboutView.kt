@@ -16,7 +16,7 @@
 
 package com.valaphee.blit
 
-import com.valaphee.blit.data.config.Config
+import com.valaphee.blit.config.Config
 import javafx.geometry.Pos
 import javafx.scene.image.Image
 import javafx.scene.text.TextAlignment

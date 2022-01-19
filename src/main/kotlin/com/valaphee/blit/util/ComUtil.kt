@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit
+package com.valaphee.blit.util
 
 import com.sun.javafx.tk.TKStage
 import javafx.stage.Stage
@@ -34,6 +34,7 @@ val Stage.hWnd: Pointer<Int>?
                 javaClass.getMethod("impl_getPeer")
             }.apply { isAccessible = true }.invoke(this) as TKStage
             val platformWindow = tkStage.javaClass.getDeclaredMethod("getPlatformWindow").apply { isAccessible = true }.invoke(tkStage)
+            @Suppress("UNCHECKED_CAST")
             Pointer.pointerToAddress(platformWindow.javaClass.getMethod("getNativeHandle").apply { isAccessible = true }.invoke(platformWindow) as Long) as Pointer<Int>
         } catch (ex: Throwable) {
             ex.printStackTrace()

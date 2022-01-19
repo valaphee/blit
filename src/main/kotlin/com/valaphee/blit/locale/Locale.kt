@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit.data.locale
+package com.valaphee.blit.locale
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.valaphee.blit.data.DataType
+import com.fasterxml.jackson.annotation.JsonTypeName
 import com.valaphee.blit.data.KeyedData
 import java.text.DateFormat
 import java.text.MessageFormat
@@ -35,7 +35,7 @@ import java.util.regex.Pattern
  *
  * @author Kevin Ludwig
  */
-@DataType("locale")
+@JsonTypeName("locale")
 class Locale(
     @get:JsonProperty("key") override val key: String,
     @get:JsonProperty("entries") val entries: Map<String, Any>
@@ -47,7 +47,7 @@ class Locale(
     /**
      * Shorthand for accessing the locale-specific date format
      */
-    val dateFormat: DateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, toJavaLocale())
+    val dateFormat: DateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, java.util.Locale.forLanguageTag(key.replace('_', '-')))
 
     /**
      * Get formatted texts
@@ -63,8 +63,6 @@ class Locale(
             MessageFormat(pattern.matcher(it).replaceAll("\\[$1\\]"))
         }).also { entryFormats[key] = it }).format(arguments)
     } ?: key
-
-    private fun toJavaLocale(): java.util.Locale = java.util.Locale.forLanguageTag(key.replace('_', '-'))
 
     companion object {
         private val pattern = Pattern.compile("\\{(\\D*?)}")

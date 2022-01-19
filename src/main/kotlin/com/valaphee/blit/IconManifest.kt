@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit.data.manifest
+package com.valaphee.blit
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonTypeName
 import com.google.inject.Singleton
 import com.valaphee.blit.data.Data
-import com.valaphee.blit.data.DataType
 import javafx.scene.image.Image
 
 /**
@@ -30,7 +30,7 @@ import javafx.scene.image.Image
  * @author Kevin Ludwig
  */
 @Singleton
-@DataType("icon_manifest")
+@JsonTypeName("icon_manifest")
 class IconManifest(
     @get:JsonProperty("default_file_icon") val defaultFileIcon: FileIcon,
     @get:JsonProperty("file_icons") val fileIcons: List<FileIcon>,

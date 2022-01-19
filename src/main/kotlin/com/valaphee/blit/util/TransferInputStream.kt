@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit.source
+package com.valaphee.blit.util
 
 import java.io.FilterInputStream
 import java.io.InputStream

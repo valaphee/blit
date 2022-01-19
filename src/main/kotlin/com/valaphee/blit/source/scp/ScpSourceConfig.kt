@@ -17,8 +17,8 @@
 package com.valaphee.blit.source.scp
 
 import com.fasterxml.jackson.annotation.JsonTypeName
-import com.valaphee.blit.source.IntStringConverter
 import com.valaphee.blit.source.SourceConfig
+import com.valaphee.blit.util.IntStringConverter
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventTarget

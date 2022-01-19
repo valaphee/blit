@@ -18,8 +18,8 @@ package com.valaphee.blit.source.scp
 
 import com.valaphee.blit.progress
 import com.valaphee.blit.source.AbstractEntry
-import com.valaphee.blit.source.TransferInputStream
-import com.valaphee.blit.source.TransferOutputStream
+import com.valaphee.blit.util.TransferInputStream
+import com.valaphee.blit.util.TransferOutputStream
 import io.ktor.utils.io.pool.useInstance
 import kotlinx.coroutines.sync.withPermit
 import org.apache.sshd.scp.common.helpers.ScpTimestampCommandDetails

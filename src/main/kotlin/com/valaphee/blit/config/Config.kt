@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit.data.config
+package com.valaphee.blit.config
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonTypeName
 import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import com.valaphee.blit.data.Data
-import com.valaphee.blit.data.DataType
 import com.valaphee.blit.source.SourceConfig
 import com.valaphee.blit.source.local.LocalSourceConfig
 import javafx.beans.property.SimpleIntegerProperty
@@ -48,7 +48,7 @@ import kotlin.math.abs
  * @author Kevin Ludwig
  */
 @Singleton
-@DataType("config")
+@JsonTypeName("config")
 class Config(
     theme: Theme = Theme.JMetroDark,
     locale: String = "en_US",

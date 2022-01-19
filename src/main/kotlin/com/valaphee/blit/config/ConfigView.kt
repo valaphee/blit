@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit.data.config
+package com.valaphee.blit.config
 
-import com.valaphee.blit.data.locale.Locale
+import com.valaphee.blit.locale.Locale
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import javafx.scene.layout.Priority
