@@ -44,5 +44,3 @@ gradle-app.setting
 .idea
 *.iws
 *.iml
-
-/data

@@ -70,12 +70,12 @@ class SftpEntry(
         source.semaphore.withPermit { source.pool.useInstance { it.write("$path/$name").use { stream.transferToWithProgress(it, length) } } }
     }
 
-    override suspend fun rename(name: String) {
+    override suspend fun rename(path: String) {
         try {
-            source.semaphore.withPermit { source.pool.useInstance { it.rename(path, "${path.substringBeforeLast('/', "")}/$name") } }
+            source.semaphore.withPermit { source.pool.useInstance { it.rename(this.path, path) } }
         } catch (ex: SftpException) {
             when (ex.status) {
-                SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundException(path)
+                SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundException(this.path)
                 else -> throw ex
             }
         }

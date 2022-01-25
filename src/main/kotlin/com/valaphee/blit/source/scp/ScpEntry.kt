@@ -57,8 +57,8 @@ class ScpEntry(
         source.semaphore.withPermit { source.pool.useInstance { it.upload(TransferInputStream(stream) { coroutineContext.progress = it / length.toDouble() }, "$path/$name", length, permissions, ScpTimestampCommandDetails(time, time)) } }
     }
 
-    override suspend fun rename(name: String) {
-        source.semaphore.withPermit { source.pool.useInstance { it.session.executeRemoteCommand("""mv "$path" "${path.substringBeforeLast('/', "")}/$name"""") } }
+    override suspend fun rename(path: String) {
+        source.semaphore.withPermit { source.pool.useInstance { it.session.executeRemoteCommand("""mv "${this.path}" "$path"""") } }
     }
 
     override suspend fun delete() {

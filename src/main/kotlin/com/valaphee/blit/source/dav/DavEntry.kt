@@ -124,10 +124,10 @@ class DavEntry(
         }
     }
 
-    override suspend fun rename(name: String) {
-        source.httpClient.request<Unit>("${source._url}/$path") {
+    override suspend fun rename(path: String) {
+        source.httpClient.request<Unit>("${source._url}/${this.path}") {
             method = httpMethodMove
-            headers { this["Destination"] = URLBuilder("${source._url}/${path.substringBeforeLast('/', "")}/$name").buildString() }
+            headers { this["Destination"] = URLBuilder("${source._url}/$path").buildString() }
         }
     }
 

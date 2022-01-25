@@ -81,9 +81,9 @@ interface Entry<T : Entry<T>> {
     /**
      * Renaming the entry. Will render this entry invalid.
      *
-     * @param name the name of the new entry
+     * @param path the path of the new entry
      */
-    suspend fun rename(name: String)
+    suspend fun rename(path: String)
 
     /**
      * Deleting the entry. Will render this entry invalid.

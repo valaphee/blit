@@ -53,8 +53,8 @@ class LocalEntry(
         FileOutputStream("$file/$name").use { stream.transferToWithProgress(it, size) }
     }
 
-    override suspend fun rename(name: String) {
-        file.renameTo(File(file.parentFile, name))
+    override suspend fun rename(path: String) {
+        file.renameTo(File(path))
     }
 
     override suspend fun delete() {

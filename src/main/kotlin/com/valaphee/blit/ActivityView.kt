@@ -23,10 +23,10 @@ import javafx.scene.layout.Priority
 import jfxtras.styles.jmetro.JMetroStyleClass
 import tornadofx.View
 import tornadofx.fixedWidth
-import tornadofx.onChange
 import tornadofx.progressbar
 import tornadofx.readonlyColumn
 import tornadofx.stackpane
+import tornadofx.stringBinding
 import tornadofx.tableview
 import tornadofx.text
 import tornadofx.vbox
@@ -64,7 +64,7 @@ class ActivityView : View("Activity") {
                 cellFormat {
                     graphic = stackpane {
                         progressbar(it)
-                        text().apply { it.onChange { text = progressFormat.format(it) } }
+                        text(it.stringBinding { progressFormat.format(it) })
                     }
                 }
             }

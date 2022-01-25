@@ -16,10 +16,7 @@
 
 package com.valaphee.blit.data
 
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -39,42 +36,33 @@ import java.io.File
  * @author Kevin Ludwig
  */
 class DataModule(
-    private val path: File = File("data")
+    private val path: File
 ) : AbstractModule() {
     @Inject lateinit var objectMapper: ObjectMapper
 
     override fun configure() {
-        if (!::objectMapper.isInitialized) objectMapper = jacksonObjectMapper().apply {
-            registerModule(AfterburnerModule())
-            propertyNamingStrategy = PropertyNamingStrategies.SNAKE_CASE
-            setSerializationInclusion(JsonInclude.Include.NON_DEFAULT)
-            enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-            disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        }.also { bind(ObjectMapper::class.java).toInstance(it) }
+        if (!::objectMapper.isInitialized) objectMapper = jacksonObjectMapper().apply { registerModule(AfterburnerModule()) }.also { bind(ObjectMapper::class.java).toInstance(it) }
 
         ClassGraph().acceptPaths("data").scan().use {
-            val (keyed, other) = (it.allResources.map { it.url } + path.walk().filter { it.isFile }.map { it.toURI().toURL() })
+            val (keyedData, data) = (it.allResources.map { it.url } + path.walk().filter { it.isFile }.map { it.toURI().toURL() })
                 .mapNotNull {
-                    try {
-                        when (it.file.substring(it.file.lastIndexOf('.') + 1)) {
-                            "json" -> {
-                                @Suppress("UNCHECKED_CAST")
-                                objectMapper.readValue<Data>(it)
-                            }
-                            else -> null
+                    when (it.file.substring(it.file.lastIndexOf('.') + 1)) {
+                        "json" -> try {
+                            objectMapper.readValue<Data>(it)
+                        } catch (_: Throwable) {
+                            null
                         }
-                    } catch (e: Throwable) {
-                        e.printStackTrace()
+                        else -> null
                     }
                 }
                 .partition { it is KeyedData }
-            keyed.filterIsInstance<KeyedData>()
+            keyedData.filterIsInstance<KeyedData>()
                 .groupBy { it::class }
                 .forEach { (_, value) ->
                     @Suppress("UNCHECKED_CAST")
                     (bind(TypeLiteral.get(Types.mapOf(String::class.java, value.first()::class.java))) as AnnotatedBindingBuilder<Any>).toInstance(value.associateBy { it.key })
                 }
-            other.forEach {
+            data.forEach {
                 @Suppress("UNCHECKED_CAST")
                 (bind(it::class.java) as AnnotatedBindingBuilder<Any>).toInstance(it)
             }

@@ -48,7 +48,7 @@ import kotlin.math.abs
  * @author Kevin Ludwig
  */
 @Singleton
-@JsonTypeName("config")
+@JsonTypeName("blit:config")
 class Config(
     theme: Theme = Theme.JMetroDark,
     locale: String = "en_US",
@@ -206,7 +206,7 @@ class Config(
         val proxyPassword = bind(Config::proxyPasswordProperty)
 
         override fun onCommit() {
-            objectMapper.writeValue(File(File("data").also(File::mkdir), "config.json"), Config(theme.value, locale.value, dataSizeUnit.value, temporaryPath.value, sources, proxyMode.value, proxyHost.value, proxyPort.value, proxyUsername.value, proxyPassword.value))
+            objectMapper.writeValue(File(File(System.getProperty("user.home"), ".valaphee/blit").also(File::mkdirs), "config.json"), Config(theme.value, locale.value, dataSizeUnit.value, temporaryPath.value, sources, proxyMode.value, proxyHost.value, proxyPort.value, proxyUsername.value, proxyPassword.value))
         }
     }
 }

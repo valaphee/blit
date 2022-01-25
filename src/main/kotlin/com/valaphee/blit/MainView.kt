@@ -34,6 +34,7 @@ import javafx.scene.control.TableColumnBase
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeTableRow
 import javafx.scene.control.TreeTableView
+import javafx.scene.control.cell.TextFieldTreeTableCell
 import javafx.scene.image.ImageView
 import javafx.scene.input.Clipboard
 import javafx.scene.input.DataFormat
@@ -42,7 +43,6 @@ import javafx.scene.input.KeyEvent
 import javafx.scene.input.TransferMode
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
-import javafx.stage.Stage
 import jfxtras.styles.jmetro.JMetroStyleClass
 import kotlinx.coroutines.runBlocking
 import org.controlsfx.control.BreadCrumbBar
@@ -126,7 +126,7 @@ class MainView : View("Blit") {
                     }
                 }
                 separator()
-                item(locale["main.menu.file.exit.name"]) { action { (scene.window as Stage).close() } }
+                item(locale["main.menu.file.exit.name"]) { action { close() } }
             }
             menu(locale["main.menu.help.name"]) { item(locale["main.menu.help.about.name"]) { action { find<AboutView>().openModal(resizable = false) } } }
         }
@@ -234,17 +234,33 @@ class MainView : View("Blit") {
                 vgrow = Priority.ALWAYS
                 isShowRoot = false
                 selectionModel.selectionMode = SelectionMode.MULTIPLE
-
+                /*isEditable = true*/
                 placeholder = Label("")
 
                 column(locale["main.tree.column.name.title"], Entry<T>::self) {
                     tableColumnBaseSetWidth(this, 250.0)
-                    cellFormat {
-                        val name = it.name
-                        text = name
-                        graphic = if (it.directory) ImageView((iconManifest.folderIcons.firstOrNull { it.folderNames.contains(name) } ?: iconManifest.defaultFolderIcon).image) else {
-                            val extension = name.substringAfterLast('.', "")
-                            ImageView((iconManifest.fileIcons.firstOrNull { it.fileExtensions.contains(extension) || it.fileNames.contains(name) } ?: iconManifest.defaultFileIcon).image)
+                    setCellFactory {
+                        object : TextFieldTreeTableCell<Entry<T>, Entry<T>>() {
+                            private val defaultStyle = style
+                            private val defaultStyleClass = listOf(*styleClass.toTypedArray())
+
+                            override fun updateItem(item: Entry<T>?, empty: Boolean) {
+                                super.updateItem(item, empty)
+
+                                if (item == null || empty) {
+                                    text = null
+                                    graphic = null
+                                    style = defaultStyle
+                                    styleClass.setAll(defaultStyleClass)
+                                } else {
+                                    val name = item.name
+                                    text = name
+                                    graphic = if (item.directory) ImageView((iconManifest.folderIcons.firstOrNull { it.folderNames.contains(name) } ?: iconManifest.defaultFolderIcon).image) else run {
+                                        val extension = name.substringAfterLast('.', "")
+                                        ImageView((iconManifest.fileIcons.firstOrNull { it.fileExtensions.contains(extension) || it.fileNames.contains(name) } ?: iconManifest.defaultFileIcon).image)
+                                    }
+                                }
+                            }
                         }
                     }
                     setComparator { a, b -> a.name.compareTo(b.name) }
@@ -382,7 +398,7 @@ class MainView : View("Blit") {
 
             private fun rename(item: TreeItem<Entry<T>>) {
                 val entry = item.value
-                RenameView(entry.name) { activity.launch(locale["main.tree.task.rename.name", entry, it]) { entry.rename(it) } }.openModal(resizable = false)
+                RenameView(entry.toString()) { activity.launch(locale["main.tree.task.rename.name", entry, it]) { entry.rename(it) } }.openModal(resizable = false)
             }
 
             private fun delete(item: TreeItem<Entry<T>>) {

@@ -112,6 +112,8 @@ class ConfigViewSources : Fragment("Sources") {
                         }
                     }
                 }
+
+                selectionModel.selectLast()
             })
         }
         form {
