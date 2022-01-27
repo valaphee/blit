@@ -28,10 +28,9 @@ import java.io.OutputStream
  */
 class FtpEntry(
     private val source: FtpSource,
-    private val path: String,
+    override val path: String,
     private val ftpFile: FTPFile
 ) : AbstractEntry<FtpEntry>() {
-    override val name = path.removeSuffix("/").split('/').last()
     override val size get() = ftpFile.size
     override val modifyTime get() = ftpFile.timestamp.timeInMillis
     override val directory get() = ftpFile.isDirectory
@@ -57,6 +56,4 @@ class FtpEntry(
     override suspend fun rename(name: String) = TODO()
 
     override suspend fun delete() = TODO()
-
-    override fun toString() = path
 }

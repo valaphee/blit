@@ -45,7 +45,7 @@ import tornadofx.vgrow
  *
  * @author Kevin Ludwig
  */
-class ConfigViewSources : Fragment("Sources") {
+class ConfigViewSources : Fragment("Connections") {
     private val locale by di<Locale>()
     private val configModel by di<Config.Model>()
 

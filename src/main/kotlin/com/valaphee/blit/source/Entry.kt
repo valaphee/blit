@@ -35,6 +35,11 @@ interface Entry<T : Entry<T>> {
     val self: Entry<T>
 
     /**
+     * Path, contains the name
+     */
+    val path: String
+
+    /**
      * Name, does not contain the path
      */
     val name: String

@@ -34,10 +34,9 @@ import kotlin.coroutines.coroutineContext
  */
 class ScpEntry(
     private val source: ScpSource,
-    private val path: String,
+    override val path: String,
     private var attributes: SftpClient.Attributes
 ) : AbstractEntry<ScpEntry>() {
-    override val name = path.removeSuffix("/").split('/').last()
     override val size get() = attributes.size
     override val modifyTime get() = attributes.modifyTime.toMillis()
     override val directory get() = attributes.isDirectory
@@ -64,8 +63,6 @@ class ScpEntry(
     override suspend fun delete() {
         source.semaphore.withPermit { source.pool.useInstance { it.session.executeRemoteCommand("""rm -rf "$path"""") } }
     }
-
-    override fun toString() = path
 
     companion object {
         private val permissions = listOf(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.GROUP_READ, PosixFilePermission.GROUP_WRITE, PosixFilePermission.GROUP_EXECUTE, PosixFilePermission.OTHERS_READ, PosixFilePermission.OTHERS_EXECUTE)

@@ -72,7 +72,7 @@ class DavSourceConfig(
                 field("Password") { passwordfield(passwordProperty) }
             }
             fieldset("Nextcloud") {
-                field("Use") { checkbox(property = nextcloudProperty) }
+                field("Active") { checkbox(property = nextcloudProperty) }
                 field("Upload Chunk Size") {
                     textfield {
                         bind(nextcloudUploadChunkSizeProperty, converter = LongStringConverter)

@@ -31,6 +31,7 @@ import javafx.scene.control.ContextMenu
 import javafx.scene.control.Label
 import javafx.scene.control.SelectionMode
 import javafx.scene.control.TableColumnBase
+import javafx.scene.control.TextField
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeTableRow
 import javafx.scene.control.TreeTableView
@@ -62,7 +63,6 @@ import tornadofx.menu
 import tornadofx.menubar
 import tornadofx.onChange
 import tornadofx.paddingTop
-import tornadofx.pane
 import tornadofx.populateTree
 import tornadofx.progressbar
 import tornadofx.runLater
@@ -70,6 +70,7 @@ import tornadofx.separator
 import tornadofx.setContent
 import tornadofx.splitpane
 import tornadofx.style
+import tornadofx.useMaxSize
 import tornadofx.vbox
 import tornadofx.vgrow
 import java.awt.Desktop
@@ -139,10 +140,12 @@ class MainView : View("Blit") {
         }
 
         hbox {
-            pane { hgrow = Priority.ALWAYS }
+            progressbar(activity.progress) {
+                hgrow = Priority.ALWAYS
+                useMaxSize = true
+            }
             button("...") { action { find<ActivityView>().openWindow() } }
         }
-        progressbar(activity.progress)
     }
 
     inner class Pane<T : Entry<T>> : VBox() {
@@ -181,7 +184,7 @@ class MainView : View("Blit") {
 
                         tree.rootProperty().onChange {
                             it?.let {
-                                val path = it.value.toString()
+                                val path = it.value.path
                                 selectedCrumb = if (path == "/") BreadCrumbBar.buildTreeModel("/") else BreadCrumbBar.buildTreeModel(*path.toCanonicalPath().toTypedArray().apply { if (this.getOrNull(0)?.isEmpty() == true) this[0] = "/" })
                             }
                         }
@@ -234,24 +237,19 @@ class MainView : View("Blit") {
                 vgrow = Priority.ALWAYS
                 isShowRoot = false
                 selectionModel.selectionMode = SelectionMode.MULTIPLE
-                /*isEditable = true*/
+                isEditable = true
                 placeholder = Label("")
 
                 column(locale["main.tree.column.name.title"], Entry<T>::self) {
                     tableColumnBaseSetWidth(this, 250.0)
                     setCellFactory {
                         object : TextFieldTreeTableCell<Entry<T>, Entry<T>>() {
-                            private val defaultStyle = style
-                            private val defaultStyleClass = listOf(*styleClass.toTypedArray())
-
                             override fun updateItem(item: Entry<T>?, empty: Boolean) {
                                 super.updateItem(item, empty)
 
                                 if (item == null || empty) {
                                     text = null
                                     graphic = null
-                                    style = defaultStyle
-                                    styleClass.setAll(defaultStyleClass)
                                 } else {
                                     val name = item.name
                                     text = name
@@ -259,6 +257,33 @@ class MainView : View("Blit") {
                                         val extension = name.substringAfterLast('.', "")
                                         ImageView((iconManifest.fileIcons.firstOrNull { it.fileExtensions.contains(extension) || it.fileNames.contains(name) } ?: iconManifest.defaultFileIcon).image)
                                     }
+                                }
+                            }
+
+                            override fun startEdit() {
+                                val textFieldNull = textFieldTreeTableCellTextField[this] == null
+
+                                super.startEdit()
+
+                                if (textFieldNull) {
+                                    val textField = (textFieldTreeTableCellTextField[this] as TextField)
+                                    textField.setOnAction {
+                                        activity.launch(locale["main.tree.task.rename.name", item, textField.text]) { item.rename("${item.path.substringBeforeLast('/', "")}/${textField.text}") }
+
+                                        cancelEdit()
+                                        it.consume()
+                                    }
+                                }
+                            }
+
+                            override fun cancelEdit() {
+                                super.cancelEdit()
+
+                                val name = item.name
+                                text = name
+                                graphic = if (item.directory) ImageView((iconManifest.folderIcons.firstOrNull { it.folderNames.contains(name) } ?: iconManifest.defaultFolderIcon).image) else run {
+                                    val extension = name.substringAfterLast('.', "")
+                                    ImageView((iconManifest.fileIcons.firstOrNull { it.fileExtensions.contains(extension) || it.fileNames.contains(name) } ?: iconManifest.defaultFileIcon).image)
                                 }
                             }
                         }
@@ -279,7 +304,6 @@ class MainView : View("Blit") {
                     TreeTableRow<Entry<T>>().apply {
                         setOnMouseClicked {
                             if (isEmpty) selectionModel.clearSelection()
-
                             it.consume()
                         }
                         setOnDragDetected {
@@ -292,12 +316,10 @@ class MainView : View("Blit") {
                                     dragEntries[id] = selectionModel.selectedItems.map { it.value }
                                 }
                             }
-
                             it.consume()
                         }
                         setOnDragOver {
                             if (source != null && (it.gestureSource != this && it.dragboard.hasFiles() || it.dragboard.hasContent(dragEntriesFormat))) it.acceptTransferModes(*TransferMode.COPY_OR_MOVE)
-
                             it.consume()
                         }
                         setOnDragDropped {
@@ -326,7 +348,6 @@ class MainView : View("Blit") {
                                     }
                                 } else TODO()
                             }
-
                             it.consume()
                         }
                     }
@@ -342,9 +363,9 @@ class MainView : View("Blit") {
                             separator()
                             item(locale["main.tree.menu.refresh.name"]) { action { populate(root) } }
                         } else {
-                            item(locale["main.tree.menu.open.name"]) { action { it.list.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.toString()) } ?: it.list.forEach(::open) } }
+                            item(locale["main.tree.menu.open.name"]) { action { it.list.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.path) } ?: it.list.forEach(::open) } }
                             separator()
-                            item(locale["main.tree.menu.rename.name"]) { action { it.list.forEach(::rename) } }
+                            item(locale["main.tree.menu.rename.name"]) { action {} }
                             item(locale["main.tree.menu.delete.name"]) { action { it.list.forEach(::delete) } }
                         }
                     }
@@ -352,35 +373,55 @@ class MainView : View("Blit") {
 
                 setOnKeyPressed {
                     when (it.code) {
-                        KeyCode.ENTER -> selectionModel.selectedItems.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.toString()) } ?: selectionModel.selectedItems.forEach(::open)
-                        KeyCode.BACK_SPACE -> navigateRelative("..")
-                        KeyCode.C -> if (it.isControlDown) Clipboard.getSystemClipboard().setContent {
-                            activity.runBlocking(locale["main.tree.task.download.name"]) {
-                                suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
-                                    File(_config.temporaryPath, entry.name).mkdir()
-                                    entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
-                                } else listOf(File(_config.temporaryPath, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
+                        KeyCode.ENTER -> {
+                            selectionModel.selectedItems.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.path) } ?: selectionModel.selectedItems.forEach(::open)
+                            it.consume()
+                        }
+                        KeyCode.BACK_SPACE -> {
+                            navigateRelative("..")
+                            it.consume()
+                        }
+                        KeyCode.C -> if (it.isControlDown) {
+                            Clipboard.getSystemClipboard().setContent {
+                                activity.runBlocking(locale["main.tree.task.download.name"]) {
+                                    suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
+                                        File(_config.temporaryPath, entry.name).mkdir()
+                                        entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
+                                    } else listOf(File(_config.temporaryPath, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
 
-                                putFiles(selectionModel.selectedItems.flatMap { flatten(it.value) })
-
-                                it.consume()
+                                    putFiles(selectionModel.selectedItems.flatMap { flatten(it.value) })
+                                    it.consume()
+                                }
                             }
                         }
-                        KeyCode.D -> if (it.isControlDown) selectionModel.selectedItems.forEach(::delete)
-                        KeyCode.V -> if (it.isControlDown) with(Clipboard.getSystemClipboard()) {
-                            if (hasFiles()) {
-                                val item = selectionModel.selectedItem ?: root
-                                val entry = item.value
-                                if (!entry.directory) TODO()
-                                files.forEach { file -> activity.launch(locale["main.tree.task.upload.name", file.name]) { FileInputStream(file).use { entry.transferFrom(file.name, it, file.length()) } } }
-                            }
+                        KeyCode.D -> if (it.isControlDown) {
+                            selectionModel.selectedItems.forEach(::delete)
+                            it.consume()
                         }
-                        KeyCode.DELETE -> selectionModel.selectedItems.forEach(::delete)
-                        KeyCode.F2 -> selectionModel.selectedItems.forEach(::rename)
+                        KeyCode.V -> if (it.isControlDown) {
+                            with(Clipboard.getSystemClipboard()) {
+                                if (hasFiles()) {
+                                    val item = selectionModel.selectedItem ?: root
+                                    val entry = item.value
+                                    if (!entry.directory) TODO()
+                                    files.forEach { file -> activity.launch(locale["main.tree.task.upload.name", file.name]) { FileInputStream(file).use { entry.transferFrom(file.name, it, file.length()) } } }
+                                }
+                            }
+                            it.consume()
+                        }
+                        KeyCode.DELETE -> {
+                            selectionModel.selectedItems.forEach(::delete)
+                            it.consume()
+                        }
                         KeyCode.F5 -> populate(root)
                     }
                 }
-                setOnMousePressed { if (it.isPrimaryButtonDown && it.clickCount == 2) selectionModel.selectedItem?.let { if (!it.value.directory) open(it) } }
+                setOnMousePressed {
+                    if (it.isPrimaryButtonDown && it.clickCount == 2) {
+                        selectionModel.selectedItem?.let { if (!it.value.directory) open(it) }
+                        it.consume()
+                    }
+                }
             }
 
             private fun open(item: TreeItem<Entry<T>>) {
@@ -394,11 +435,6 @@ class MainView : View("Blit") {
                         }
                     }
                 }
-            }
-
-            private fun rename(item: TreeItem<Entry<T>>) {
-                val entry = item.value
-                RenameView(entry.toString()) { activity.launch(locale["main.tree.task.rename.name", entry, it]) { entry.rename(it) } }.openModal(resizable = false)
             }
 
             private fun delete(item: TreeItem<Entry<T>>) {
@@ -428,6 +464,7 @@ class MainView : View("Blit") {
     companion object {
         private val windowsRootPath = "^[a-zA-Z]:[\\\\/].*\$".toRegex()
         internal val tableColumnBaseSetWidth = TableColumnBase::class.java.getDeclaredMethod("setWidth", Double::class.java).apply { isAccessible = true }
+        private val textFieldTreeTableCellTextField = TextFieldTreeTableCell::class.java.getDeclaredField("textField").apply { isAccessible = true }
         private val dragEntriesFormat = DataFormat("application/blit-entry-id")
 
         internal fun String.toCanonicalPath(): List<String> {

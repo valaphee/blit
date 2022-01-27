@@ -32,6 +32,7 @@ import java.io.OutputStream
 class LocalEntry(
     private val file: File
 ) : AbstractEntry<LocalEntry>() {
+    override val path: String get() = file.path
     override val name: String get() = file.name
     override val size = file.length()
     override val modifyTime = file.lastModified()
@@ -60,6 +61,4 @@ class LocalEntry(
     override suspend fun delete() {
         file.delete()
     }
-
-    override fun toString() = "$file"
 }

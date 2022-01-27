@@ -33,10 +33,9 @@ import java.nio.file.Path
  */
 class K8scpEntry(
     private val source: K8scpSource,
-    private val path: String,
+    override val path: String,
     private val attributes: SftpClient.Attributes
 ) : AbstractEntry<K8scpEntry>() {
-    override val name = path.removeSuffix("/").split('/').last()
     override val size get() = attributes.size
     override val modifyTime get() = attributes.modifyTime.toMillis()
     override val directory get() = attributes.isDirectory
@@ -75,8 +74,6 @@ class K8scpEntry(
         val (namespace, pod, podPath) = source.getNamespacePodAndPath(path)
         if (K8scpSource.copy.exec(namespace, pod, arrayOf("rm", "-rf", podPath), false).waitFor() != 0) throw NotFoundException(name)
     }
-
-    override fun toString() = path
 
     companion object {
         internal val namespaceOrPodAttributes = SftpClient.Attributes().apply {

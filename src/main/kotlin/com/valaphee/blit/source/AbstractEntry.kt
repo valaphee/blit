@@ -25,4 +25,8 @@ abstract class AbstractEntry<T : Entry<T>> : Entry<T> {
     override val item: TreeItem<Entry<T>> = TreeItem(this)
 
     override val self get() = this
+
+    override val name get() = path.removeSuffix("/").split('/').last()
+
+    override fun toString() = name
 }

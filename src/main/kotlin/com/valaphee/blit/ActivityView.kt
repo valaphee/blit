@@ -21,14 +21,16 @@ import com.valaphee.blit.locale.Locale
 import javafx.scene.control.Label
 import javafx.scene.layout.Priority
 import jfxtras.styles.jmetro.JMetroStyleClass
+import tornadofx.Stylesheet
 import tornadofx.View
-import tornadofx.fixedWidth
+import tornadofx.addClass
 import tornadofx.progressbar
 import tornadofx.readonlyColumn
 import tornadofx.stackpane
 import tornadofx.stringBinding
 import tornadofx.tableview
 import tornadofx.text
+import tornadofx.useMaxSize
 import tornadofx.vbox
 import tornadofx.vgrow
 import java.text.NumberFormat
@@ -54,17 +56,18 @@ class ActivityView : View("Activity") {
             placeholder = Label("")
 
             readonlyColumn("", Activity.Task::name) {
-                fixedWidth(400)
+                MainView.tableColumnBaseSetWidth(this, 500.0)
                 isReorderable = false
             }
             readonlyColumn("", Activity.Task::progressProperty) {
-                fixedWidth(200)
+                MainView.tableColumnBaseSetWidth(this, 300.0)
                 isReorderable = false
 
                 cellFormat {
+                    addClass(Stylesheet.progressBarTableCell)
                     graphic = stackpane {
-                        progressbar(it)
-                        text(it.stringBinding { progressFormat.format(it) })
+                        progressbar(it) { useMaxSize = true }
+                        text(it.stringBinding { it?.let { if (it.toDouble() < 0.0) null else progressFormat.format(it) } })
                     }
                 }
             }

@@ -8,7 +8,7 @@
           "file": {
             "name": "File",
             "general.name": "General",
-            "sources.name": "Sources",
+            "sources.name": "Connections",
             "network.name": "Network",
             "exit.name": "Exit"
           },
@@ -89,10 +89,6 @@
       },
       "certificate": {
         "ok.text": "Ok"
-      },
-      "rename": {
-        "ok.text": "Ok",
-        "cancel.text": "Cancel"
       }
     }
   }

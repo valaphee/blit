@@ -46,10 +46,9 @@ import kotlin.coroutines.coroutineContext
  */
 class DavEntry(
     private val source: DavSource,
-    private val path: String,
+    override val path: String,
     private val prop: Multistatus.Response.Propstat.Prop
 ) : AbstractEntry<DavEntry>() {
-    override val name = path.removeSuffix("/").split('/').last()
     override val size get() = prop.getcontentlength
     override val modifyTime get() = prop.getlastmodified?.time ?: 0
     override val directory get() = prop.resourcetype?.collection != null
@@ -134,8 +133,6 @@ class DavEntry(
     override suspend fun delete() {
         source.httpClient.delete<Unit>("${source._url}/$path")
     }
-
-    override fun toString() = path
 
     companion object {
         private fun ceil(value: Double): Int {

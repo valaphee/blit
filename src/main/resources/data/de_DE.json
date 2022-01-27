@@ -8,7 +8,7 @@
           "file": {
             "name": "Datei",
             "general.name": "Allgemein",
-            "sources.name": "Quellen",
+            "sources.name": "Verbindungen",
             "network.name": "Netzwerk",
             "exit.name": "Beenden"
           },
@@ -44,10 +44,6 @@
             "delete.name": "Lösche {0}"
           }
         }
-      },
-      "rename": {
-        "ok.text": "Ok",
-        "cancel.text": "Abbrechen"
       },
       "config": {
         "general": {
@@ -90,6 +86,9 @@
         "ok.text": "Ok",
         "cancel.text": "Abbrechen",
         "apply.text": "Übernehmen"
+      },
+      "certificate": {
+        "ok.text": "Ok"
       }
     }
   }

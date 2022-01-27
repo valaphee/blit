@@ -32,10 +32,9 @@ import java.io.OutputStream
  */
 class SftpEntry(
     private val source: SftpSource,
-    private val path: String,
+    override val path: String,
     private var attributes: SftpClient.Attributes
 ) : AbstractEntry<SftpEntry>() {
-    override val name = path.removeSuffix("/").split('/').last()
     override val size get() = attributes.size
     override val modifyTime get() = attributes.modifyTime.toMillis()
     override val directory get() = attributes.isDirectory
@@ -91,6 +90,4 @@ class SftpEntry(
             }
         }
     }
-
-    override fun toString() = path
 }
