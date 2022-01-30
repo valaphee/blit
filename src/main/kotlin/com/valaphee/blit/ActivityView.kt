@@ -52,15 +52,14 @@ class ActivityView : View("Activity") {
 
         tableview(activity.tasks) {
             vgrow = Priority.ALWAYS
-
             placeholder = Label("")
 
             readonlyColumn("", Activity.Task::name) {
-                MainView.tableColumnBaseSetWidth(this, 500.0)
+                MainView.tableColumnBaseSetWidth(this, 549.0)
                 isReorderable = false
             }
             readonlyColumn("", Activity.Task::progressProperty) {
-                MainView.tableColumnBaseSetWidth(this, 300.0)
+                MainView.tableColumnBaseSetWidth(this, 250.0)
                 isReorderable = false
 
                 cellFormat {

@@ -16,6 +16,7 @@
 
 package com.valaphee.blit
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder
 import com.valaphee.blit.config.Config
 import com.valaphee.blit.config.ConfigView
 import com.valaphee.blit.config.ConfigViewGeneral
@@ -45,6 +46,11 @@ import javafx.scene.input.TransferMode
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import jfxtras.styles.jmetro.JMetroStyleClass
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.controlsfx.control.BreadCrumbBar
 import org.controlsfx.control.textfield.CustomTextField
@@ -65,7 +71,6 @@ import tornadofx.onChange
 import tornadofx.paddingTop
 import tornadofx.populateTree
 import tornadofx.progressbar
-import tornadofx.runLater
 import tornadofx.separator
 import tornadofx.setContent
 import tornadofx.splitpane
@@ -81,11 +86,14 @@ import java.io.IOException
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 import java.util.UUID
+import java.util.concurrent.Executors
 
 /**
  * @author Kevin Ludwig
  */
-class MainView : View("Blit") {
+class MainView : View("Blit"), CoroutineScope {
+    override val coroutineContext = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), ThreadFactoryBuilder().setNameFormat("blit-%d").setDaemon(true).build()).asCoroutineDispatcher() + SupervisorJob()
+
     private val locale by di<Locale>()
     private val iconManifest by di<IconManifest>()
     private val _config by di<Config>()
@@ -218,13 +226,15 @@ class MainView : View("Blit") {
             if (canonicalPath == _path) return
 
             source?.let {
-                activity.launch(locale["main.navigator.task.navigate.name", canonicalPath]) {
-                    val item = it.get(canonicalPath).item
-                    _path = canonicalPath
-                    runLater {
-                        name.value = null
-                        tree.root = item
-                        tree.populate(tree.root)
+                launch {
+                    activity.run(locale["main.navigator.task.navigate.name", canonicalPath]) {
+                        val item = it.get(canonicalPath).item
+                        _path = canonicalPath
+                        launch(Dispatchers.Main) {
+                            name.value = null
+                            tree.root = item
+                            tree.populate(tree.root)
+                        }
                     }
                 }
             }
@@ -237,7 +247,7 @@ class MainView : View("Blit") {
                 vgrow = Priority.ALWAYS
                 isShowRoot = false
                 selectionModel.selectionMode = SelectionMode.MULTIPLE
-                isEditable = true
+                /*isEditable = true*/
                 placeholder = Label("")
 
                 column(locale["main.tree.column.name.title"], Entry<T>::self) {
@@ -268,7 +278,7 @@ class MainView : View("Blit") {
                                 if (textFieldNull) {
                                     val textField = (textFieldTreeTableCellTextField[this] as TextField)
                                     textField.setOnAction {
-                                        activity.launch(locale["main.tree.task.rename.name", item, textField.text]) { item.rename("${item.path.substringBeforeLast('/', "")}/${textField.text}") }
+                                        launch { activity.run(locale["main.tree.task.rename.name", item, textField.text]) { item.rename("${item.path.substringBeforeLast('/', "")}/${textField.text}") } }
 
                                         cancelEdit()
                                         it.consume()
@@ -297,7 +307,7 @@ class MainView : View("Blit") {
                 }
                 column(locale["main.tree.column.modified.title"], Entry<T>::modifyTime) {
                     tableColumnBaseSetWidth(this, 125.0)
-                    cellFormat { text = if (it != 0L) locale.dateFormat.format(it) else "" }
+                    cellFormat { text = if (it != 0L) locale.dateTimeFormat.format(it) else "" }
                 }
 
                 setRowFactory {
@@ -329,16 +339,18 @@ class MainView : View("Blit") {
                                         val target = treeItem?.value ?: runBlocking { source.get(source.home) }
 
                                         fun flatten(entry: Entry<*>, path: String? = null) {
-                                            if (entry.directory) activity.launch(locale["main.tree.task.populate.name", entry]) { entry.list().forEach { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") } } else {
+                                            if (entry.directory) launch { activity.run(locale["main.tree.task.populate.name", entry]) { entry.list().forEach { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") } } } else {
                                                 val outStream = PipedOutputStream()
                                                 val inStream = PipedInputStream(outStream)
-                                                activity.launch(locale["main.tree.task.download.name", entry]) {
-                                                    outStream.use {
-                                                        entry.transferTo(outStream)
-                                                        outStream.flush()
+                                                launch {
+                                                    activity.run(locale["main.tree.task.download.name", entry]) {
+                                                        outStream.use {
+                                                            entry.transferTo(outStream)
+                                                            outStream.flush()
+                                                        }
                                                     }
                                                 }
-                                                activity.launch(locale["main.tree.task.upload.name", entry.name]) { inStream.use { target.transferFrom("${path?.let { "$path/" } ?: ""}${entry.name}", inStream, entry.size) } }
+                                                launch { activity.run(locale["main.tree.task.upload.name", entry.name]) { inStream.use { target.transferFrom("${path?.let { "$path/" } ?: ""}${entry.name}", inStream, entry.size) } } }
                                             }
                                         }
 
@@ -383,14 +395,16 @@ class MainView : View("Blit") {
                         }
                         KeyCode.C -> if (it.isControlDown) {
                             Clipboard.getSystemClipboard().setContent {
-                                activity.runBlocking(locale["main.tree.task.download.name"]) {
-                                    suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
-                                        File(_config.temporaryPath, entry.name).mkdir()
-                                        entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
-                                    } else listOf(File(_config.temporaryPath, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
+                                launch(Dispatchers.Main) {
+                                    activity.run(locale["main.tree.task.download.name"]) {
+                                        suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
+                                            File(_config.temporaryPath, entry.name).mkdir()
+                                            entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
+                                        } else listOf(File(_config.temporaryPath, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
 
-                                    putFiles(selectionModel.selectedItems.flatMap { flatten(it.value) })
-                                    it.consume()
+                                        putFiles(selectionModel.selectedItems.flatMap { flatten(it.value) })
+                                        it.consume()
+                                    }
                                 }
                             }
                         }
@@ -404,7 +418,7 @@ class MainView : View("Blit") {
                                     val item = selectionModel.selectedItem ?: root
                                     val entry = item.value
                                     if (!entry.directory) TODO()
-                                    files.forEach { file -> activity.launch(locale["main.tree.task.upload.name", file.name]) { FileInputStream(file).use { entry.transferFrom(file.name, it, file.length()) } } }
+                                    files.forEach { file -> launch { activity.run(locale["main.tree.task.upload.name", file.name]) { FileInputStream(file).use { entry.transferFrom(file.name, it, file.length()) } } } }
                                 }
                             }
                             it.consume()
@@ -427,11 +441,13 @@ class MainView : View("Blit") {
             private fun open(item: TreeItem<Entry<T>>) {
                 if (Desktop.isDesktopSupported()) {
                     val entry = item.value
-                    activity.launch(locale["main.tree.task.download.name", entry]) {
-                        val file = File(_config.temporaryPath, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }
-                        try {
-                            Desktop.getDesktop().open(file)
-                        } catch (_: IOException) {
+                    launch {
+                        activity.run(locale["main.tree.task.download.name", entry]) {
+                            val file = File(_config.temporaryPath, entry.name).apply { FileOutputStream(this).use { entry.transferTo(it) } }
+                            try {
+                                Desktop.getDesktop().open(file)
+                            } catch (_: IOException) {
+                            }
                         }
                     }
                 }
@@ -439,22 +455,24 @@ class MainView : View("Blit") {
 
             private fun delete(item: TreeItem<Entry<T>>) {
                 val entry = item.value
-                activity.launch(locale["main.tree.task.delete.name", entry.name]) { entry.delete() }
+                launch { activity.run(locale["main.tree.task.delete.name", entry.name]) { entry.delete() } }
             }
 
             internal fun populate(item: TreeItem<Entry<T>>) {
-                activity.launch(locale["main.tree.task.populate.name", item.value]) {
-                    val children = item.value!!.list()
-                    runLater {
-                        populateTree(item, { entry ->
-                            if (entry.directory) object : TreeItem<Entry<T>>(entry) {
-                                init {
-                                    expandedProperty().onChange { if (it) populate(this) }
-                                }
+                launch {
+                    activity.run(locale["main.tree.task.populate.name", item.value]) {
+                        val children = item.value!!.list()
+                        launch(Dispatchers.Main) {
+                            populateTree(item, { entry ->
+                                if (entry.directory) object : TreeItem<Entry<T>>(entry) {
+                                    init {
+                                        expandedProperty().onChange { if (it) populate(this) }
+                                    }
 
-                                override fun isLeaf() = false
-                            } else TreeItem(entry)
-                        }) { if (it.isExpanded) children else emptyList() }
+                                    override fun isLeaf() = false
+                                } else TreeItem(entry)
+                            }) { if (it.isExpanded) children else emptyList() }
+                        }
                     }
                 }
             }

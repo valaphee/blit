@@ -35,7 +35,7 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.1")
     implementation("com.fasterxml.jackson.module:jackson-module-afterburner:2.13.1")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
-    implementation("com.google.inject:guice:5.0.1")
+    implementation("com.google.inject:guice:5.1.0")
     implementation("com.nativelibs4java:bridj:0.7.0")
     implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.3")
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.3")
@@ -51,7 +51,7 @@ dependencies {
     implementation("org.apache.sshd:sshd-scp:2.8.0")
     implementation("org.apache.sshd:sshd-sftp:2.8.0")
     implementation("org.controlsfx:controlsfx:11.1.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.6.0")
     implementation("org.jfxtras:jmetro:11.6.15")
 }
 
@@ -79,6 +79,9 @@ tasks {
 }
 
 setProperty("mainClassName", "com.valaphee.blit.MainKt")
+repositories {
+    mavenCentral()
+}
 
 application { mainClass.set("com.valaphee.blit.MainKt") }
 

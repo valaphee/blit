@@ -45,9 +45,9 @@ class Locale(
     private val entryFormats = mutableMapOf<String, MessageFormat>()
 
     /**
-     * Shorthand for accessing the locale-specific date format
+     * Shorthand for accessing the locale-specific date time format
      */
-    val dateFormat: DateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, java.util.Locale.forLanguageTag(key.replace('_', '-')))
+    val dateTimeFormat: DateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, java.util.Locale.forLanguageTag(key.replace('_', '-')))
 
     /**
      * Get formatted texts
