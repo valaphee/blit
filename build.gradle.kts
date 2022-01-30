@@ -21,7 +21,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.0.0"
     id("com.palantir.git-version") version "0.12.3"
     id("edu.sc.seis.launch4j") version "2.5.0"
-    kotlin("jvm") version "1.5.31"
+    kotlin("jvm") version "1.6.10"
     id("org.openjfx.javafxplugin") version "0.0.10"
     signing
 }
