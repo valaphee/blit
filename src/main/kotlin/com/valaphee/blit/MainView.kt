@@ -208,9 +208,16 @@ class MainView : View("Blit"), CoroutineScope {
                     }
 
                     addEventFilter(KeyEvent.KEY_PRESSED) {
+                        @Suppress("NON_EXHAUSTIVE_WHEN_STATEMENT")
                         when (it.code) {
-                            KeyCode.ENTER -> text?.let(::navigateRelative)
-                            KeyCode.BACK_SPACE -> if (text?.isEmpty() != false) navigateRelative("..")
+                            KeyCode.ENTER -> {
+                                text?.let(::navigateRelative)
+                                it.consume()
+                            }
+                            KeyCode.BACK_SPACE -> {
+                                if (text?.isEmpty() != false) navigateRelative("..")
+                                it.consume()
+                            }
                         }
                     }
                 })
@@ -384,6 +391,7 @@ class MainView : View("Blit"), CoroutineScope {
                 }
 
                 setOnKeyPressed {
+                    @Suppress("NON_EXHAUSTIVE_WHEN_STATEMENT")
                     when (it.code) {
                         KeyCode.ENTER -> {
                             selectionModel.selectedItems.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.path) } ?: selectionModel.selectedItems.forEach(::open)
@@ -403,10 +411,10 @@ class MainView : View("Blit"), CoroutineScope {
                                         } else listOf(File(_config.temporaryPath, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
 
                                         putFiles(selectionModel.selectedItems.flatMap { flatten(it.value) })
-                                        it.consume()
                                     }
                                 }
                             }
+                            it.consume()
                         }
                         KeyCode.D -> if (it.isControlDown) {
                             selectionModel.selectedItems.forEach(::delete)
@@ -427,7 +435,10 @@ class MainView : View("Blit"), CoroutineScope {
                             selectionModel.selectedItems.forEach(::delete)
                             it.consume()
                         }
-                        KeyCode.F5 -> populate(root)
+                        KeyCode.F5 -> {
+                            populate(root)
+                            it.consume()
+                        }
                     }
                 }
                 setOnMousePressed {
