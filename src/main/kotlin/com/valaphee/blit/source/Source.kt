@@ -23,6 +23,11 @@ import java.io.Closeable
  */
 interface Source<T : Entry<T>> : Closeable {
     /**
+     * Concurrency
+     */
+    val concurrency: Int get() = -1
+
+    /**
      * Home path
      */
     val home: String

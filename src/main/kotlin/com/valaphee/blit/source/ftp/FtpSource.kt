@@ -52,6 +52,8 @@ class FtpSource(
         }
     }
 
+    override val concurrency get() = connectionPoolSize
+
     override val home: String
         get() = runBlocking {
             semaphore.withPermit {

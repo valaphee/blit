@@ -359,7 +359,7 @@ class MainView : View("Blit"), CoroutineScope {
 
                                         dragEntries.forEach(::flatten)
 
-                                        activity.runConsumeSupply(this@MainView, tasks, 4) // TODO
+                                        activity.runConsumeSupply(this@MainView, tasks, /*min(source.concurrency, 32)*/8)
 
                                         it.isDropCompleted = true
                                     }

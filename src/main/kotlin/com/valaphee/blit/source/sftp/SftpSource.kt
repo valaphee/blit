@@ -66,6 +66,8 @@ class SftpSource(
         }
     }
 
+    override val concurrency get() = connectionPoolSize
+
     override val home get() = runBlocking { semaphore.withPermit { pool.useInstance { it.session.executeRemoteCommand("pwd").lines().first() } } }
 
     override suspend fun get(path: String) = try {
