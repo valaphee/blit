@@ -31,6 +31,8 @@ val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDe
 val details = versionDetails()
 version = "${details.lastTag}.${details.commitDistance}"
 
+repositories { mavenCentral() }
+
 dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.1")
     implementation("com.fasterxml.jackson.module:jackson-module-afterburner:2.13.1")
@@ -79,9 +81,6 @@ tasks {
 }
 
 setProperty("mainClassName", "com.valaphee.blit.MainKt")
-repositories {
-    mavenCentral()
-}
 
 application { mainClass.set("com.valaphee.blit.MainKt") }
 

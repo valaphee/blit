@@ -16,7 +16,6 @@
 
 package com.valaphee.blit
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder
 import com.valaphee.blit.config.Config
 import com.valaphee.blit.config.ConfigView
 import com.valaphee.blit.config.ConfigViewGeneral
@@ -49,7 +48,6 @@ import jfxtras.styles.jmetro.JMetroStyleClass
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.controlsfx.control.BreadCrumbBar
@@ -86,13 +84,12 @@ import java.io.IOException
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 import java.util.UUID
-import java.util.concurrent.Executors
 
 /**
  * @author Kevin Ludwig
  */
 class MainView : View("Blit"), CoroutineScope {
-    override val coroutineContext = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), ThreadFactoryBuilder().setNameFormat("blit-%d").setDaemon(true).build()).asCoroutineDispatcher() + SupervisorJob()
+    override val coroutineContext = SupervisorJob() + Dispatchers.IO
 
     private val locale by di<Locale>()
     private val iconManifest by di<IconManifest>()
@@ -344,24 +341,25 @@ class MainView : View("Blit"), CoroutineScope {
                                 if (it.dragboard.hasContent(dragEntriesFormat)) {
                                     dragEntries.remove(it.dragboard.getContent(dragEntriesFormat))?.let { dragEntries ->
                                         val target = treeItem?.value ?: runBlocking { source.get(source.home) }
+                                        val tasks = mutableListOf<Pair<String, suspend () -> Unit>>()
 
                                         fun flatten(entry: Entry<*>, path: String? = null) {
                                             if (entry.directory) launch { activity.run(locale["main.tree.task.populate.name", entry]) { entry.list().forEach { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") } } } else {
                                                 val outStream = PipedOutputStream()
                                                 val inStream = PipedInputStream(outStream)
-                                                launch {
-                                                    activity.run(locale["main.tree.task.download.name", entry]) {
-                                                        outStream.use {
-                                                            entry.transferTo(outStream)
-                                                            outStream.flush()
-                                                        }
+                                                tasks += locale["main.tree.task.download.name", entry] to suspend {
+                                                    outStream.use {
+                                                        entry.transferTo(outStream)
+                                                        outStream.flush()
                                                     }
                                                 }
-                                                launch { activity.run(locale["main.tree.task.upload.name", entry.name]) { inStream.use { target.transferFrom("${path?.let { "$path/" } ?: ""}${entry.name}", inStream, entry.size) } } }
+                                                tasks += locale["main.tree.task.upload.name", entry.name] to suspend { inStream.use { target.transferFrom("${path?.let { "$path/" } ?: ""}${entry.name}", inStream, entry.size) } }
                                             }
                                         }
 
                                         dragEntries.forEach(::flatten)
+
+                                        activity.runConsumeSupply(this@MainView, tasks, 4) // TODO
 
                                         it.isDropCompleted = true
                                     }
