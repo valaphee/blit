@@ -31,7 +31,10 @@ val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDe
 val details = versionDetails()
 version = "${details.lastTag}.${details.commitDistance}"
 
-repositories { mavenCentral() }
+repositories {
+    mavenCentral()
+    maven("https://maven.pkg.jetbrains.space/public/p/ktor/eap")
+}
 
 dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.1")
@@ -44,9 +47,9 @@ dependencies {
     implementation("commons-net:commons-net:3.8.0")
     implementation("de.codecentric.centerdevice:javafxsvg:1.3.0")
     implementation("io.github.classgraph:classgraph:4.8.138")
-    implementation("io.ktor:ktor-client-auth:1.6.7")
-    implementation("io.ktor:ktor-client-jackson:1.6.7")
-    implementation("io.ktor:ktor-client-okhttp:1.6.7")
+    implementation("io.ktor:ktor-client-auth:2.0.0-eap-256")
+    implementation("io.ktor:ktor-client-jackson:2.0.0-eap-256")
+    implementation("io.ktor:ktor-client-okhttp:2.0.0-eap-256")
     implementation("io.kubernetes:client-java:14.0.0")
     implementation("no.tornado:tornadofx:1.7.20")
     implementation("org.apache.sshd:sshd-netty:2.8.0")

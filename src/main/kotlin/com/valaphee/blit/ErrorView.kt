@@ -43,7 +43,7 @@ class ErrorView(
 
         prefWidth = 300.0
 
-        label(errorMessage)
-        buttonbar { button(locale["rename.ok.text"]) { action { (scene.window as Stage).close() } } }
+        label(errorMessage) { isWrapText = true }
+        buttonbar { button(locale["error.ok.text"]) { action { (scene.window as Stage).close() } } }
     }
 }

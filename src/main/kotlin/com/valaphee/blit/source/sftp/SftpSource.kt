@@ -16,7 +16,7 @@
 
 package com.valaphee.blit.source.sftp
 
-import com.valaphee.blit.source.NotFoundException
+import com.valaphee.blit.source.NotFoundError
 import com.valaphee.blit.source.Source
 import io.ktor.utils.io.pool.DefaultPool
 import io.ktor.utils.io.pool.useInstance
@@ -74,7 +74,7 @@ class SftpSource(
         semaphore.withPermit { pool.useInstance { SftpEntry(this, path, it.stat(path)) } }
     } catch (ex: SftpException) {
         when (ex.status) {
-            SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundException(path)
+            SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundError(path)
             else -> throw ex
         }
     }

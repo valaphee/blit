@@ -16,7 +16,7 @@
 
 package com.valaphee.blit.source.scp
 
-import com.valaphee.blit.source.NotFoundException
+import com.valaphee.blit.source.NotFoundError
 import com.valaphee.blit.source.Source
 import com.valaphee.blit.source.sftp.SftpSource
 import io.ktor.utils.io.pool.DefaultPool
@@ -62,7 +62,7 @@ class ScpSource(
 
     override val home get() = runBlocking { semaphore.withPermit { pool.useInstance { it.session.executeRemoteCommand("pwd").lines().first() } } }
 
-    override suspend fun get(path: String) = parseLsEntry(semaphore.withPermit { pool.useInstance { it.session.executeRemoteCommand("""stat --format "%A 0 %U %G %s %y %n" "$path"""").lines().first() } })?.second?.let { ScpEntry(this, path, it) } ?: throw NotFoundException(path)
+    override suspend fun get(path: String) = parseLsEntry(semaphore.withPermit { pool.useInstance { it.session.executeRemoteCommand("""stat --format "%A 0 %U %G %s %y %n" "$path"""").lines().first() } })?.second?.let { ScpEntry(this, path, it) } ?: throw NotFoundError(path)
 
     override fun close() {
         pool.close()

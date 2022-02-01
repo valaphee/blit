@@ -17,7 +17,8 @@
 package com.valaphee.blit.source.sftp
 
 import com.valaphee.blit.source.AbstractEntry
-import com.valaphee.blit.source.NotFoundException
+import com.valaphee.blit.source.GeneralError
+import com.valaphee.blit.source.NotFoundError
 import com.valaphee.blit.util.transferToWithProgress
 import io.ktor.utils.io.pool.useInstance
 import kotlinx.coroutines.sync.withPermit
@@ -39,6 +40,18 @@ class SftpEntry(
     override val modifyTime get() = attributes.modifyTime.toMillis()
     override val directory get() = attributes.isDirectory
 
+    override suspend fun makeDirectory(name: String) {
+        check(directory)
+
+        try {
+            source.semaphore.withPermit { source.pool.useInstance { it.mkdir("$path/$name") } }
+        } catch (ex: SftpException) {
+            when (ex.status) {
+                else -> throw GeneralError("Make directory failed.", ex)
+            }
+        }
+    }
+
     override suspend fun list() = if (directory) try {
         source.semaphore.withPermit {
             source.pool.useInstance {
@@ -48,8 +61,10 @@ class SftpEntry(
                 }
             }
         }
-    } catch (_: RuntimeException) {
-        emptyList()
+    } catch (ex: SftpException) {
+        when (ex.status) {
+            else -> throw GeneralError("List failed.", ex)
+        }
     } else emptyList()
 
     override suspend fun transferTo(stream: OutputStream) {
@@ -57,8 +72,8 @@ class SftpEntry(
             source.semaphore.withPermit { source.pool.useInstance { it.read(path).use { it.transferToWithProgress(stream, size) } } }
         } catch (ex: SftpException) {
             when (ex.status) {
-                SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundException(path)
-                else -> throw ex
+                SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundError(path)
+                else -> throw GeneralError("Read failed.", ex)
             }
         }
     }
@@ -66,7 +81,13 @@ class SftpEntry(
     override suspend fun transferFrom(name: String, stream: InputStream, length: Long) {
         check(directory)
 
-        source.semaphore.withPermit { source.pool.useInstance { it.write("$path/$name").use { stream.transferToWithProgress(it, length) } } }
+        try {
+            source.semaphore.withPermit { source.pool.useInstance { it.write("$path/$name").use { stream.transferToWithProgress(it, length) } } }
+        } catch (ex: SftpException) {
+            when (ex.status) {
+                else -> throw GeneralError("Write failed.", ex)
+            }
+        }
     }
 
     override suspend fun rename(path: String) {
@@ -74,8 +95,8 @@ class SftpEntry(
             source.semaphore.withPermit { source.pool.useInstance { it.rename(this.path, path) } }
         } catch (ex: SftpException) {
             when (ex.status) {
-                SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundException(this.path)
-                else -> throw ex
+                SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundError(this.path)
+                else -> throw GeneralError("Rename failed.", ex)
             }
         }
     }
@@ -85,8 +106,8 @@ class SftpEntry(
             source.semaphore.withPermit { source.pool.useInstance { it.remove(path) } }
         } catch (ex: SftpException) {
             when (ex.status) {
-                SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundException(path)
-                else -> throw ex
+                SftpConstants.SSH_FX_NO_SUCH_FILE -> throw NotFoundError(path)
+                else -> throw GeneralError("Delete failed.", ex)
             }
         }
     }

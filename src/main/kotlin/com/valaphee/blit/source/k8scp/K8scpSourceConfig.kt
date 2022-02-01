@@ -41,15 +41,13 @@ class K8scpSourceConfig(
     private val podProperty = SimpleStringProperty(pod)
     var pod: String by podProperty
 
-    override fun newUi(eventTarget: EventTarget) {
-        with(eventTarget) {
-            fieldset("General") {
-                field("Name") { textfield(nameProperty) }
-                field("Namespace") { textfield(namespaceProperty) }
-                field("Pod") { textfield(podProperty) }
-            }
+    override fun EventTarget.newUi() {
+        fieldset("General") {
+            field("Name") { textfield(nameProperty) }
+            field("Namespace") { textfield(namespaceProperty) }
+            field("Pod") { textfield(podProperty) }
         }
     }
 
-    override fun newSource() = K8scpSource(namespaceProperty.value, podProperty.value)
+    override fun newSource() = K8scpSource(namespace, pod)
 }

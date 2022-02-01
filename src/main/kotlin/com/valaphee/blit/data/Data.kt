@@ -23,7 +23,7 @@ import com.valaphee.blit.config.Config
 import com.valaphee.blit.locale.Locale
 
 /**
- * A [Data] object is a Jackson serializable and injectable object
+ * A [Data] object is a Jackson serializable and injectable object.
  *
  * @author Kevin Ludwig
  */

@@ -2,75 +2,39 @@
   "locale": {
     "key": "de_DE",
     "entries": {
-      "name": "Deutsch (Deutschland)",
-      "main": {
-        "menu": {
-          "file": {
-            "name": "Datei",
-            "general.name": "Allgemein",
-            "sources.name": "Verbindungen",
-            "network.name": "Netzwerk",
-            "exit.name": "Beenden"
-          },
-          "help": {
-            "name": "Hilfe",
-            "about.name": "Über"
-          }
-        },
-        "navigator": {
-          "go.text": "Los",
-          "task.navigate.name": "Navigiere zu {0}"
-        },
-        "tree": {
-          "column": {
-            "name.title": "Name",
-            "size.title": "Größe",
-            "modified.title": "Änderungsdatum"
-          },
-          "menu": {
-            "open.name": "Öffnen",
-            "rename.name": "Umbenennen",
-            "delete.name": "Löschen",
-            "parent.name": "..",
-            "new_directory.name": "Neuer Ordner",
-            "new_file.name": "Neue Datei",
-            "refresh.name": "Aktualisieren"
-          },
-          "task": {
-            "populate.name": "Erweitere {0}",
-            "download.name": "Lade {0} herunter",
-            "upload.name": "Lade {0} hoch",
-            "rename.name": "Nenne {0} um zu {1}",
-            "delete.name": "Lösche {0}"
-          }
-        }
-      },
+      "certificate.ok.text": "Ok",
       "config": {
+        "apply.text": "Übernehmen",
+        "cancel.text": "Abbrechen",
         "general": {
           "appearance.text": "Aussehen",
-          "theme": {
-            "text": "Theme",
-            "javafx": "JavaFX",
-            "jmetro_light": "JMetro Hell",
-            "jmetro_dark": "JMetro Dunkel"
-          },
-          "locale.text": "Sprache",
           "data_size_unit": {
-            "text": "Datengrößeneinheit",
             "bytes": "Bytes",
             "iec": "IEC",
-            "si": "SI"
+            "si": "SI",
+            "text": "Datengrößeneinheit"
           },
+          "locale.text": "Sprache",
           "path.text": "Pfade",
           "temporary_path": {
-            "text": "Temporärer Pfad",
-            "invalid": "Ungültiger Pfad"
+            "invalid": "Ungültiger Pfad",
+            "text": "Temporärer Pfad"
+          },
+          "theme": {
+            "javafx": "JavaFX",
+            "jmetro_dark": "JMetro Dunkel",
+            "jmetro_light": "JMetro Hell",
+            "text": "Theme"
           }
         },
+        "network": {
+          "proxy.text": "Proxy"
+        },
+        "ok.text": "Ok",
         "sources": {
+          "delete.text": "Löschen",
           "new.text": "Neu",
           "save.text": "Speichern",
-          "delete.text": "Löschen",
           "type": {
             "dav": "WebDAV",
             "ftp": "FTP",
@@ -79,17 +43,52 @@
             "scp": "SCP",
             "sftp": "SFTP"
           }
-        },
-        "network": {
-          "proxy.text": "Proxy"
-        },
-        "ok.text": "Ok",
-        "cancel.text": "Abbrechen",
-        "apply.text": "Übernehmen"
+        }
       },
-      "certificate": {
-        "ok.text": "Ok"
-      }
+      "error.ok.text": "Ok",
+      "main": {
+        "menu": {
+          "file": {
+            "exit.name": "Beenden",
+            "general.name": "Allgemein",
+            "name": "Datei",
+            "network.name": "Netzwerk",
+            "sources.name": "Verbindungen"
+          },
+          "help": {
+            "about.name": "Über",
+            "name": "Hilfe"
+          }
+        },
+        "navigator": {
+          "go.text": "Los",
+          "task.navigate.name": "Navigiere zu {0}"
+        },
+        "tree": {
+          "column": {
+            "modified.title": "Änderungsdatum",
+            "name.title": "Name",
+            "size.title": "Größe"
+          },
+          "menu": {
+            "delete.name": "Löschen",
+            "new_directory.name": "Neuer Ordner",
+            "new_file.name": "Neue Datei",
+            "open.name": "Öffnen",
+            "parent.name": "..",
+            "refresh.name": "Aktualisieren",
+            "rename.name": "Umbenennen"
+          },
+          "task": {
+            "delete.name": "Lösche {0}",
+            "download.name": "Lade {0} herunter",
+            "populate.name": "Erweitere {0}",
+            "rename.name": "Nenne {0} um zu {1}",
+            "upload.name": "Lade {0} hoch"
+          }
+        }
+      },
+      "name": "Deutsch (Deutschland)"
     }
   }
 }

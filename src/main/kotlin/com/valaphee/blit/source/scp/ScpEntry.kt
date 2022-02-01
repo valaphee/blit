@@ -41,9 +41,17 @@ class ScpEntry(
     override val modifyTime get() = attributes.modifyTime.toMillis()
     override val directory get() = attributes.isDirectory
 
+    override suspend fun makeDirectory(name: String) {
+        check(directory)
+
+        source.semaphore.withPermit { source.pool.useInstance { it.session.executeRemoteCommand("""mkdir "$path/$name"""") } }
+    }
+
     override suspend fun list() = if (directory) source.semaphore.withPermit { source.pool.useInstance { it.session.executeRemoteCommand("""ls -al --full-time "$path"""").lines().mapNotNull { parseLsEntry(it)?.let { (name, attributes) -> if (name != "." && name != "..") ScpEntry(source, "${if (this.path == "/") "" else this.path}/$name", attributes) else null } } } } else emptyList()
 
     override suspend fun transferTo(stream: OutputStream) {
+        check(!directory)
+
         val coroutineContext = coroutineContext
         source.semaphore.withPermit { source.pool.useInstance { it.download(path, TransferOutputStream(stream) { coroutineContext.progress = it / size.toDouble() }) } }
     }

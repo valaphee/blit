@@ -18,24 +18,24 @@ package com.valaphee.blit.source.dav
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.valaphee.blit.CertificateView
-import com.valaphee.blit.source.NotFoundException
+import com.valaphee.blit.source.NotFoundError
 import com.valaphee.blit.source.Source
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.features.HttpTimeout
-import io.ktor.client.features.auth.Auth
-import io.ktor.client.features.auth.providers.BasicAuthCredentials
-import io.ktor.client.features.auth.providers.basic
-import io.ktor.client.features.cookies.HttpCookies
-import io.ktor.client.features.json.JacksonSerializer
-import io.ktor.client.features.json.Json
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.providers.BasicAuthCredentials
+import io.ktor.client.plugins.auth.providers.basic
+import io.ktor.client.plugins.cookies.HttpCookies
+import io.ktor.client.plugins.json.JacksonSerializer
+import io.ktor.client.plugins.json.Json
 import io.ktor.client.request.request
-import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.readBytes
 import io.ktor.client.statement.request
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.URLBuilder
+import io.ktor.http.encodedPath
 import tornadofx.runLater
 import java.security.KeyStore
 import java.security.SecureRandom
@@ -86,13 +86,13 @@ class DavSource(
 
     override suspend fun get(path: String): DavEntry {
         val path = if (path.startsWith('/')) path.substring(1) else path // Unix path correction, "." ("") and "/" are the same
-        val httpResponse = httpClient.request<HttpResponse>("$_url/$path") { method = httpMethodPropfind }
+        val httpResponse = httpClient.request("$_url/$path") { method = httpMethodPropfind }
         return when (httpResponse.status) {
             HttpStatusCode.MultiStatus -> {
                 val href = httpResponse.request.url.encodedPath
                 xmlMapper.readValue<Multistatus>(httpResponse.readBytes()).response.find { it.href.equals(href, true) }?.propstat?.find { it.status == "HTTP/1.1 200 OK" }?.prop?.let { DavEntry(this, path, it) } ?: TODO()
             }
-            HttpStatusCode.NotFound -> throw NotFoundException(path)
+            HttpStatusCode.NotFound -> throw NotFoundError(path)
             else -> TODO()
         }
     }

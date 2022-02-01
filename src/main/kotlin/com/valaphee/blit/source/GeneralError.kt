@@ -19,6 +19,22 @@ package com.valaphee.blit.source
 /**
  * @author Kevin Ludwig
  */
-class NotFoundException(
-    val path: String
-) : Exception(path)
+open class GeneralError : Exception {
+    val error: String
+
+    constructor(error: String) : super(error) {
+        this.error = error
+    }
+
+    constructor(error: String, errorMessage: String) : super(errorMessage) {
+        this.error = error
+    }
+
+    constructor(error: String, errorMessage: String, cause: Throwable) : super(errorMessage, cause) {
+        this.error = error
+    }
+
+    constructor(error: String, cause: Throwable) : super(error, cause) {
+        this.error = error
+    }
+}

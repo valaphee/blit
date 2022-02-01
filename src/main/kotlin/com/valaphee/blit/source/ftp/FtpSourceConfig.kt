@@ -63,35 +63,33 @@ class FtpSourceConfig(
     private val connectionPoolSizeProperty = SimpleIntegerProperty(connectionPoolSize)
     var connectionPoolSize: Int by connectionPoolSizeProperty
 
-    override fun newUi(eventTarget: EventTarget) {
-        with(eventTarget) {
-            fieldset("General") {
-                field("Name") { textfield(nameProperty) }
-                field("Host") {
-                    textfield(hostProperty) { hgrow = Priority.ALWAYS }
-                    label("Port")
-                    textfield {
-                        bind(portProperty, converter = IntStringConverter)
+    override fun EventTarget.newUi() {
+        fieldset("General") {
+            field("Name") { textfield(nameProperty) }
+            field("Host") {
+                textfield(hostProperty) { hgrow = Priority.ALWAYS }
+                label("Port")
+                textfield {
+                    bind(portProperty, converter = IntStringConverter)
 
-                        minWidth = 65.0
-                        maxWidth = 65.0
+                    minWidth = 65.0
+                    maxWidth = 65.0
 
-                        filterInput { it.controlNewText.isInt() }
-                    }
+                    filterInput { it.controlNewText.isInt() }
                 }
-                field("Connection Pool Size") {
-                    textfield {
-                        bind(connectionPoolSizeProperty, converter = IntStringConverter)
-
-                        filterInput { it.controlNewText.isInt() }
-                    }
-                }
-                separator()
-                field("Username") { textfield(usernameProperty) }
-                field("Password") { passwordfield(passwordProperty) }
             }
+            field("Connection Pool Size") {
+                textfield {
+                    bind(connectionPoolSizeProperty, converter = IntStringConverter)
+
+                    filterInput { it.controlNewText.isInt() }
+                }
+            }
+            separator()
+            field("Username") { textfield(usernameProperty) }
+            field("Password") { passwordfield(passwordProperty) }
         }
     }
 
-    override fun newSource() = FtpSource(hostProperty.value, portProperty.value, usernameProperty.value, passwordProperty.value, connectionPoolSizeProperty.value)
+    override fun newSource() = FtpSource(host, port, username, password, connectionPoolSize)
 }

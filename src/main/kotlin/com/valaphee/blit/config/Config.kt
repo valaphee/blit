@@ -86,7 +86,7 @@ class Config(
         @get:JsonValue val key: String,
         val format: (Long) -> String
     ) {
-        Bytes("bytes", { it.toString() }),
+        Bytes("bytes", { String.format("%,d", it) }),
         IEC("iec", {
             val sizeAbs = if (it == Long.MIN_VALUE) Long.MAX_VALUE else abs(it)
             if (sizeAbs < 1024) "$it B" else {

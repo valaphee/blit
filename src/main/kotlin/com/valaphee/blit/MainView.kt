@@ -136,14 +136,12 @@ class MainView : View("Blit"), CoroutineScope {
             }
             menu(locale["main.menu.help.name"]) { item(locale["main.menu.help.about.name"]) { action { find<AboutView>().openModal(resizable = false) } } }
         }
-
         splitpane {
             vgrow = Priority.ALWAYS
 
             @Suppress("UPPER_BOUND_VIOLATED_WARNING") add(Pane<Entry<*>>())
             @Suppress("UPPER_BOUND_VIOLATED_WARNING") add(Pane<Entry<*>>())
         }
-
         hbox {
             progressbar(activity.progress) {
                 hgrow = Priority.ALWAYS
@@ -380,8 +378,16 @@ class MainView : View("Blit"), CoroutineScope {
                             separator()
                             item(locale["main.tree.menu.refresh.name"]) { action { populate(root) } }
                         } else {
-                            item(locale["main.tree.menu.open.name"]) { action { it.list.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.path) } ?: it.list.forEach(::open) } }
-                            separator()
+                            if (it.list.size == 1 && it.list[0].value.directory) {
+                                item(locale["main.tree.menu.open.name"]) { action { it.list.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.path) } ?: it.list.forEach(::open) } }
+                                separator()
+                                item(locale["main.tree.menu.new_directory.name"]) { action {} }
+                                item(locale["main.tree.menu.new_file.name"]) { action {} }
+                                separator()
+                            } else if (it.list.none { it.value.directory }) {
+                                item(locale["main.tree.menu.open.name"]) { action { it.list.forEach(::open) } }
+                                separator()
+                            }
                             item(locale["main.tree.menu.rename.name"]) { action {} }
                             item(locale["main.tree.menu.delete.name"]) { action { it.list.forEach(::delete) } }
                         }

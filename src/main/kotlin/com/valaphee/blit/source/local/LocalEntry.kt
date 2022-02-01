@@ -17,7 +17,7 @@
 package com.valaphee.blit.source.local
 
 import com.valaphee.blit.source.AbstractEntry
-import com.valaphee.blit.source.NotFoundException
+import com.valaphee.blit.source.NotFoundError
 import com.valaphee.blit.util.transferToWithProgress
 import java.io.File
 import java.io.FileInputStream
@@ -38,20 +38,28 @@ class LocalEntry(
     override val modifyTime = file.lastModified()
     override val directory get() = file.isDirectory
 
+    override suspend fun makeDirectory(name: String) {
+        check(directory)
+
+        File(file, name).mkdir()
+    }
+
     override suspend fun list() = file.listFiles()?.map { LocalEntry(it) } ?: emptyList()
 
     override suspend fun transferTo(stream: OutputStream) {
+        check(!directory)
+
         try {
             FileInputStream(file).use { it.transferToWithProgress(stream, size) }
         } catch (ex: FileNotFoundException) {
-            throw NotFoundException("$file")
+            throw NotFoundError(path)
         }
     }
 
     override suspend fun transferFrom(name: String, stream: InputStream, length: Long) {
         check(directory)
 
-        FileOutputStream("$file/$name").use { stream.transferToWithProgress(it, size) }
+        FileOutputStream(File(file, name)).use { stream.transferToWithProgress(it, size) }
     }
 
     override suspend fun rename(path: String) {

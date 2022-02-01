@@ -16,6 +16,7 @@
 
 package com.valaphee.blit.config
 
+import com.fasterxml.jackson.annotation.JsonTypeName
 import com.valaphee.blit.locale.Locale
 import com.valaphee.blit.source.SourceConfig
 import com.valaphee.blit.source.dav.DavSourceConfig
@@ -31,6 +32,7 @@ import tornadofx.Fragment
 import tornadofx.action
 import tornadofx.bindSelected
 import tornadofx.dynamicContent
+import tornadofx.fieldset
 import tornadofx.form
 import tornadofx.hbox
 import tornadofx.hgrow
@@ -39,6 +41,7 @@ import tornadofx.listview
 import tornadofx.onChange
 import tornadofx.vbox
 import tornadofx.vgrow
+import kotlin.reflect.full.findAnnotation
 
 /**
  * Sources configuration tab
@@ -49,7 +52,7 @@ class ConfigViewSources : Fragment("Connections") {
     private val locale by di<Locale>()
     private val configModel by di<Config.Model>()
 
-    private val source = SimpleObjectProperty<SourceConfig>()
+    private val source = SimpleObjectProperty<SourceConfig?>()
 
     override val root = hbox {
         vbox {
@@ -119,7 +122,12 @@ class ConfigViewSources : Fragment("Connections") {
         form {
             hgrow = Priority.ALWAYS
 
-            dynamicContent(source) { source.value?.newUi(this) }
+            dynamicContent(source) {
+                source.value?.let {
+                    it::class.findAnnotation<JsonTypeName>()?.let { fieldset(locale["config.sources.type.${it.value}"]) }
+                    with(it) { newUi() }
+                }
+            }
         }
     }
 }

@@ -62,26 +62,24 @@ class DavSourceConfig(
     private val nextcloudUploadChunkSizeProperty = SimpleLongProperty(nextcloudUploadChunkSize)
     var nextcloudUploadChunkSize: Long by nextcloudUploadChunkSizeProperty
 
-    override fun newUi(eventTarget: EventTarget) {
-        with(eventTarget) {
-            fieldset("General") {
-                field("Name") { textfield(nameProperty) }
-                field("URL") { textfield(urlProperty) }
-                separator()
-                field("Username") { textfield(usernameProperty) }
-                field("Password") { passwordfield(passwordProperty) }
-            }
-            fieldset("Nextcloud") {
-                field("Active") { checkbox(property = nextcloudProperty) }
-                field("Upload Chunk Size") {
-                    textfield {
-                        bind(nextcloudUploadChunkSizeProperty, converter = LongStringConverter)
-                        filterInput { it.controlNewText.isLong() }
-                    }
+    override fun EventTarget.newUi() {
+        fieldset("General") {
+            field("Name") { textfield(nameProperty) }
+            field("URL") { textfield(urlProperty) }
+            separator()
+            field("Username") { textfield(usernameProperty) }
+            field("Password") { passwordfield(passwordProperty) }
+        }
+        fieldset("Nextcloud") {
+            field("Active") { checkbox(property = nextcloudProperty) }
+            field("Upload Chunk Size") {
+                textfield {
+                    bind(nextcloudUploadChunkSizeProperty, converter = LongStringConverter)
+                    filterInput { it.controlNewText.isLong() }
                 }
             }
         }
     }
 
-    override fun newSource() = DavSource(urlProperty.value, usernameProperty.value, passwordProperty.value, nextcloudProperty.value, nextcloudUploadChunkSizeProperty.value)
+    override fun newSource() = DavSource(url, username, password, nextcloud, nextcloudUploadChunkSize)
 }

@@ -16,7 +16,7 @@
 
 package com.valaphee.blit.source.k8scp
 
-import com.valaphee.blit.source.NotFoundException
+import com.valaphee.blit.source.NotFoundError
 import com.valaphee.blit.source.Source
 import com.valaphee.blit.source.scp.parseLsEntry
 import io.kubernetes.client.Copy
@@ -44,7 +44,7 @@ class K8scpSource(
         val (namespace, pod, podPath) = getNamespacePodAndPath(path)
         return if (namespace != null && pod != null) {
             val process = copy.exec(namespace, pod, arrayOf("stat", "--format", "%A 0 %U %G %s %y %n", podPath), false)
-            BufferedReader(InputStreamReader(process.inputStream)).use { parseLsEntry(it.readText())?.second }?.let { K8scpEntry(this, path, it) } ?: throw NotFoundException(path)
+            BufferedReader(InputStreamReader(process.inputStream)).use { parseLsEntry(it.readText())?.second }?.let { K8scpEntry(this, path, it) } ?: throw NotFoundError(path)
         } else K8scpEntry(this, path, K8scpEntry.namespaceOrPodAttributes)
     }
 

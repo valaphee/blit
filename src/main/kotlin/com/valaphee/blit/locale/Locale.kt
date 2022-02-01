@@ -31,7 +31,7 @@ import java.util.regex.Pattern
  * Remind that Kotlin uses automatic wildcard types for JVM for this reason use Map<String, @JvmSuppressWildcards Locale>.
  *
  * @property key the key used by jackson serialization.
- * @property entries the locale-specific entries (tree-structure)
+ * @property entries the locale-specific entries (tree-structure).
  *
  * @author Kevin Ludwig
  */

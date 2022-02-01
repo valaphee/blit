@@ -19,16 +19,18 @@ package com.valaphee.blit.source.dav
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.valaphee.blit.progress
 import com.valaphee.blit.source.AbstractEntry
-import com.valaphee.blit.source.NotFoundException
+import com.valaphee.blit.source.NotFoundError
 import com.valaphee.blit.util.transferToWithProgress
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.put
 import io.ktor.client.request.request
-import io.ktor.client.statement.HttpResponse
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsChannel
 import io.ktor.client.statement.readBytes
 import io.ktor.client.statement.request
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.URLBuilder
 import io.ktor.http.content.OutgoingContent
@@ -53,9 +55,11 @@ class DavEntry(
     override val modifyTime get() = prop.getlastmodified?.time ?: 0
     override val directory get() = prop.resourcetype?.collection != null
 
+    override suspend fun makeDirectory(name: String) = TODO()
+
     override suspend fun list(): List<DavEntry> = if (directory) {
         val path = if (path.startsWith('/')) path.substring(1) else path // Unix path correction, "." ("") and "/" are the same
-        val httpResponse = source.httpClient.request<HttpResponse>("${source._url}/$path") { method = httpMethodPropfind }
+        val httpResponse = source.httpClient.request("${source._url}/$path") { method = httpMethodPropfind }
         when (httpResponse.status) {
             HttpStatusCode.MultiStatus -> {
                 val href = httpResponse.request.url.encodedPath
@@ -64,16 +68,16 @@ class DavEntry(
                     it.propstat.find { it.status == "HTTP/1.1 200 OK" }?.prop?.let { DavEntry(source, subPath, it) }
                 }
             }
-            HttpStatusCode.NotFound -> throw NotFoundException(path)
+            HttpStatusCode.NotFound -> throw NotFoundError(path)
             else -> TODO()
         }
     } else emptyList()
 
     override suspend fun transferTo(stream: OutputStream) {
-        val httpResponse = source.httpClient.get<HttpResponse>("${source._url}/$path")
+        val httpResponse = source.httpClient.get("${source._url}/$path")
         when (httpResponse.status) {
-            HttpStatusCode.OK -> httpResponse.content.transferToWithProgress(stream, httpResponse.contentLength() ?: size)
-            HttpStatusCode.NotFound -> throw NotFoundException(path)
+            HttpStatusCode.OK -> httpResponse.bodyAsChannel().transferToWithProgress(stream, httpResponse.contentLength() ?: size)
+            HttpStatusCode.NotFound -> throw NotFoundError(path)
         }
     }
 
@@ -82,23 +86,23 @@ class DavEntry(
 
         if (source.nextcloud && length > source.nextcloudUploadChunkSize) {
             val id = "blit-${UUID.randomUUID()}"
-            source.httpClient.request<Unit>("${source.url}/uploads/${source.username}/$id") { method = httpMethodMkcol }
+            source.httpClient.request("${source.url}/uploads/${source.username}/$id") { method = httpMethodMkcol }
 
             val coroutineContext = coroutineContext
             val chunkCount = ceil(length / source.nextcloudUploadChunkSize.toDouble())
             for (i in 0..chunkCount) {
-                source.httpClient.put<Unit>("${source.url}/uploads/${source.username}/$id/${i * source.nextcloudUploadChunkSize}") { body = stream.readNBytes(source.nextcloudUploadChunkSize.toInt()) }
+                source.httpClient.put("${source.url}/uploads/${source.username}/$id/${i * source.nextcloudUploadChunkSize}") { setBody(stream.readNBytes(source.nextcloudUploadChunkSize.toInt())) }
                 coroutineContext.progress = i / chunkCount.toDouble()
             }
 
-            source.httpClient.request<Unit>("${source.url}/uploads/${source.username}/$id/.file") {
+            source.httpClient.request("${source.url}/uploads/${source.username}/$id/.file") {
                 method = httpMethodMove
-                headers { this["Destination"] = URLBuilder("${source._url}/$path/$name").buildString() }
+                headers { this[HttpHeaders.Destination] = URLBuilder("${source._url}/$path/$name").buildString() }
             }
         } else {
             val coroutineContext = coroutineContext
-            source.httpClient.put<Unit>("${source._url}/$path/$name") {
-                body = object : OutgoingContent.WriteChannelContent() {
+            source.httpClient.put("${source._url}/$path/$name") {
+                setBody(object : OutgoingContent.WriteChannelContent() {
                     override val contentLength get() = length
 
                     override suspend fun writeTo(channel: ByteWriteChannel) {
@@ -118,20 +122,20 @@ class DavEntry(
                             ByteArrayPool.recycle(buffer)
                         }
                     }
-                }
+                })
             }
         }
     }
 
     override suspend fun rename(path: String) {
-        source.httpClient.request<Unit>("${source._url}/${this.path}") {
+        source.httpClient.request("${source._url}/${this.path}") {
             method = httpMethodMove
-            headers { this["Destination"] = URLBuilder("${source._url}/$path").buildString() }
+            headers { this[HttpHeaders.Destination] = URLBuilder("${source._url}/$path").buildString() }
         }
     }
 
     override suspend fun delete() {
-        source.httpClient.delete<Unit>("${source._url}/$path")
+        source.httpClient.delete("${source._url}/$path")
     }
 
     companion object {

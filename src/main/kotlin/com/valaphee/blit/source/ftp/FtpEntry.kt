@@ -35,17 +35,15 @@ class FtpEntry(
     override val modifyTime get() = ftpFile.timestamp.timeInMillis
     override val directory get() = ftpFile.isDirectory
 
-    override suspend fun list() = if (directory) try {
-        source.semaphore.withPermit {
-            source.pool.useInstance {
-                it.listFiles(path).mapNotNull { FtpEntry(source, "${if (path == "/") "" else path}/$name", it) }
-            }
-        }
-    } catch (_: RuntimeException) {
-        emptyList()
-    } else emptyList()
+    override suspend fun makeDirectory(name: String) = TODO()
 
-    override suspend fun transferTo(stream: OutputStream) = TODO()
+    override suspend fun list() = if (directory) source.semaphore.withPermit { source.pool.useInstance { it.listFiles(path).mapNotNull { FtpEntry(source, "${if (path == "/") "" else path}/$name", it) } } } else emptyList()
+
+    override suspend fun transferTo(stream: OutputStream) {
+        check(!directory)
+
+        TODO()
+    }
 
     override suspend fun transferFrom(name: String, stream: InputStream, length: Long) {
         check(directory)
@@ -53,7 +51,7 @@ class FtpEntry(
         TODO()
     }
 
-    override suspend fun rename(name: String) = TODO()
+    override suspend fun rename(path: String) = TODO()
 
     override suspend fun delete() = TODO()
 }

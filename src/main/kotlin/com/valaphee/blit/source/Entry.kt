@@ -60,6 +60,13 @@ interface Entry<T : Entry<T>> {
     val directory: Boolean
 
     /**
+     * Creating a directory entry.
+     *
+     * @param name the name of the entry
+     */
+    suspend fun makeDirectory(name: String)
+
+    /**
      * Listing directory.
      *
      * @return the children of directory, empty when not a directory.
@@ -70,7 +77,7 @@ interface Entry<T : Entry<T>> {
      * Downloading the content of the entry.
      *
      * @param stream the stream where data is written to.
-     * @throws NotFoundException a [NotFoundException] will be thrown when the entry does not exist.
+     * @throws NotFoundError a [NotFoundError] will be thrown when the entry does not exist.
      */
     suspend fun transferTo(stream: OutputStream)
 

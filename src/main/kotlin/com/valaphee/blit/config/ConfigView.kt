@@ -22,8 +22,7 @@ import javafx.scene.control.TabPane
 import javafx.scene.layout.Priority
 import javafx.stage.Stage
 import jfxtras.styles.jmetro.JMetroStyleClass
-import tornadofx.Component
-import tornadofx.Fragment
+import tornadofx.UIComponent
 import tornadofx.View
 import tornadofx.action
 import tornadofx.button
@@ -46,8 +45,8 @@ class ConfigView : View("Configure Blit") {
     private val _config by di<Config>()
     private val configModel by di<Config.Model>()
 
-    // Classes of tabs and their specific JavaFX counterpart, used for selection
-    private var tabs = mutableMapOf<KClass<out Component>, Tab>()
+    // Classes of tabs and their specific JavaFX counterpart, used for selection.
+    private var tabs = mutableMapOf<KClass<out UIComponent>, Tab>()
 
     override val root = vbox {
         _config.theme.apply(this)
@@ -59,9 +58,9 @@ class ConfigView : View("Configure Blit") {
             vgrow = Priority.ALWAYS
             tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
 
-            this@ConfigView.tabs[ConfigViewGeneral::class] = tab(ConfigViewGeneral::class)
-            this@ConfigView.tabs[ConfigViewSources::class] = tab(ConfigViewSources::class)
-            this@ConfigView.tabs[ConfigViewNetwork::class] = tab(ConfigViewNetwork::class)
+            tab(ConfigViewGeneral::class)
+            tab(ConfigViewSources::class)
+            tab(ConfigViewNetwork::class)
         }
         buttonbar {
             button(locale["config.ok.text"]) {
@@ -88,17 +87,16 @@ class ConfigView : View("Configure Blit") {
      *
      * @param `class` Class of the tab to select
      */
-    fun <T : Fragment> select(`class`: KClass<out T>) {
+    fun <T : UIComponent> select(`class`: KClass<out T>) {
         tabs[`class`]?.select()
     }
 
     /**
      * Selects a specific tab by its class.
      *
-     * @param T Class of the tab to select
+     * @param T the class of the tab to select.
      */
-    inline fun <reified T> select() {
-        @Suppress("UNCHECKED_CAST")
-        select(T::class as KClass<Fragment>)
-    }
+    inline fun <reified T : UIComponent> select() = select(T::class)
+
+    private fun TabPane.tab(uiComponent: KClass<out UIComponent>, op: Tab.() -> Unit = {}) = tab(find(uiComponent), op).also { this@ConfigView.tabs[uiComponent] = it }
 }

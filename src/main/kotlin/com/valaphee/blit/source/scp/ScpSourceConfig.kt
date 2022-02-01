@@ -71,44 +71,42 @@ class ScpSourceConfig(
     private val connectionPoolSizeProperty = SimpleIntegerProperty(connectionPoolSize)
     var connectionPoolSize: Int by connectionPoolSizeProperty
 
-    override fun newUi(eventTarget: EventTarget) {
-        with(eventTarget) {
-            fieldset("General") {
-                field("Name") { textfield(nameProperty) }
-                field("Host") {
-                    textfield(hostProperty) { hgrow = Priority.ALWAYS }
-                    label("Port")
-                    textfield {
-                        bind(portProperty, converter = IntStringConverter)
+    override fun EventTarget.newUi() {
+        fieldset("General") {
+            field("Name") { textfield(nameProperty) }
+            field("Host") {
+                textfield(hostProperty) { hgrow = Priority.ALWAYS }
+                label("Port")
+                textfield {
+                    bind(portProperty, converter = IntStringConverter)
 
-                        minWidth = 65.0
-                        maxWidth = 65.0
+                    minWidth = 65.0
+                    maxWidth = 65.0
 
-                        filterInput { it.controlNewText.isInt() }
-                    }
+                    filterInput { it.controlNewText.isInt() }
                 }
-                field("Connection Pool Size") {
-                    textfield {
-                        bind(connectionPoolSizeProperty, converter = IntStringConverter)
+            }
+            field("Connection Pool Size") {
+                textfield {
+                    bind(connectionPoolSizeProperty, converter = IntStringConverter)
 
-                        filterInput { it.controlNewText.isInt() }
-                    }
+                    filterInput { it.controlNewText.isInt() }
                 }
-                separator()
-                field("Username") { textfield(usernameProperty) }
-                field("Password") { passwordfield(passwordProperty) }
-                field("Private Key") {
-                    textfield(privateKeyProperty)
-                    button("...") {
-                        action {
-                            val parentPath = if (privateKey.isEmpty()) null else File(privateKey).parentFile
-                            chooseFile("Select Private Key", emptyArray(), if (parentPath?.isDirectory == true) parentPath else null).firstOrNull()?.let { privateKey = it.absolutePath }
-                        }
+            }
+            separator()
+            field("Username") { textfield(usernameProperty) }
+            field("Password") { passwordfield(passwordProperty) }
+            field("Private Key") {
+                textfield(privateKeyProperty)
+                button("...") {
+                    action {
+                        val parentPath = if (privateKey.isEmpty()) null else File(privateKey).parentFile
+                        chooseFile("Select Private Key", emptyArray(), if (parentPath?.isDirectory == true) parentPath else null).firstOrNull()?.let { privateKey = it.absolutePath }
                     }
                 }
             }
         }
     }
 
-    override fun newSource() = ScpSource(hostProperty.value, portProperty.value, usernameProperty.value, passwordProperty.value, privateKeyProperty.value, connectionPoolSizeProperty.value)
+    override fun newSource() = ScpSource(host, port, username, password, privateKey, connectionPoolSize)
 }

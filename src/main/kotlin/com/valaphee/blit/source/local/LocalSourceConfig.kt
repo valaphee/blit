@@ -30,8 +30,8 @@ import tornadofx.textfield
 class LocalSourceConfig(
     name: String
 ) : SourceConfig(name) {
-    override fun newUi(eventTarget: EventTarget) {
-        with(eventTarget) { fieldset("General") { field("Name") { textfield(nameProperty) } } }
+    override fun EventTarget.newUi() {
+        fieldset("General") { field("Name") { textfield(nameProperty) } }
     }
 
     override fun newSource() = LocalSource()

@@ -14,22 +14,11 @@
  * limitations under the License.
  */
 
-package com.valaphee.blit.source.local
-
-import com.valaphee.blit.source.NotFoundError
-import com.valaphee.blit.source.Source
-import java.io.File
+package com.valaphee.blit.source
 
 /**
  * @author Kevin Ludwig
  */
-class LocalSource : Source<LocalEntry> {
-    override val home: String get() = File(System.getProperty("user.home")).absolutePath
-
-    override suspend fun get(path: String): LocalEntry {
-        val file = File(path)
-        return if (file.exists()) LocalEntry(file) else throw NotFoundError(path)
-    }
-
-    override fun close() = Unit
-}
+class NotFoundError(
+    val path: String
+) : GeneralError("Not found.", "\"$path\" not found.")

@@ -17,7 +17,7 @@
 package com.valaphee.blit
 
 import com.google.inject.Singleton
-import com.valaphee.blit.source.NotFoundException
+import com.valaphee.blit.source.GeneralError
 import javafx.beans.property.DoubleProperty
 import javafx.beans.property.SimpleDoubleProperty
 import kotlinx.coroutines.CoroutineScope
@@ -56,10 +56,8 @@ class Activity {
         withContext(task) {
             try {
                 block()
-            } catch (ex: NotFoundException) {
-                launch(Dispatchers.Main) { ErrorView("Not found", "${ex.path} not found").openModal(resizable = false) }
-            } catch (ex: Throwable) {
-                ex.printStackTrace()
+            } catch (error: GeneralError) {
+                launch(Dispatchers.Main) { ErrorView(error.error, error.message!!).openModal(resizable = false) }
             }
         }
 
