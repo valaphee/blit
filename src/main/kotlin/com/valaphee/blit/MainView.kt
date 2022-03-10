@@ -249,7 +249,7 @@ class MainView : View("Blit"), CoroutineScope {
                 vgrow = Priority.ALWAYS
                 isShowRoot = false
                 selectionModel.selectionMode = SelectionMode.MULTIPLE
-                /*isEditable = true*/
+                isEditable = true
                 placeholder = Label("")
 
                 column(locale["main.tree.column.name.title"], Entry<T>::self) {
@@ -291,11 +291,16 @@ class MainView : View("Blit"), CoroutineScope {
                             override fun cancelEdit() {
                                 super.cancelEdit()
 
-                                val name = item.name
-                                text = name
-                                graphic = if (item.directory) ImageView((iconManifest.folderIcons.firstOrNull { it.folderNames.contains(name) } ?: iconManifest.defaultFolderIcon).image) else run {
-                                    val extension = name.substringAfterLast('.', "")
-                                    ImageView((iconManifest.fileIcons.firstOrNull { it.fileExtensions.contains(extension) || it.fileNames.contains(name) } ?: iconManifest.defaultFileIcon).image)
+                                if (item == null || isEmpty) {
+                                    text = null
+                                    graphic = null
+                                } else {
+                                    val name = item.name
+                                    text = name
+                                    graphic = if (item.directory) ImageView((iconManifest.folderIcons.firstOrNull { it.folderNames.contains(name) } ?: iconManifest.defaultFolderIcon).image) else run {
+                                        val extension = name.substringAfterLast('.', "")
+                                        ImageView((iconManifest.fileIcons.firstOrNull { it.fileExtensions.contains(extension) || it.fileNames.contains(name) } ?: iconManifest.defaultFileIcon).image)
+                                    }
                                 }
                             }
                         }

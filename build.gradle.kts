@@ -38,7 +38,6 @@ repositories {
 
 dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.1")
-    implementation("com.fasterxml.jackson.module:jackson-module-afterburner:2.13.1")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
     implementation("com.google.inject:guice:5.1.0")
     implementation("com.nativelibs4java:bridj:0.7.0")
@@ -46,11 +45,11 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.3")
     implementation("commons-net:commons-net:3.8.0")
     implementation("de.codecentric.centerdevice:javafxsvg:1.3.0")
-    implementation("io.github.classgraph:classgraph:4.8.138")
+    implementation("io.github.classgraph:classgraph:4.8.140")
     implementation("io.ktor:ktor-client-auth:2.0.0-eap-256")
     implementation("io.ktor:ktor-client-jackson:2.0.0-eap-256")
     implementation("io.ktor:ktor-client-okhttp:2.0.0-eap-256")
-    implementation("io.kubernetes:client-java:14.0.0")
+    implementation("io.kubernetes:client-java:14.0.1")
     implementation("no.tornado:tornadofx:1.7.20")
     implementation("org.apache.sshd:sshd-netty:2.8.0")
     implementation("org.apache.sshd:sshd-scp:2.8.0")
@@ -92,7 +91,7 @@ javafx { modules("javafx.controls", "javafx.graphics") }
 launch4j {
     jarTask = tasks.shadowJar.get()
     icon = "${projectDir}/app.ico"
-    copyright = "Copyright (c) 2021, Valaphee"
+    copyright = "Copyright (c) 2021-2022, Valaphee"
     jvmOptions = setOf("--add-opens=java.base/java.nio=ALL-UNNAMED", "--add-opens java.base/jdk.internal.misc=ALL-UNNAMED", "-Dio.netty.tryReflectionSetAccessible=true")
     companyName = "Valaphee"
     fileDescription = "Blit is a free and open-source, cross-platform WebDAV, K8s CP and SFTP client with a vast list of features."

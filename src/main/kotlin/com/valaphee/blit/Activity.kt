@@ -38,8 +38,6 @@ import kotlin.coroutines.CoroutineContext
  */
 @Singleton
 class Activity {
-    private val semaphore = Semaphore(8)
-
     val tasks = mutableListOf<Task>().toObservable()
     val progress: DoubleProperty = SimpleDoubleProperty(0.0)
     private var update = false

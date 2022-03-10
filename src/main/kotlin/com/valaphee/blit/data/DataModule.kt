@@ -49,7 +49,7 @@ class DataModule(
                     when (it.file.substring(it.file.lastIndexOf('.') + 1)) {
                         "json" -> try {
                             objectMapper.readValue<Data>(it)
-                        } catch (_: Throwable) {
+                        } catch (_: Exception) {
                             null
                         }
                         else -> null
