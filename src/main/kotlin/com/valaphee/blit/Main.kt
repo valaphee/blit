@@ -42,7 +42,7 @@ fun main(arguments: Array<String>) {
     SvgImageLoaderFactory.install()
 
     FX.dicontainer = object : DIContainer {
-        private val injector = Guice.createInjector(DataModule(File(System.getProperty("user.home"), ".valaphee")), object : AbstractModule() {
+        private val injector = Guice.createInjector(DataModule(File(System.getProperty("user.home"), ".valaphee/blit")), object : AbstractModule() {
             @Singleton
             @Provides
             fun locale(config: Config, locales: Map<String, @JvmSuppressWildcards Locale>) = locales[config.locale] ?: locales["en_US"]

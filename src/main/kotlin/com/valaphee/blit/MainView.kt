@@ -147,7 +147,14 @@ class MainView : View("Blit"), CoroutineScope {
                 hgrow = Priority.ALWAYS
                 useMaxSize = true
             }
-            button("...") { action { find<ActivityView>().openWindow() } }
+            button("...") {
+                action {
+                    find<ActivityView>().apply {
+                        openWindow()
+                        modalStage?.toFront()
+                    }
+                }
+            }
         }
     }
 
@@ -344,25 +351,25 @@ class MainView : View("Blit"), CoroutineScope {
                                 if (it.dragboard.hasContent(dragEntriesFormat)) {
                                     dragEntries.remove(it.dragboard.getContent(dragEntriesFormat))?.let { dragEntries ->
                                         val target = treeItem?.value ?: runBlocking { source.get(source.home) }
-                                        val tasks = mutableListOf<Pair<String, suspend () -> Unit>>()
+                                        if (!target.directory) TODO()
 
-                                        fun flatten(entry: Entry<*>, path: String? = null) {
-                                            if (entry.directory) launch { activity.run(locale["main.tree.task.populate.name", entry]) { entry.list().forEach { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") } } } else {
+                                        fun transfer(entry: Entry<*>, path: String? = null) {
+                                            if (entry.directory) launch { activity.run(locale["main.tree.task.populate.name", entry]) { entry.list().forEach { transfer(it, "${path?.let { "$path/" } ?: ""}${entry.name}") } } } else {
                                                 val outStream = PipedOutputStream()
                                                 val inStream = PipedInputStream(outStream)
-                                                tasks += locale["main.tree.task.download.name", entry] to suspend {
-                                                    outStream.use {
-                                                        entry.transferTo(outStream)
-                                                        outStream.flush()
+                                                launch {
+                                                    activity.run(locale["main.tree.task.download.name", entry]) {
+                                                        outStream.use {
+                                                            entry.transferTo(outStream)
+                                                            outStream.flush()
+                                                        }
                                                     }
                                                 }
-                                                tasks += locale["main.tree.task.upload.name", entry.name] to suspend { inStream.use { target.transferFrom("${path?.let { "$path/" } ?: ""}${entry.name}", inStream, entry.size) } }
+                                                launch { activity.run(locale["main.tree.task.upload.name", entry.name]) { inStream.use { target.transferFrom("${path?.let { "$path/" } ?: ""}${entry.name}", inStream, entry.size) } } }
                                             }
                                         }
 
-                                        dragEntries.forEach(::flatten)
-
-                                        activity.runConsumeSupply(this@MainView, tasks, /*min(source.concurrency, 32)*/8)
+                                        dragEntries.forEach(::transfer)
 
                                         it.isDropCompleted = true
                                     }
@@ -400,7 +407,6 @@ class MainView : View("Blit"), CoroutineScope {
                 }
 
                 setOnKeyPressed {
-                    @Suppress("NON_EXHAUSTIVE_WHEN_STATEMENT")
                     when (it.code) {
                         KeyCode.ENTER -> {
                             selectionModel.selectedItems.firstOrNull { it.value.directory }?.value?.let { navigateRelative(it.path) } ?: selectionModel.selectedItems.forEach(::open)
@@ -414,12 +420,12 @@ class MainView : View("Blit"), CoroutineScope {
                             Clipboard.getSystemClipboard().setContent {
                                 launch(Dispatchers.Main) {
                                     activity.run(locale["main.tree.task.download.name"]) {
-                                        suspend fun flatten(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
+                                        suspend fun download(entry: Entry<T>, path: String? = null): List<File> = if (entry.directory) {
                                             File(_config.temporaryPath, entry.name).mkdir()
-                                            entry.list().flatMap { flatten(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
+                                            entry.list().flatMap { download(it, "${path?.let { "$path/" } ?: ""}${entry.name}") }
                                         } else listOf(File(_config.temporaryPath, "${path?.let { "$path/" } ?: ""}${entry.name}").apply { FileOutputStream(this).use { entry.transferTo(it) } })
 
-                                        putFiles(selectionModel.selectedItems.flatMap { flatten(it.value) })
+                                        putFiles(selectionModel.selectedItems.flatMap { download(it.value) })
                                     }
                                 }
                             }
@@ -448,6 +454,7 @@ class MainView : View("Blit"), CoroutineScope {
                             populate(root)
                             it.consume()
                         }
+                        else -> Unit
                     }
                 }
                 setOnMousePressed {

@@ -26,8 +26,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import tornadofx.toObservable
 import kotlin.coroutines.AbstractCoroutineContextElement
@@ -49,24 +47,15 @@ class Activity {
             launch(Dispatchers.Main) { tasks += task }
 
             run()
-        }
 
-        withContext(task) {
             try {
-                block()
+                withContext(task) { block() }
             } catch (error: GeneralError) {
                 launch(Dispatchers.Main) { ErrorView(error.error, error.message!!).openModal(resizable = false) }
+            } finally {
+                launch(Dispatchers.Main) { tasks -= task }
             }
         }
-
-        coroutineScope { launch(Dispatchers.Main) { tasks -= task } }
-    }
-
-    fun runConsumeSupply(coroutineScope: CoroutineScope, tasks: List<Pair<String, suspend () -> Unit>>, concurrency: Int) {
-        check(tasks.size % 2 == 0)
-
-        val semaphore = Semaphore(concurrency * 2)
-        tasks.forEach { coroutineScope.launch { semaphore.withPermit { run(it.first, it.second) } } }
     }
 
     private fun run() {

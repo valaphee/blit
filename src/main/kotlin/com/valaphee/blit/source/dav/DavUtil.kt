@@ -18,16 +18,10 @@ package com.valaphee.blit.source.dav
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
-import com.fasterxml.jackson.module.afterburner.AfterburnerModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.ktor.http.HttpMethod
 
 internal val httpMethodPropfind = HttpMethod("PROPFIND")
 internal val httpMethodMkcol = HttpMethod("MKCOL")
 internal val httpMethodMove = HttpMethod("MOVE")
-internal val xmlMapper = XmlMapper().apply {
-    registerModule(AfterburnerModule())
-    registerKotlinModule()
-
-    disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-}
+internal val xmlMapper = XmlMapper().registerKotlinModule().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)

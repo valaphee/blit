@@ -17,7 +17,6 @@
 package com.valaphee.blit.data
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.afterburner.AfterburnerModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.inject.AbstractModule
@@ -41,7 +40,7 @@ class DataModule(
     @Inject lateinit var objectMapper: ObjectMapper
 
     override fun configure() {
-        if (!::objectMapper.isInitialized) objectMapper = jacksonObjectMapper().apply { registerModule(AfterburnerModule()) }.also { bind(ObjectMapper::class.java).toInstance(it) }
+        if (!::objectMapper.isInitialized) objectMapper = jacksonObjectMapper().also { bind(ObjectMapper::class.java).toInstance(it) }
 
         ClassGraph().acceptPaths("data").scan().use {
             val (keyedData, data) = (it.allResources.map { it.url } + path.walk().filter { it.isFile }.map { it.toURI().toURL() })
